@@ -51,7 +51,7 @@ public class SignUpController {
 		}
 	}
 	
-	@PostMapping("/testing")
+	@PostMapping("/test")
 	public String testFunction() {
 		return "test";
 	}
