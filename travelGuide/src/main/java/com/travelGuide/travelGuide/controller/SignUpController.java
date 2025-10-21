@@ -49,6 +49,10 @@ public class SignUpController {
 			e.printStackTrace();
 			return response;
 		}
-
+	}
+	
+	@PostMapping("/test")
+	public String testFunction() {
+		return "test";
 	}
 }
