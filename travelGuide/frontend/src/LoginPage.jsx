@@ -31,7 +31,7 @@ const LoginPage = () => {
 
       if (data.errorCode === "100") {
         // Successful login → redirect to Dashboard with username
-        navigate("/dashboard", { state: { username: data.userName } });
+        navigate("/homepage", { state: { username: data.userName } });
       } else if (data.errorCode === "106") {
         // Error → show popup
         Swal.fire({
