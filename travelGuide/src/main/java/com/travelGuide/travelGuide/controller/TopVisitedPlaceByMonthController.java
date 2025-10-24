@@ -1,7 +1,11 @@
 package com.travelGuide.travelGuide.controller;
 
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import org.aspectj.util.LangUtil.StringChecker;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +45,14 @@ public class TopVisitedPlaceByMonthController {
 	}
 	
 	@PostMapping("/getTopPlacesByMonth")
-	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth(@RequestParam String month) {
+	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth() {
 		TopVisitedPlacesByMonthRespBody response = null;
 		List<TopVisitedPlacesByMonthRespBody> responseList = new ArrayList<>();
 		try {
+			
+			LocalDate today = LocalDate.now();
+			String month = today.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH).toLowerCase();
+			
 			if(month!=null) {
 				responseList = topVisiitedPlacesByMonthService.getTopVisitedPlaceByMonth(month);
 			}else {
