@@ -19,3 +19,10 @@ createRoot(document.getElementById("root")).render(
     <App />
   </StrictMode>
 );
+
+//OAuth implementation
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <GoogleOAuthProvider clientId="189568540017-edlbo7rlh95m7ne2q4ls7u3tg3ea41hd.apps.googleusercontent.com">
+    <App />
+  </GoogleOAuthProvider>
+);

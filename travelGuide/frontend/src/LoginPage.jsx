@@ -3,6 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import Swal from "sweetalert2";
 import { FiPhone, FiLock } from "react-icons/fi";
 import "./Auth.css";
+import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
+
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -16,7 +18,7 @@ const LoginPage = () => {
   useEffect(() => {
     window.addEventListener("beforeinstallprompt", (e) => {
       e.preventDefault();
-      setDeferredPrompt(e); // store the event
+      setDeferredPrompt(e);
       console.log("📲 PWA install prompt captured");
     });
   }, []);
@@ -24,15 +26,14 @@ const LoginPage = () => {
   // ✅ Show custom PWA install popup
   const showInstallPrompt = async () => {
     if (!deferredPrompt) {
-  Swal.fire({
-    icon: "info",
-    title: "Install Unavailable",
-    text: "Please refresh the page or try in a supported browser (like Chrome).",
-    confirmButtonColor: "#2563eb",
-  });
-  return;
-}
-
+      Swal.fire({
+        icon: "info",
+        title: "Install Unavailable",
+        text: "Please refresh the page or try in a supported browser (like Chrome).",
+        confirmButtonColor: "#2563eb",
+      });
+      return;
+    }
 
     const result = await Swal.fire({
       title: "Install TripPulse?",
@@ -62,7 +63,7 @@ const LoginPage = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // ✅ Handle login submit
+  // ✅ Handle login submit (normal msisdn/password)
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -77,7 +78,6 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (data.errorCode === "100") {
-        // ✅ Login success
         if (data.token) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("username", data.userName);
@@ -91,7 +91,6 @@ const LoginPage = () => {
         });
         navigate("/homepage", { state: { username: data.userName } });
       } else if (data.errorCode === "106") {
-        // ❌ Wrong credentials
         Swal.fire({
           icon: "error",
           title: "Invalid Credentials",
@@ -99,7 +98,6 @@ const LoginPage = () => {
           confirmButtonColor: "#d33",
         });
       } else {
-        // ⚠️ Other issues
         Swal.fire({
           icon: "warning",
           title: "Login Issue",
@@ -117,83 +115,128 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+  try {
+    const googleToken = credentialResponse.credential; // ID token
+    const res = await fetch("http://localhost:8080/api/auth/google", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential: googleToken }),
+    });
+    const data = await res.json();
+
+    if (data.errorCode === "100") {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("username", data.userName);
+
+      Swal.fire({
+        icon: "success",
+        title: `Welcome ${data.userName || "traveler"}!`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
+      navigate("/homepage", { state: { username: data.userName } });
+    } else {
+      Swal.fire({ icon: "error", title: "Google Sign-In Failed" });
+    }
+  } catch (err) {
+    console.error(err);
+    Swal.fire({ icon: "error", title: "Sign-In Error" });
+  }
+};
+
+
+  // 🔹 Added function: handle Google login error
+  const handleGoogleFailure = () => {
+    Swal.fire({
+      icon: "error",
+      title: "Google Sign-In Failed",
+      text: "Please try again later.",
+    });
+  };
+
   return (
-    <div className="auth-wrapper">
-      <div className="auth-card">
-        <div className="auth-logo">
-          <img src="src/assets/logo.png" alt="TripPulse Logo" />
-        </div>
-        <h2 className="auth-heading">Welcome to TripPulse</h2>
-        <p className="auth-subtext">Sign in to explore live travel insights</p>
+    // 🔹 Wrap your component with GoogleOAuthProvider (clientId from Google Cloud)
+    <GoogleOAuthProvider clientId="189568540017-edlbo7rlh95m7ne2q4ls7u3tg3ea41hd.apps.googleusercontent.com">
+      <div className="auth-wrapper">
+        <div className="auth-card">
+          <div className="auth-logo">
+            <img src="src/assets/logo.png" alt="TripPulse Logo" />
+          </div>
+          <h2 className="auth-heading">Welcome to TripPulse</h2>
+          <p className="auth-subtext">Sign in to explore live travel insights</p>
 
-        <form className="auth-form" onSubmit={handleSubmit}>
-          <div className="input-group">
-            <FiPhone className="input-icon" />
-            <input
-              type="tel"
-              name="msisdn"
-              placeholder="Enter phone number"
-              value={formData.msisdn}
-              onChange={handleChange}
-              pattern="\d{10}"
-              title="Enter a valid 10-digit phone number"
-              required
-            />
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <div className="input-group">
+              <FiPhone className="input-icon" />
+              <input
+                type="tel"
+                name="msisdn"
+                placeholder="Enter phone number"
+                value={formData.msisdn}
+                onChange={handleChange}
+                pattern="\d{10}"
+                title="Enter a valid 10-digit phone number"
+                required
+              />
+            </div>
+
+            <div className="input-group">
+              <FiLock className="input-icon" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button type="submit" className="sign-in-btn">
+              Sign In
+            </button>
+          </form>
+
+          <div className="divider">
+            <span>or continue with</span>
           </div>
 
-          <div className="input-group">
-            <FiLock className="input-icon" />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              required
+          {/* 🔹 Added Google Login Button */}
+          <div className="social-login">
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleFailure}
+              shape="rectangular"
+              theme="outline"
+              text="signin_with"
+              width="240"
             />
+
+            <button className="social-btn">
+              <img
+                src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
+                alt="Apple"
+              />
+              Apple
+            </button>
           </div>
 
-          <button type="submit" className="sign-in-btn">
-            Sign In
-          </button>
-        </form>
+          <p className="auth-footer">
+            Don’t have an account?{" "}
+            <Link to="/signup" className="auth-link">
+              Sign Up
+            </Link>
+          </p>
 
-        <div className="divider">
-          <span>or continue with</span>
+          <button className="install-btn" onClick={showInstallPrompt}>
+            📲 Install TripPulse
+          </button>
+
+          <p className="guest-text">Continue as Guest</p>
         </div>
-
-        <div className="social-login">
-          <button className="social-btn">
-            <img
-              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-              alt="Google"
-            />
-            Google
-          </button>
-          <button className="social-btn">
-            <img
-              src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apple/apple-original.svg"
-              alt="Apple"
-            />
-            Apple
-          </button>
-        </div>
-
-        <p className="auth-footer">
-          Don’t have an account?{" "}
-          <Link to="/signup" className="auth-link">
-            Sign Up
-          </Link>
-        </p>
-
-        {/* 🧭 Install as PWA Button */}
-        <button className="install-btn" onClick={showInstallPrompt}>
-          📲 Install TripPulse
-        </button>
-
-        <p className="guest-text">Continue as Guest</p>
       </div>
-    </div>
+    </GoogleOAuthProvider>
   );
 };
 
