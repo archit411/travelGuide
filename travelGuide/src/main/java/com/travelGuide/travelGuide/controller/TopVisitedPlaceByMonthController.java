@@ -1,24 +1,21 @@
 package com.travelGuide.travelGuide.controller;
 
 import java.time.LocalDate;
-import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import org.aspectj.util.LangUtil.StringChecker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.travelGuide.travelGuide.Pojo.TopVisitedPlacesByMonthReqBody;
 import com.travelGuide.travelGuide.Pojo.TopVisitedPlacesByMonthRespBody;
-import com.travelGuide.travelGuide.model.TopVisitedByMonth;
 import com.travelGuide.travelGuide.service.TopVisiitedPlacesByMonthService;
 
 @RequestMapping("/api")
@@ -57,6 +54,26 @@ public class TopVisitedPlaceByMonthController {
 			
 			if(month!=null) {
 				responseList = topVisiitedPlacesByMonthService.getTopVisitedPlaceByMonth(month);
+			}else {
+				responseList.add(response);
+				return responseList;
+			}
+			return responseList;
+		}catch(Exception e) {
+			e.printStackTrace();
+			responseList.add(response);
+			return responseList;
+		}		
+	}
+	
+	@PostMapping("/getTopPlacesByMonth/{month}")
+	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth(@PathVariable String month) {
+		TopVisitedPlacesByMonthRespBody response = null;
+		List<TopVisitedPlacesByMonthRespBody> responseList = new ArrayList<>();
+		try {
+			
+			if(month!=null) {
+				responseList = topVisiitedPlacesByMonthService.getTopVisitedPlaceByMonth(month.toLowerCase());
 			}else {
 				responseList.add(response);
 				return responseList;

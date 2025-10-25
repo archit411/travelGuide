@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import com.travelGuide.travelGuide.Pojo.SignUpRequestBody;
 import com.travelGuide.travelGuide.Pojo.SignUpResponseBody;
 import com.travelGuide.travelGuide.constants.Constants;
+import com.travelGuide.travelGuide.jwt.JwtUtil;
 import com.travelGuide.travelGuide.model.SignUpModel;
 import com.travelGuide.travelGuide.repositories.TravelGuideSignUpRepository;
 
@@ -18,6 +19,9 @@ public class TravelGuideServiceImpl implements TravelGuideService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	public SignUpResponseBody getUserName(SignUpRequestBody request) {
 
@@ -159,6 +163,9 @@ public class TravelGuideServiceImpl implements TravelGuideService {
 						response.setErrorCode(Constants.ERROR_CODES.REST_SUCCESS_CODE);
 						response.setErrorMsg(Constants.ERROR_MESSAGE.REST_SUCCESS_MSG);
 						response.setUserName(modelObject.getUsername());
+						
+						String token = jwtUtil.generateToken(modelObject.getUsername());
+						response.setToken(token);
 					} else {
 						response = new SignUpResponseBody();
 						response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);

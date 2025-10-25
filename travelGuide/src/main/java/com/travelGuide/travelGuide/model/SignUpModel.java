@@ -1,25 +1,40 @@
 package com.travelGuide.travelGuide.model;
 
-import org.hibernate.annotations.ValueGenerationType;
-import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy;
 
-import jakarta.annotation.Generated;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name="sign_up_model")
 public class SignUpModel {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+	@SequenceGenerator(name = "signup_seq",sequenceName = "sign_up_model_id_seq",allocationSize = 1)
+	@GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "signup_seq")
+	@Column(name="id" , updatable = false , nullable = false)
 	private int id;
+	
+	@Column(name="f_name")
 	private String fName;
+	
+	@Column(name="l_name")
 	private String lName;
+	
+	@Column(name="msisdn")
 	private String msisdn;
+	
+	@Column(name="password")
 	private String password;
+	
+	@Column(name="email_id")
 	private String emailId;
+	
+	@Column(name="username")
 	private String username;
 
 	public String getUsername() {
