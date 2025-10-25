@@ -67,9 +67,13 @@ export default function TripPulse() {
 
     const fetchData = async () => {
       try {
+        const token = localStorage.getItem("token");
         const response = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}` //attach jwt token 
+          },
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();

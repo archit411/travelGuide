@@ -29,6 +29,12 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (data.errorCode === "100") {
+
+        //store jwt token and username
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          localStorage.setItem("username", data.userName);  
+        }
         navigate("/homepage", { state: { username: data.userName } });
       } else if (data.errorCode === "106") {
         Swal.fire({
