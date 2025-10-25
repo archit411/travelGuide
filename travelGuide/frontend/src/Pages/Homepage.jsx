@@ -12,21 +12,45 @@ import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 
 function RegionCard({ region }) {
-  if (!region) return null; // ✅ prevents undefined errors
+  if (!region) return null;
 
-  const { region: name, weather, ...places } = region;
+  const { region: name, weather, imageUrl, ...places } = region;
+
+  // 🖼️ fallback image by region name
+  const fallbackImages = {
+    goa: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
+    manali: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200",
+    shimla: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?q=80&w=1200",
+    jaipur: "https://images.unsplash.com/photo-1616064399191-70fc29388c32?q=80&w=1200",
+  };
+
+  const bg =
+    imageUrl ||
+    fallbackImages[name?.toLowerCase()] ||
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
 
   return (
     <div className="region-card">
-      <h3 className="region-title">{name || "Unknown Region"}</h3>
-      <p className="region-weather">🌤 {weather || "Weather not available"}</p>
+      {/* Top Image Section */}
+      <div
+        className="region-img"
+        style={{
+          backgroundImage: `url(${bg})`,
+        }}
+      >
+        <div className="region-overlay">
+          <h3>{name || "Unknown Region"}</h3>
+          <p>🌤 {weather || "Weather not available"}</p>
+        </div>
+      </div>
 
+      {/* Places */}
       <div className="place-list">
         {Object.keys(places)
           .filter((key) => key.startsWith("place") && !key.includes("Description"))
           .map((placeKey, index) => (
-            <div key={index} className="place-item">
-              <h4>{places[placeKey] || "Untitled Place"}</h4>
+            <div key={index} className="place-card">
+              <h4>📍 {places[placeKey] || "Untitled Place"}</h4>
               <p>{places[placeKey + "Description"] || "No description provided."}</p>
             </div>
           ))}
@@ -72,7 +96,7 @@ export default function TripPulse() {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` //attach jwt token 
+            "Authorization": `Bearer ${token}` 
           },
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -88,7 +112,7 @@ export default function TripPulse() {
             clearInterval(interval);
             setLoading(false);
           }
-        }, 400); // show new card every 400ms for smooth loading
+        }, 400); 
       } catch (err) {
         console.error("Error fetching places:", err);
         setTopPlaces([]);
@@ -135,7 +159,7 @@ export default function TripPulse() {
   {loading
     ? Array.from({ length: 3 }).map((_, i) => <RegionSkeleton key={i} />)
     : topPlaces
-        .filter((r) => r && typeof r === "object") // ✅ only valid data
+        .filter((r) => r && typeof r === "object") 
         .map((region, i) => <RegionCard key={i} region={region} />)}
 </div>
 
