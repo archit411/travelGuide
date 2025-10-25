@@ -5,8 +5,6 @@ import {
   FiHome,
   FiBookmark,
   FiUser,
-  FiHeart,
-  FiChevronRight,
 } from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
 import "./home.css";
@@ -31,12 +29,10 @@ function RegionCard({ region }) {
 
   return (
     <div className="region-card">
-      {/* Top Image Section */}
+      {/* 🏞️ Top Image */}
       <div
         className="region-img"
-        style={{
-          backgroundImage: `url(${bg})`,
-        }}
+        style={{ backgroundImage: `url(${bg})` }}
       >
         <div className="region-overlay">
           <h3>{name || "Unknown Region"}</h3>
@@ -44,14 +40,17 @@ function RegionCard({ region }) {
         </div>
       </div>
 
-      {/* Places */}
+      {/* 📍 Places */}
       <div className="place-list">
         {Object.keys(places)
           .filter((key) => key.startsWith("place") && !key.includes("Description"))
           .map((placeKey, index) => (
             <div key={index} className="place-card">
               <h4>📍 {places[placeKey] || "Untitled Place"}</h4>
-              <p>{places[placeKey + "Description"] || "No description provided."}</p>
+              <p>
+                {places[placeKey + "Description"] ||
+                  "No description provided."}
+              </p>
             </div>
           ))}
       </div>
@@ -59,8 +58,7 @@ function RegionCard({ region }) {
   );
 }
 
-
-
+// 💀 Skeleton Placeholder
 function RegionSkeleton() {
   return (
     <div className="region-card skeleton-card">
@@ -75,7 +73,6 @@ function RegionSkeleton() {
 export default function TripPulse() {
   const [active, setActive] = useState("home");
   const [topPlaces, setTopPlaces] = useState([]);
-  const [loadedCount, setLoadedCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState("");
 
@@ -85,37 +82,48 @@ export default function TripPulse() {
     setMonth(localMonth);
   }, []);
 
-  // 🌐 Fetch all regions
+  // 🌐 Fetch ALL regions cleanly
   useEffect(() => {
     if (!month) return;
 
     const fetchData = async () => {
+      setLoading(true);
+      setTopPlaces([]);
+
       try {
         const token = localStorage.getItem("token");
+
         const response = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}` 
+            "Authorization": `Bearer ${token}`,
           },
         });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+        if (response.status === 401) {
+          console.error("❌ Unauthorized - check your JWT token or backend CORS.");
+          setTopPlaces([]);
+          setLoading(false);
+          return;
+        }
+
+        if (!response.ok)
+          throw new Error(`HTTP error! status: ${response.status}`);
+
         const data = await response.json();
 
-        // Display cards one by one (progressive loading)
-        let i = 0;
-        const interval = setInterval(() => {
-          if (i < data.length) {
-            setTopPlaces((prev) => [...prev, data[i]]);
-            i++;
-          } else {
-            clearInterval(interval);
-            setLoading(false);
-          }
-        }, 400); 
+        if (Array.isArray(data)) {
+          console.log(`✅ Loaded ${data.length} regions`);
+          setTopPlaces(data);
+        } else {
+          console.warn("⚠️ Unexpected API format:", data);
+          setTopPlaces([]);
+        }
       } catch (err) {
         console.error("Error fetching places:", err);
         setTopPlaces([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -125,7 +133,7 @@ export default function TripPulse() {
 
   return (
     <div className="tp">
-      {/* Header */}
+      {/* 🔝 Header */}
       <header className="tp-header">
         <div className="tp-brand">
           <img className="brand-logo" src="src/assets/logo.png" alt="TripPulse" />
@@ -134,13 +142,12 @@ export default function TripPulse() {
             <div className="brand-sub">Discover • Plan • Go</div>
           </div>
         </div>
-
         <button className="btn btn--primary">
           <span className="btn__icon">+</span> Add Update
         </button>
       </header>
 
-      {/* Search */}
+      {/* 🔍 Search */}
       <div className="tp-search">
         <div className="search">
           <FiSearch />
@@ -150,25 +157,27 @@ export default function TripPulse() {
 
       <hr className="tp-divider" />
 
-      {/* 🧭 All Regions Section */}
+      {/* 🌍 Region Cards Section */}
       <section className="tp-highlights">
         <div className="section-head">
           <h2>{month ? `${month}'s Top Destinations` : "Loading..."}</h2>
         </div>
-<div className="region-grid">
-  {loading
-    ? Array.from({ length: 3 }).map((_, i) => <RegionSkeleton key={i} />)
-    : topPlaces
-        .filter((r) => r && typeof r === "object") 
-        .map((region, i) => <RegionCard key={i} region={region} />)}
-</div>
 
+        <div className="region-grid">
+          {loading
+            ? Array.from({ length: 3 }).map((_, i) => <RegionSkeleton key={i} />)
+            : topPlaces.map((region, i) => (
+                <RegionCard key={i} region={region} />
+              ))}
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer className="tp-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
+      {/* 🇮🇳 Footer */}
+      <footer className="tp-footer">
+        🇮🇳 Made in India • ❤️ Crafted in Mumbai
+      </footer>
 
-      {/* Bottom Navigation */}
+      {/* 🧭 Bottom Nav */}
       <nav className="tp-nav">
         {[
           { id: "home", label: "Home", icon: <FiHome /> },

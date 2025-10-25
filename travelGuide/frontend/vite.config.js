@@ -6,31 +6,36 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "autoUpdate",
-      includeAssets: ["favicon.svg", "robots.txt", "apple-touch-icon.png"],
+      registerType: "prompt",
+      includeAssets: ["favicon.svg", "apple-touch-icon.png", "mask-icon.svg"],
       manifest: {
-        name: "My App",
-        short_name: "MyApp",
-        description: "A Vite React PWA example",
-        theme_color: "#ffffff",
+        name: "TripPulse",
+        short_name: "TripPulse",
+        description: "Discover, plan, and explore live travel insights.",
+        theme_color: "#111827",
         background_color: "#ffffff",
         display: "standalone",
         start_url: "/",
+        scope: "/",
+        orientation: "portrait",
         icons: [
           {
-            src: "vite.svg",
+            src: "logo.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "vite.svg",
+            src: "logo.png",
             sizes: "512x512",
             type: "image/png",
           },
+          {
+            src: "logo.png",
+            sizes: "512x512",
+            type: "image/png",
+            purpose: "maskable",
+          },
         ],
-      },
-      devOptions: {
-        enabled: false, // 🚫 disable PWA during dev to avoid those console errors
       },
     }),
   ],

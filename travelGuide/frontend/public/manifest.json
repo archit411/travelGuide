@@ -1,20 +1,72 @@
 {
-  "name": "My Vite App",
-  "short_name": "ViteApp",
+  "name": "TripPulse",
+  "short_name": "TripPulse",
+  "description": "Discover, plan, and explore live travel insights — anytime, anywhere.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
-  "theme_color": "#ffffff",
+  "theme_color": "#111827",
+  "categories": ["travel", "maps", "lifestyle"],
   "icons": [
     {
-      "src": "/vite.svg",
+      "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/vite.svg",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png"
+    },
+    {
+      "src": "/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Top Destinations",
+      "short_name": "Destinations",
+      "description": "Explore trending travel destinations",
+      "url": "/homepage",
+      "icons": [
+        {
+          "src": "/icons/destinations.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Saved Places",
+      "short_name": "Saved",
+      "description": "View your bookmarked travel spots",
+      "url": "/saved",
+      "icons": [
+        {
+          "src": "/icons/saved.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/trippulse-home.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "label": "TripPulse Home"
+    },
+    {
+      "src": "/screenshots/trippulse-destinations.jpg",
+      "sizes": "1080x1920",
+      "type": "image/jpeg",
+      "label": "Top Destinations"
+    }
+  ],
+  "dir": "ltr",
+  "lang": "en-US"
 }
