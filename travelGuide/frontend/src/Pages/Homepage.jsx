@@ -15,42 +15,25 @@ import {
 import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 
-function RegionCard({ region }) {
-  if (!region) return null;
-  const { region: name, weather, imageUrl, ...places } = region;
-  const fallbackImages = {
-    goa: "https://images.unsplash.com/photo-1526772662000-3f88f10405ff?q=80&w=1200",
-    manali: "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200",
-    shimla: "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?q=80&w=1200",
-    jaipur: "https://images.unsplash.com/photo-1616064399191-70fc29388c32?q=80&w=1200",
-  };
-  const bg =
-    imageUrl ||
-    fallbackImages[name?.toLowerCase()] ||
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
+// 🔹 Card for each place
+function PlaceCard({ place }) {
+  const { name, description, imageUrl } = place;
 
   return (
-    <div className="region-card">
-      <div className="region-img" style={{ backgroundImage: `url(${bg})` }}>
-        <div className="region-overlay">
-          <h3>{name || "Unknown Region"}</h3>
-          <p>🌤 {weather || "Weather not available"}</p>
-        </div>
-      </div>
-      <div className="place-list">
-        {Object.keys(places)
-          .filter((key) => key.startsWith("place") && !key.includes("Description"))
-          .map((placeKey, index) => (
-            <div key={index} className="place-card">
-              <h4>📍 {places[placeKey]}</h4>
-              <p>{places[placeKey + "Description"]}</p>
-            </div>
-          ))}
+    <div className="place-card-new">
+      <div
+        className="place-image"
+        style={{ backgroundImage: `url(${imageUrl})` }}
+      ></div>
+      <div className="place-info">
+        <h4>📍 {name}</h4>
+        <p>{description}</p>
       </div>
     </div>
   );
 }
 
+// 🔹 Add Story Modal (same as before)
 function AddStoryModal({ onClose, onAddStory }) {
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState("");
@@ -125,7 +108,8 @@ function AddStoryModal({ onClose, onAddStory }) {
   };
 
   const handleSubmit = () => {
-    if (!preview || !location) return alert("Please upload or capture an image and add a location.");
+    if (!preview || !location)
+      return alert("Please upload or capture an image and add a location.");
     onAddStory({ image: preview, location, temperature, crowd, comment, likes: 0 });
     onClose();
   };
@@ -134,7 +118,9 @@ function AddStoryModal({ onClose, onAddStory }) {
     <div className="popup-overlay">
       <div className="popup-card">
         <div className="popup-header">
-          <button className="popup-close" onClick={onClose}><FiX /></button>
+          <button className="popup-close" onClick={onClose}>
+            <FiX />
+          </button>
           <h2>Add Update</h2>
           <p>Share your travel experience</p>
         </div>
@@ -172,8 +158,12 @@ function AddStoryModal({ onClose, onAddStory }) {
                 <video ref={videoRef} autoPlay playsInline className="camera-feed" />
                 <canvas ref={canvasRef} style={{ display: "none" }} />
                 <div className="camera-controls">
-                  <button className="btn btn--primary" onClick={capturePhoto}>📸 Capture</button>
-                  <button className="btn btn--cancel" onClick={stopCamera}>Cancel</button>
+                  <button className="btn btn--primary" onClick={capturePhoto}>
+                    📸 Capture
+                  </button>
+                  <button className="btn btn--cancel" onClick={stopCamera}>
+                    Cancel
+                  </button>
                 </div>
               </div>
             )}
@@ -252,24 +242,34 @@ function AddStoryModal({ onClose, onAddStory }) {
   );
 }
 
+// 🔹 View Story Modal
 function ViewStoryModal({ story, onClose }) {
   if (!story) return null;
   return (
     <div className="popup-overlay">
       <div className="popup-content view-story">
-        <button className="popup-close" onClick={onClose}><FiX /></button>
+        <button className="popup-close" onClick={onClose}>
+          <FiX />
+        </button>
         <img src={story.image} alt={story.location} className="story-full-img" />
         <div className="story-info">
-          <p><FiMapPin /> {story.location}</p>
-          <p><FiUsers /> Crowd: {story.crowd}</p>
+          <p>
+            <FiMapPin /> {story.location}
+          </p>
+          <p>
+            <FiUsers /> Crowd: {story.crowd}
+          </p>
           {story.comment && <p>💬 {story.comment}</p>}
-          <p><FiHeart color="red" /> {story.likes} Likes</p>
+          <p>
+            <FiHeart color="red" /> {story.likes} Likes
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
+// 🔹 Main Component
 export default function TripPulse() {
   const [active, setActive] = useState("home");
   const [topPlaces, setTopPlaces] = useState([]);
@@ -292,7 +292,10 @@ export default function TripPulse() {
         const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
-          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
         });
         const data = await res.json();
         setTopPlaces(Array.isArray(data) ? data : []);
@@ -344,14 +347,63 @@ export default function TripPulse() {
         </div>
       )}
 
+      {/* 🔹 Top 10 Places Section */}
       <section className="tp-highlights">
         <div className="section-head">
-          <h2>{month ? `${month}'s Top Destinations` : "Loading..."}</h2>
+          <h2>{month ? `${month}'s Top 10 Places to Visit` : "Loading..."}</h2>
         </div>
-        <div className="region-grid">
-          {loading
-            ? Array.from({ length: 3 }).map((_, i) => <div key={i} className="skeleton skeleton-card" />)
-            : topPlaces.map((region, i) => <RegionCard key={i} region={region} />)}
+
+        <div className="place-grid">
+          {loading ? (
+            Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="skeleton skeleton-card" />
+            ))
+          ) : (
+            topPlaces
+              .flatMap((region) => [
+                { name: region.placeOne, description: region.placeOneDescription },
+                { name: region.placeTwo, description: region.placeTwoDescription },
+              ])
+              .map((place, index) => {
+                const unsplashImages = {
+                  Delhi:
+                    "https://images.unsplash.com/photo-1576402187872-4e6e77b0d19a?q=80&w=1200",
+                  Amritsar:
+                    "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?q=80&w=1200",
+                  Udaipur:
+                    "https://images.unsplash.com/photo-1591608516513-3c0c9351e77d?q=80&w=1200",
+                  Jaisalmer:
+                    "https://images.unsplash.com/photo-1591608516513-3c0c9351e77d?q=80&w=1200",
+                  Pondicherry:
+                    "https://images.unsplash.com/photo-1609250291996-9b1a97af3c73?q=80&w=1200",
+                  Gokarna:
+                    "https://images.unsplash.com/photo-1602586768972-1df6fbccae1b?q=80&w=1200",
+                  Darjeeling:
+                    "https://images.unsplash.com/photo-1589467091923-5570b05e7996?q=80&w=1200",
+                  Puri:
+                    "https://images.unsplash.com/photo-1622633905399-4c0c9ee4f3e0?q=80&w=1200",
+                  Manali:
+                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200",
+                  Jaipur:
+                    "https://images.unsplash.com/photo-1616064399191-70fc29388c32?q=80&w=1200",
+                };
+
+                const imageUrl =
+                  unsplashImages[place.name.split(" ")[0]] ||
+                  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
+
+                return (
+                  <PlaceCard
+                    key={index}
+                    place={{
+                      name: place.name,
+                      description: place.description,
+                      imageUrl,
+                    }}
+                  />
+                );
+              })
+          )}
         </div>
       </section>
 
@@ -375,7 +427,9 @@ export default function TripPulse() {
         ))}
       </nav>
 
-      {showAddModal && <AddStoryModal onClose={() => setShowAddModal(false)} onAddStory={addStory} />}
+      {showAddModal && (
+        <AddStoryModal onClose={() => setShowAddModal(false)} onAddStory={addStory} />
+      )}
       {viewStory && <ViewStoryModal story={viewStory} onClose={() => setViewStory(null)} />}
     </div>
   );

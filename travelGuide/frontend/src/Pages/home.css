@@ -505,3 +505,55 @@ body {
     font-size: 0.95rem;
   }
 }
+.place-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 1rem 2rem;
+  justify-items: center;
+}
+
+.place-card-new {
+  width: 220px;
+  height: 250px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease;
+}
+
+.place-card-new:hover {
+  transform: translateY(-5px);
+}
+
+.place-image {
+  width: 100%;
+  height: 130px;
+  background-size: cover;
+  background-position: center;
+}
+
+.place-info {
+  padding: 10px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 120px;
+}
+
+.place-info h4 {
+  margin: 0;
+  font-size: 1rem;
+  color: #222;
+}
+
+.place-info p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  color: #555;
+  line-height: 1.3;
+}
