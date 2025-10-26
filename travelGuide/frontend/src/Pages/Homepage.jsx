@@ -6,66 +6,105 @@ import {
   FiUser,
   FiX,
   FiUpload,
-  FiHeart,
   FiCamera,
   FiImage,
-  FiMapPin,
-  FiUsers,
 } from "react-icons/fi";
-import { FaUtensils } from "react-icons/fa";
+import { FaUtensils, FaStar } from "react-icons/fa";
 import "./home.css";
 
-// 🔹 Card for each place
+/* 🔹 Skeleton Loader */
+function SkeletonCard() {
+  return (
+    <div className="skeleton-card shimmer">
+      <div className="skeleton-img"></div>
+      <div className="skeleton-text"></div>
+      <div className="skeleton-subtext"></div>
+    </div>
+  );
+}
+
+/* 🔹 Place Card */
 function PlaceCard({ place }) {
   const { name, description, imageUrl } = place;
-
   return (
     <div className="place-card-new">
       <div
         className="place-image"
-        style={{ backgroundImage: `url(${imageUrl})` }}
+        style={{
+          backgroundImage: `url(${
+            imageUrl ||
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
+          })`,
+        }}
       ></div>
       <div className="place-info">
         <h4>📍 {name}</h4>
-        <p>{description}</p>
+        <p>{description || "No description available."}</p>
       </div>
     </div>
   );
 }
 
-// 🔹 Add Story Modal (same as before)
+/* 🔔 Custom Modern Alert Component */
+function ModernAlert({ message, onClose }) {
+  if (!message) return null;
+  return (
+    <div className="alert-overlay" onClick={onClose}>
+      <div className="alert-box" onClick={(e) => e.stopPropagation()}>
+        <div className="alert-icon">📵</div>
+        <p>{message}</p>
+        <button onClick={onClose} className="btn btn--primary full">
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* 📸 Add Story Modal */
 function AddStoryModal({ onClose, onAddStory }) {
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
-  const [temperature, setTemperature] = useState("");
+  const [temperature, setTemperature] = useState(
+    `${Math.floor(Math.random() * 10) + 20}°C`
+  );
   const [crowd, setCrowd] = useState("Low");
   const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(false);
+  const [alertMsg, setAlertMsg] = useState("");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const apiKey = "YOUR_GOOGLE_PLACES_API_KEY";
+
+  const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   const startCamera = async () => {
+    if (!isMobileDevice) {
+      setAlertMsg("📱 Camera access is only available on mobile devices.");
+      return;
+    }
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment" },
+      });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         setIsCameraActive(true);
       }
-    } catch {
-      alert("Camera access denied or unavailable.");
+    } catch (err) {
+      console.error("Camera error:", err);
+      setAlertMsg("Unable to access camera. Please check permissions.");
     }
   };
 
   const capturePhoto = () => {
-    const canvas = canvasRef.current;
     const video = videoRef.current;
-    if (!canvas || !video) return;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    const ctx = canvas.getContext("2d");
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    const ctx = canvas.getContext("2d");
-    ctx.drawImage(video, 0, 0);
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageData = canvas.toDataURL("image/png");
     setPreview(imageData);
     stopCamera();
@@ -80,53 +119,51 @@ function AddStoryModal({ onClose, onAddStory }) {
     setIsCameraActive(false);
   };
 
+  // 🧹 Clean up camera when modal closes
+  useEffect(() => {
+    return () => stopCamera();
+  }, []);
+
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.size <= 10 * 1024 * 1024) setPreview(URL.createObjectURL(file));
-    else alert("File too large (max 10MB).");
-  };
-
-  const handleLocationChange = async (e) => {
-    const value = e.target.value;
-    setLocation(value);
-    if (value.length < 3) return setSuggestions([]);
-    try {
-      const res = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-          value
-        )}&key=${apiKey}&components=country:in`
-      );
-      const data = await res.json();
-      if (data.status === "OK") setSuggestions(data.predictions);
-    } catch {}
-  };
-
-  const handleSelectLocation = (desc) => {
-    setLocation(desc);
-    setSuggestions([]);
-    setTemperature(`${Math.floor(Math.random() * 10) + 15}°C`);
+    if (file && file.size <= 10 * 1024 * 1024) {
+      setPreview(URL.createObjectURL(file));
+    } else {
+      setAlertMsg("⚠️ File too large (max 10MB).");
+    }
   };
 
   const handleSubmit = () => {
-    if (!preview || !location)
-      return alert("Please upload or capture an image and add a location.");
-    onAddStory({ image: preview, location, temperature, crowd, comment, likes: 0 });
+    if (!preview || !location.trim())
+      return setAlertMsg(
+        "Please upload or capture an image and add a valid location."
+      );
+    onAddStory({
+      image: preview,
+      location,
+      temperature,
+      crowd,
+      comment,
+      rating,
+      likes: 0,
+    });
     onClose();
   };
 
   return (
-    <div className="popup-overlay">
-      <div className="popup-card">
-        <div className="popup-header">
-          <button className="popup-close" onClick={onClose}>
-            <FiX />
-          </button>
-          <h2>Add Update</h2>
-          <p>Share your travel experience</p>
-        </div>
+    <>
+      <div className="popup-overlay">
+        <div className="popup-card">
+          <div className="popup-header">
+            <button className="popup-close" onClick={onClose}>
+              <FiX />
+            </button>
+            <h2>Add Update</h2>
+            <p>Share your travel experience</p>
+          </div>
 
-        <div className="popup-body">
-          <div className="upload-box">
+          <div className="popup-body">
+            {/* 📸 Camera or Upload */}
             {!isCameraActive ? (
               <>
                 {preview ? (
@@ -135,7 +172,7 @@ function AddStoryModal({ onClose, onAddStory }) {
                   <div className="upload-placeholder">
                     <FiUpload size={32} />
                     <p>Click to upload or use camera</p>
-                    <small>PNG, JPG, MP4 up to 10MB</small>
+                    <small>PNG, JPG up to 10MB</small>
                   </div>
                 )}
                 <div className="upload-actions">
@@ -146,7 +183,7 @@ function AddStoryModal({ onClose, onAddStory }) {
                     <FiImage /> Upload from Gallery
                     <input
                       type="file"
-                      accept="image/*,video/*"
+                      accept="image/*"
                       onChange={handleFileChange}
                       style={{ display: "none" }}
                     />
@@ -167,109 +204,93 @@ function AddStoryModal({ onClose, onAddStory }) {
                 </div>
               </div>
             )}
-          </div>
 
-          <div className="form-section location-suggest">
-            <label>Destination</label>
-            <input
-              type="text"
-              placeholder="e.g., Manali - Solang Valley"
-              value={location}
-              onChange={handleLocationChange}
-            />
-            {suggestions.length > 0 && (
-              <ul className="suggestion-list">
-                {suggestions.map((s, i) => (
-                  <li key={i} onClick={() => handleSelectLocation(s.description)}>
-                    <FiMapPin /> {s.description}
-                  </li>
+            {/* 🌍 Location */}
+            <div className="form-section">
+              <label>Destination</label>
+              <input
+                type="text"
+                placeholder="Enter location..."
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+              />
+            </div>
+
+            {/* 🌡️ Temperature */}
+            <div className="form-section">
+              <label>Current Temperature</label>
+              <input
+                type="text"
+                value={temperature}
+                onChange={(e) => setTemperature(e.target.value)}
+                placeholder="e.g., 26°C"
+              />
+              <small>Auto-generated — editable if needed</small>
+            </div>
+
+            {/* 👥 Crowd Level */}
+            <div className="form-section">
+              <label>Crowd Level</label>
+              <div className="crowd-options">
+                {["Low", "Medium", "High"].map((level) => (
+                  <button
+                    key={level}
+                    className={`crowd-chip ${crowd === level ? "active" : ""}`}
+                    onClick={() => setCrowd(level)}
+                  >
+                    {level}
+                  </button>
                 ))}
-              </ul>
-            )}
-            <small>Your location will be auto-detected</small>
-          </div>
+              </div>
+            </div>
 
-          <div className="form-section">
-            <label>Current Temperature</label>
-            <input
-              type="text"
-              value={temperature}
-              onChange={(e) => setTemperature(e.target.value)}
-              placeholder="Auto-fetched from weather API"
-            />
-            <small>Auto-fetched from weather API (editable)</small>
-          </div>
+            {/* ⭐ Rating */}
+            <div className="form-section">
+              <label>Your Rating</label>
+              <div className="rating-stars">
+                {[1, 2, 3, 4, 5].map((num) => (
+                  <FaStar
+                    key={num}
+                    size={24}
+                    onClick={() => setRating(num)}
+                    color={num <= rating ? "#facc15" : "#d1d5db"}
+                    style={{ cursor: "pointer", transition: "0.2s" }}
+                  />
+                ))}
+              </div>
+              <small>{rating ? `${rating}/5 stars` : "Tap a star to rate"}</small>
+            </div>
 
-          <div className="form-section">
-            <label>Crowd Level</label>
-            <div className="crowd-options">
-              {["Low", "Medium", "High"].map((level) => (
-                <button
-                  key={level}
-                  className={`crowd-chip ${crowd === level ? "active" : ""}`}
-                  onClick={() => setCrowd(level)}
-                >
-                  {level === "Low" && "🟢 Low — Peaceful"}
-                  {level === "Medium" && "🟡 Medium — Moderate"}
-                  {level === "High" && "🔴 High — Crowded"}
-                </button>
-              ))}
+            {/* 💬 Caption */}
+            <div className="form-section">
+              <label>Caption (Optional)</label>
+              <textarea
+                placeholder="Share your experience..."
+                value={comment}
+                onChange={(e) => setComment(e.target.value)}
+                maxLength={200}
+              />
             </div>
           </div>
 
-          <div className="form-section">
-            <label>Caption (Optional)</label>
-            <textarea
-              placeholder="Share your experience... (e.g., 'Perfect weather for trekking!')"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              maxLength={200}
-            />
-            <small>Max 200 characters</small>
+          <div className="popup-footer">
+            <button className="btn btn--primary full" onClick={handleSubmit}>
+              Post Update
+            </button>
+            <button className="btn btn--cancel full" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </div>
-
-        <div className="popup-footer">
-          <button className="btn btn--primary full" onClick={handleSubmit}>
-            Post Update
-          </button>
-          <button className="btn btn--cancel full" onClick={onClose}>
-            Cancel
-          </button>
-        </div>
       </div>
-    </div>
+
+      {/* 🩵 Modern Alert Popup */}
+      <ModernAlert message={alertMsg} onClose={() => setAlertMsg("")} />
+    </>
   );
 }
 
-// 🔹 View Story Modal
-function ViewStoryModal({ story, onClose }) {
-  if (!story) return null;
-  return (
-    <div className="popup-overlay">
-      <div className="popup-content view-story">
-        <button className="popup-close" onClick={onClose}>
-          <FiX />
-        </button>
-        <img src={story.image} alt={story.location} className="story-full-img" />
-        <div className="story-info">
-          <p>
-            <FiMapPin /> {story.location}
-          </p>
-          <p>
-            <FiUsers /> Crowd: {story.crowd}
-          </p>
-          {story.comment && <p>💬 {story.comment}</p>}
-          <p>
-            <FiHeart color="red" /> {story.likes} Likes
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// 🔹 Main Component
+/* 🌍 Main Component */
 export default function TripPulse() {
   const [active, setActive] = useState("home");
   const [topPlaces, setTopPlaces] = useState([]);
@@ -277,7 +298,6 @@ export default function TripPulse() {
   const [month, setMonth] = useState("");
   const [stories, setStories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [viewStory, setViewStory] = useState(null);
 
   useEffect(() => {
     const localMonth = new Date().toLocaleString("default", { month: "long" });
@@ -299,7 +319,8 @@ export default function TripPulse() {
         });
         const data = await res.json();
         setTopPlaces(Array.isArray(data) ? data : []);
-      } catch {
+      } catch (err) {
+        console.error("Error fetching:", err);
       } finally {
         setLoading(false);
       }
@@ -308,6 +329,21 @@ export default function TripPulse() {
   }, [month]);
 
   const addStory = (story) => setStories((prev) => [story, ...prev]);
+
+  const places = topPlaces
+    .flatMap((region) => [
+      region.placeOne && {
+        name: region.placeOne,
+        description: region.placeOneDescription,
+        imageUrl: region.placeOneImageUrl,
+      },
+      region.placeTwo && {
+        name: region.placeTwo,
+        description: region.placeTwoDescription,
+        imageUrl: region.placeTwoImageUrl,
+      },
+    ])
+    .filter(Boolean);
 
   return (
     <div className="tp">
@@ -336,7 +372,7 @@ export default function TripPulse() {
           <h3>Your Stories</h3>
           <div className="stories-grid">
             {stories.map((s, i) => (
-              <div key={i} className="story-card" onClick={() => setViewStory(s)}>
+              <div key={i} className="story-card">
                 <img src={s.image} alt={s.location} />
                 <div className="story-overlay">
                   <p className="story-loc">📍 {s.location}</p>
@@ -347,63 +383,15 @@ export default function TripPulse() {
         </div>
       )}
 
-      {/* 🔹 Top 10 Places Section */}
       <section className="tp-highlights">
         <div className="section-head">
-          <h2>{month ? `${month}'s Top 10 Places to Visit` : "Loading..."}</h2>
+          <h2>{month ? `${month}'s Top Places` : "Loading..."}</h2>
         </div>
 
         <div className="place-grid">
-          {loading ? (
-            Array.from({ length: 10 }).map((_, i) => (
-              <div key={i} className="skeleton skeleton-card" />
-            ))
-          ) : (
-            topPlaces
-              .flatMap((region) => [
-                { name: region.placeOne, description: region.placeOneDescription },
-                { name: region.placeTwo, description: region.placeTwoDescription },
-              ])
-              .map((place, index) => {
-                const unsplashImages = {
-                  Delhi:
-                    "https://images.unsplash.com/photo-1576402187872-4e6e77b0d19a?q=80&w=1200",
-                  Amritsar:
-                    "https://images.unsplash.com/photo-1603262110263-fb0112e7cc33?q=80&w=1200",
-                  Udaipur:
-                    "https://images.unsplash.com/photo-1591608516513-3c0c9351e77d?q=80&w=1200",
-                  Jaisalmer:
-                    "https://images.unsplash.com/photo-1591608516513-3c0c9351e77d?q=80&w=1200",
-                  Pondicherry:
-                    "https://images.unsplash.com/photo-1609250291996-9b1a97af3c73?q=80&w=1200",
-                  Gokarna:
-                    "https://images.unsplash.com/photo-1602586768972-1df6fbccae1b?q=80&w=1200",
-                  Darjeeling:
-                    "https://images.unsplash.com/photo-1589467091923-5570b05e7996?q=80&w=1200",
-                  Puri:
-                    "https://images.unsplash.com/photo-1622633905399-4c0c9ee4f3e0?q=80&w=1200",
-                  Manali:
-                    "https://images.unsplash.com/photo-1544735716-392fe2489ffa?q=80&w=1200",
-                  Jaipur:
-                    "https://images.unsplash.com/photo-1616064399191-70fc29388c32?q=80&w=1200",
-                };
-
-                const imageUrl =
-                  unsplashImages[place.name.split(" ")[0]] ||
-                  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
-
-                return (
-                  <PlaceCard
-                    key={index}
-                    place={{
-                      name: place.name,
-                      description: place.description,
-                      imageUrl,
-                    }}
-                  />
-                );
-              })
-          )}
+          {loading
+            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
+            : places.map((place, i) => <PlaceCard key={i} place={place} />)}
         </div>
       </section>
 
@@ -430,7 +418,6 @@ export default function TripPulse() {
       {showAddModal && (
         <AddStoryModal onClose={() => setShowAddModal(false)} onAddStory={addStory} />
       )}
-      {viewStory && <ViewStoryModal story={viewStory} onClose={() => setViewStory(null)} />}
     </div>
   );
 }
