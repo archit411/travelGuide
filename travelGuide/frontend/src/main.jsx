@@ -2,8 +2,9 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
 import { registerSW } from "virtual:pwa-register";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
-// ✅ Register the service worker
+
 registerSW({
   immediate: true,
   onNeedRefresh() {
@@ -14,15 +15,11 @@ registerSW({
   },
 });
 
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <App />
+    <GoogleOAuthProvider clientId="189568540017-edlbo7rlh95m7ne2q4ls7u3tg3ea41hd.apps.googleusercontent.com">
+      <App />
+    </GoogleOAuthProvider>
   </StrictMode>
-);
-
-//OAuth implementation
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <GoogleOAuthProvider clientId="189568540017-edlbo7rlh95m7ne2q4ls7u3tg3ea41hd.apps.googleusercontent.com">
-    <App />
-  </GoogleOAuthProvider>
 );
