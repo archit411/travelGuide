@@ -13,7 +13,7 @@ import jakarta.persistence.Table;
 public class TravelPost {
 
 	@Id
-	@SequenceGenerator(name = "travel_post_id_seq",sequenceName = "travel_post_seq",allocationSize = 1)
+	@SequenceGenerator(name = "travel_post_seq",sequenceName = "travel_post_seq",allocationSize = 1)
 	@GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "travel_post_seq")
 	@Column(name="id" , updatable = false , nullable = false)
 	private int id;
