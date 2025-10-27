@@ -239,3 +239,106 @@
   background: #2563eb;
   transform: translateY(-2px);
 }
+/* 🔸 Inline Input Errors */
+.input-error {
+  color: #e11d48;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  text-align: left;
+}
+
+/* 🔸 Google Welcome Toast */
+.google-toast {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: top 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  z-index: 10000;
+}
+
+.google-toast.show {
+  top: 20px;
+  opacity: 1;
+}
+
+.google-logo {
+  width: 20px;
+  height: 20px;
+}
+/* 🔸 Inline error text */
+.input-error {
+  color: #e11d48;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  text-align: left;
+}
+
+/* 🔹 Welcome toast animation */
+.google-toast {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: top 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  z-index: 10000;
+  font-weight: 500;
+}
+
+.google-toast.show {
+  top: 20px;
+  opacity: 1;
+}
+
+.google-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}
+
+
+/* 🔹 Universal welcome toast */
+.google-toast {
+  position: fixed;
+  top: -60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: top 0.4s ease, opacity 0.3s ease;
+  opacity: 0;
+  z-index: 10000;
+  font-weight: 500;
+}
+
+.google-toast.show {
+  top: 20px;
+  opacity: 1;
+}
+
+.google-logo {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+}

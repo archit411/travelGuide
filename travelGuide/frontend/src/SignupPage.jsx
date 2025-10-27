@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ToastContainer } from "react-toastify";
 import Confetti from "react-confetti";
 import Swal from "sweetalert2";
 import { FiUser, FiMail, FiPhone, FiLock, FiCheckCircle } from "react-icons/fi";
-import "react-toastify/dist/ReactToastify.css";
 import "./Auth.css";
 
 const SignupPage = () => {
@@ -16,16 +14,39 @@ const SignupPage = () => {
     password: "",
   });
 
+  const [errors, setErrors] = useState({});
   const [showConfetti, setShowConfetti] = useState(false);
   const [showSuccessScreen, setShowSuccessScreen] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: "" }); // clear specific field error on change
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 🔹 Basic client-side validation
+    let newErrors = {};
+    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
+    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
+    if (!/^\S+@\S+\.\S+$/.test(formData.email))
+      newErrors.email = "Enter a valid email address";
+    if (!/^\d{10}$/.test(formData.mobileNumber))
+      newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+    if (
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
+        formData.password
+      )
+    )
+      newErrors.password =
+        "Password must have 8+ chars, 1 uppercase, 1 number, 1 special char";
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
 
     const requestBody = {
       fName: formData.firstName,
@@ -45,13 +66,8 @@ const SignupPage = () => {
       const data = await response.json();
 
       if (data.errorCode === "109") {
-        Swal.fire({
-          icon: "error",
-          title: "Account Already Exists",
-          text: data.errorMsg || "An account already exists with this number.",
-          confirmButtonColor: "#d33",
-          background: "#fff8f8",
-          backdrop: `rgba(255, 0, 0, 0.15)`,
+        setErrors({
+          mobileNumber: "An account already exists with this mobile number.",
         });
         return;
       }
@@ -61,24 +77,20 @@ const SignupPage = () => {
         setShowConfetti(true);
         setShowSuccessScreen(true);
 
-        // Auto redirect to login after 3 seconds
         setTimeout(() => {
           setShowConfetti(false);
           navigate("/login");
         }, 3000);
       } else {
-        Swal.fire({
-          icon: "warning",
-          title: "Signup Failed",
-          text: data.errorMsg || "Unknown error occurred.",
-          confirmButtonColor: "#ff9800",
+        setErrors({
+          password: data.errorMsg || "Signup failed. Please try again.",
         });
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Server Error",
-        text: "Unable to connect to server. Please try again later.",
+        text: "Unable to connect to the server. Please try again later.",
         confirmButtonColor: "#d33",
       });
       console.error("Error:", error);
@@ -101,7 +113,7 @@ const SignupPage = () => {
       ) : (
         <div className="auth-card">
           <div className="auth-logo">
-              <img src="src/assets/logo.png" alt="TripPulse Logo" />
+            <img src="src/assets/logo.png" alt="TripPulse Logo" />
           </div>
 
           <h2 className="auth-heading">Create your TripPulse Account</h2>
@@ -118,6 +130,7 @@ const SignupPage = () => {
                 onChange={handleChange}
                 required
               />
+              {errors.firstName && <p className="input-error">{errors.firstName}</p>}
             </div>
 
             <div className="input-group">
@@ -130,6 +143,7 @@ const SignupPage = () => {
                 onChange={handleChange}
                 required
               />
+              {errors.lastName && <p className="input-error">{errors.lastName}</p>}
             </div>
 
             <div className="input-group">
@@ -142,6 +156,7 @@ const SignupPage = () => {
                 onChange={handleChange}
                 required
               />
+              {errors.email && <p className="input-error">{errors.email}</p>}
             </div>
 
             <div className="input-group">
@@ -153,9 +168,11 @@ const SignupPage = () => {
                 value={formData.mobileNumber}
                 onChange={handleChange}
                 pattern="\d{10}"
-                title="Mobile number must be 10 digits"
                 required
               />
+              {errors.mobileNumber && (
+                <p className="input-error">{errors.mobileNumber}</p>
+              )}
             </div>
 
             <div className="input-group">
@@ -166,10 +183,9 @@ const SignupPage = () => {
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                pattern="^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-                title="Password must be at least 8 characters, contain one uppercase letter, one number, and one special character (@$!%*?&)"
                 required
               />
+              {errors.password && <p className="input-error">{errors.password}</p>}
             </div>
 
             <button type="submit" className="sign-in-btn">
@@ -185,8 +201,6 @@ const SignupPage = () => {
           </p>
         </div>
       )}
-
-      <ToastContainer />
     </div>
   );
 };

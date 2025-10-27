@@ -11,6 +11,7 @@ import {
 } from "react-icons/fi";
 import { FaUtensils, FaStar } from "react-icons/fa";
 import "./home.css";
+import { useNavigate } from "react-router-dom";
 
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
@@ -298,7 +299,7 @@ export default function TripPulse() {
   const [month, setMonth] = useState("");
   const [stories, setStories] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
-
+const navigate = useNavigate();
   useEffect(() => {
     const localMonth = new Date().toLocaleString("default", { month: "long" });
     setMonth(localMonth);
@@ -398,22 +399,27 @@ export default function TripPulse() {
       <footer className="tp-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
       <nav className="tp-nav">
-        {[
-          { id: "home", label: "Home", icon: <FiHome /> },
-          { id: "food", label: "Food", icon: <FaUtensils /> },
-          { id: "saved", label: "Saved", icon: <FiBookmark /> },
-          { id: "profile", label: "Profile", icon: <FiUser /> },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-btn ${active === item.id ? "active" : ""}`}
-            onClick={() => setActive(item.id)}
-          >
-            <div className="nav-icon">{item.icon}</div>
-            <span className="nav-label">{item.label}</span>
-          </button>
-        ))}
-      </nav>
+  {[
+    { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+    { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+    { id: "saved", label: "Saved", icon: <FiBookmark />, path: "/saved" },
+    { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+  ].map((item) => (
+    <button
+      key={item.id}
+      className={`nav-btn ${active === item.id ? "active" : ""}`}
+      onClick={() => {
+        setActive(item.id);
+        navigate(item.path); // 👈 Navigate to that route
+      }}
+    >
+      <div className="nav-icon">{item.icon}</div>
+      <span className="nav-label">{item.label}</span>
+    </button>
+  ))}
+</nav>
+
+
 
       {showAddModal && (
         <AddStoryModal onClose={() => setShowAddModal(false)} onAddStory={addStory} />
