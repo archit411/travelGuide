@@ -31,7 +31,7 @@ public class SignUpModel {
 	@Column(name="password")
 	private String password;
 	
-	@Column(name="email_id")
+	@Column(name="emailId")
 	private String emailId;
 	
 	@Column(name="username")

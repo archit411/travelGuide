@@ -18,7 +18,7 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.gson.GsonFactory;
 import com.travelGuide.travelGuide.jwt.JwtUtil;
 import com.travelGuide.travelGuide.model.SignUpModel;
-import com.travelGuide.travelGuide.repositories.TravelGuideSignUpRepository;
+import com.travelGuide.travelGuide.repositories.LoginSignUpRepository;
 
 
 @RestController
@@ -28,11 +28,11 @@ public class GoogleAuthController {
 	@Value("${google.clientId}")
     private String googleClientId;
 	
-	private TravelGuideSignUpRepository repository;
+	private LoginSignUpRepository repository;
 	
 	private JwtUtil jwtUtil;
 
-	public GoogleAuthController(TravelGuideSignUpRepository repository,
+	public GoogleAuthController(LoginSignUpRepository repository,
 			JwtUtil jwtUtil) {
 		super();
 		this.repository = repository;

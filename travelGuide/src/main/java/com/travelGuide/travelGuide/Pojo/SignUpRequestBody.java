@@ -1,6 +1,5 @@
 package com.travelGuide.travelGuide.Pojo;
 
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -12,10 +11,6 @@ public class SignUpRequestBody {
 	
 	@NotBlank(message="last name can't be null")
 	private String lName;
-
-	@NotBlank(message="email id can't be null")
-	@Email(message="email should be valid")
-	private String emailId;
 	
 	@NotBlank(message = "Password is required")
     @Size(min = 8, message = "Password must be at least 8 characters")
@@ -43,14 +38,6 @@ public class SignUpRequestBody {
 
 	public void setlName(String lName) {
 		this.lName = lName;
-	}
-
-	public String getEmailId() {
-		return emailId;
-	}
-
-	public void setEmailId(String emailId) {
-		this.emailId = emailId;
 	}
 
 	public String getPassword() {

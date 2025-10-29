@@ -4,8 +4,17 @@ public class SignUpResponseBody {
 
 	private String errorCode;	
 	private String errorMsg;
-	private String userName;
+	private String msisdn;
+	private String username;
 	private String token;
+	
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	public String getErrorCode() {
 		return errorCode;
@@ -23,12 +32,12 @@ public class SignUpResponseBody {
 		this.errorMsg = errorMsg;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getMsidn() {
+		return msisdn;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setMsisdn(String msisdn) {
+		this.msisdn = msisdn;
 	}
 
 	public String getToken() {
@@ -41,7 +50,7 @@ public class SignUpResponseBody {
 
 	@Override
 	public String toString() {
-		return "SignUpResponseBody [userName=" + userName + "]";
+		return "SignUpResponseBody [msisdn=" + msisdn + "]";
 	}
 
 	

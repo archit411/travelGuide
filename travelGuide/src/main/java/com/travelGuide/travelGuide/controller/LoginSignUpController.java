@@ -2,7 +2,6 @@ package com.travelGuide.travelGuide.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,17 +10,17 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.travelGuide.travelGuide.Pojo.SignUpRequestBody;
 import com.travelGuide.travelGuide.Pojo.SignUpResponseBody;
-import com.travelGuide.travelGuide.service.TravelGuideService;
+import com.travelGuide.travelGuide.service.LoginSignupService;
 
 import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api")
-public class SignUpController {
+public class LoginSignUpController {
 
 	@Autowired
-	private TravelGuideService travelGuideService;
+	private LoginSignupService loginSignupService;
 
 	@PostMapping("/signup")
 	public SignUpResponseBody getSignUpDetails(@Valid @RequestBody SignUpRequestBody request) {
@@ -30,7 +29,7 @@ public class SignUpController {
 
 		try {
 			if (request != null) {
-				response = travelGuideService.getUserName(request);
+				response = loginSignupService.signUpAndGetUsername(request);
 			}
 			return response;
 		} catch (Exception e) {
@@ -40,20 +39,15 @@ public class SignUpController {
 	}
 
 	@PostMapping("/login")
-	public SignUpResponseBody getLoginUserName(@RequestParam String msisdn, @RequestParam String password) {
+	public SignUpResponseBody loginMsisdn(@RequestParam String msisdn, @RequestParam String password) {
 
 		SignUpResponseBody response = null;
 		try {
-			response = travelGuideService.loginUsername(msisdn, password);
+			response = loginSignupService.login(msisdn, password);
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return response;
 		}
-	}
-	
-	@GetMapping("/test")
-	public String testFunction() {
-		return "test";
 	}
 }

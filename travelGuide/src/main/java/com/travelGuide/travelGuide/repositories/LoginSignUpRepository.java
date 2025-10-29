@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import com.travelGuide.travelGuide.model.SignUpModel;
 
 @Repository
-public interface TravelGuideSignUpRepository extends JpaRepository<SignUpModel, Integer>{
+public interface LoginSignUpRepository extends JpaRepository<SignUpModel, Integer>{
 
 	SignUpModel findByEmailId(String email);
 	
