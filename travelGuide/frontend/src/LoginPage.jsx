@@ -216,7 +216,6 @@ const LoginPage = () => {
             📲 Install TripPulse
           </button>
 
-          <p className="guest-text">Continue as Guest</p>
         </div>
       </div>
     </GoogleOAuthProvider>
