@@ -14,7 +14,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.travelGuide.travelGuide.Pojo.TravelPostReqBody;
 import com.travelGuide.travelGuide.Pojo.TravelPostRespBody;
@@ -38,14 +40,21 @@ public class TravelPostController {
 	private String SUPABASE_API_KEY;
 	
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public TravelPostRespBody uploadTravelPost(@RequestBody TravelPostReqBody travelPostRequest) {
+	public TravelPostRespBody uploadTravelPost(@RequestParam("caption") String caption,
+	        @RequestParam("crowdLevel") String crowdLevel,
+	        @RequestParam("destination") String destination,
+	        @RequestParam("temprature") String temprature,
+	        @RequestParam("msisdn") String msisdn,
+	        @RequestParam("userRating") double userRating,
+	        @RequestParam("image") MultipartFile image,
+	        @RequestParam("username")String username) {
 		
 		TravelPostRespBody postResponse = null;
 		
 		try {
 			
 			//this will create the image url
-			String imageFileName = UUID.randomUUID() + "_" + travelPostRequest.getImage().getOriginalFilename();
+			String imageFileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
 			
 			//create the image upload url
 			String uploadUrl = SUPABASE_URL + "/storage/v1/object/" + SUPABASE_BUCKET + "/" + imageFileName;
@@ -55,8 +64,8 @@ public class TravelPostController {
             HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(uploadUrl)) //set the target url
                     .header("Authorization", "Bearer " + SUPABASE_API_KEY) //authenticate backend with supabase api key
-                    .header("Content-Type", travelPostRequest.getImage().getContentType()) //image content type
-                    .PUT(HttpRequest.BodyPublishers.ofByteArray(travelPostRequest.getImage().getBytes())) //create put request with image byte
+                    .header("Content-Type", image.getContentType()) //image content type
+                    .PUT(HttpRequest.BodyPublishers.ofByteArray(image.getBytes())) //create put request with image byte
                     .build(); //finalize the request
             
             //actually send the put request to save image in supabse bucket
@@ -73,14 +82,15 @@ public class TravelPostController {
             String publicImageUrl = SUPABASE_URL + "/storage/v1/object/public/" + SUPABASE_BUCKET + "/" + imageFileName;
             
             TravelPost post = new TravelPost();
-            post.setCaption(travelPostRequest.getCaption());
+            post.setCaption(caption);
             post.setCreatedOn(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); //26/10/25 20:52	
-            post.setCrowdLevel(travelPostRequest.getCrowdLevel());
-            post.setDestination(travelPostRequest.getDestination());
+            post.setCrowdLevel(crowdLevel);
+            post.setDestination(destination);
             post.setImageUrl(publicImageUrl);
-            post.setTemperature(travelPostRequest.getTemprature());
-            post.setUsername(travelPostRequest.getUsername());
-            post.setUserRating(travelPostRequest.getUserRating());
+            post.setTemperature(temprature);
+            post.setmsisdn(msisdn);
+            post.setUserRating(userRating);
+            post.setUsername(username);
             
             TravelPost updatedRow = travelPostRepository.save(post);
             
@@ -92,8 +102,9 @@ public class TravelPostController {
             postResponse.setImage(updatedRow.getImageUrl());
             postResponse.setStatus("SUCCESS");
             postResponse.setTemprature(updatedRow.getTemperature());
-            postResponse.setUsername(updatedRow.getUsername());
+            postResponse.setMsisdn(updatedRow.getmsisdn());
             postResponse.setUserRating(updatedRow.getUserRating());
+            postResponse.setUsername(updatedRow.getUsername());
             
 			return postResponse;
 		}catch(Exception e) {

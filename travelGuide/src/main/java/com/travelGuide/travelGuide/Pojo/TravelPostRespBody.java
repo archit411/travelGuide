@@ -4,7 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public class TravelPostRespBody {
 
-	private String username;
+	private String msisdn;
 	private String destination;
 	private String temprature;
 	private String crowdLevel;
@@ -13,20 +13,27 @@ public class TravelPostRespBody {
 	private String  image;
 	private String createdOn;
 	private String status;
+	private String username;
 	
 	
 	
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
 	public String getStatus() {
 		return status;
 	}
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getUsername() {
-		return username;
+	public String getMsisdn() {
+		return msisdn;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setMsisdn(String msisdn) {
+		this.msisdn = msisdn;
 	}
 	public String getDestination() {
 		return destination;

@@ -18,8 +18,8 @@ public class TravelPost {
 	@Column(name="id" , updatable = false , nullable = false)
 	private int id;
 	
-	@Column(name="username")
-	private String username;
+	@Column(name="msisdn")
+	private String msisdn;
 
     @Column(name = "destination")
     private String destination;
@@ -41,6 +41,17 @@ public class TravelPost {
 
     @Column(name = "created_on")
     private String createdOn;
+    
+    @Column(name="username")
+    private String username;
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	public int getId() {
 		return id;
@@ -50,12 +61,12 @@ public class TravelPost {
 		this.id = id;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getmsisdn() {
+		return msisdn;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setmsisdn(String msisdn) {
+		this.msisdn = msisdn;
 	}
 
 	public String getDestination() {
