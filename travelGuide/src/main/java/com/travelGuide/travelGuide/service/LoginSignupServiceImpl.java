@@ -11,6 +11,8 @@ import com.travelGuide.travelGuide.jwt.JwtUtil;
 import com.travelGuide.travelGuide.model.SignUpModel;
 import com.travelGuide.travelGuide.repositories.LoginSignUpRepository;
 
+import jakarta.servlet.http.HttpSession;
+
 @Service
 public class LoginSignupServiceImpl implements LoginSignupService {
 
@@ -148,7 +150,6 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 
 	public SignUpResponseBody login(String msisdn, String password) {
 		SignUpResponseBody response = null;
-
 		try {
 
 			if (msisdn != null || msisdn != "" || password != null || password != "") {
@@ -172,6 +173,7 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 						
 						String token = jwtUtil.generateToken(modelObject.getMsisdn());
 						response.setToken(token);
+						
 					} else {
 						response = new SignUpResponseBody();
 						response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
