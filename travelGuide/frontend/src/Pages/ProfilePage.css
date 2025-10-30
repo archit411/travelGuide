@@ -1,33 +1,55 @@
-/* Page Layout */
+/* ===== Global Styles ===== */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Inter", sans-serif;
+  background: #f5f6f8;
+}
+
+/* Disable scroll globally for desktop main profile page */
+body, .no-scroll {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ===== Page Container ===== */
 .profile-page {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  background-color: #f7f8fa;
+  background: #f5f6f8;
   min-height: 100vh;
-  padding: 40px 20px;
+  padding: 40px 60px;
+  overflow: hidden; /* Desktop: no scroll */
+  box-sizing: border-box;
 }
 
-/* Content Box */
+/* ===== Profile Content Card ===== */
 .profile-content {
-  background: #fff;
+  background: #ffffff;
   width: 100%;
-  max-width: 750px;
+  max-width: 1200px;
   border-radius: 20px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  padding: 40px 50px;
-  position: relative;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  padding: 40px 60px;
+  margin: 0 auto;
+  transition: all 0.3s ease-in-out;
 }
 
-/* Header */
+.profile-content:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
 .profile-title {
   font-size: 22px;
   font-weight: 600;
+  margin-bottom: 25px;
   color: #222;
-  margin-bottom: 30px;
 }
 
-/* Profile Info Card */
+/* ===== Profile Info Card ===== */
 .profile-info-card {
   display: flex;
   align-items: center;
@@ -41,38 +63,21 @@
   width: 70px;
   height: 70px;
   border-radius: 50%;
-  object-fit: cover;
   margin-right: 20px;
+  object-fit: cover;
 }
 
 .profile-text h3 {
   font-size: 18px;
   font-weight: 600;
-  color: #111;
 }
 
 .profile-text p {
   font-size: 14px;
-  color: #666;
-  margin-bottom: 10px;
+  color: #777;
 }
 
-.edit-btn {
-  background-color: #e8f0fe;
-  color: #1a73e8;
-  font-size: 14px;
-  border: none;
-  border-radius: 10px;
-  padding: 8px 14px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.edit-btn:hover {
-  background-color: #d8e5ff;
-}
-
-/* Profile Options */
+/* ===== Option List ===== */
 .profile-options {
   display: flex;
   flex-direction: column;
@@ -86,8 +91,8 @@
   background: #f9fafc;
   padding: 14px 20px;
   border-radius: 12px;
-  transition: background 0.2s;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .option:hover {
@@ -115,9 +120,121 @@
   font-size: 14px;
 }
 
-/* Logout Button Section */
+/* ===== Personal Info Section (Scrollable) ===== */
+.personal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-height: 80vh;           /* Limit height */
+  overflow-y: auto;           /* Scroll when content exceeds */
+  padding-right: 10px;
+  box-sizing: border-box;
+}
+
+.personal-info::-webkit-scrollbar {
+  width: 6px;
+}
+
+.personal-info::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+}
+
+.personal-info::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.info-heading {
+  color: #222;
+  margin-bottom: 10px;
+}
+
+/* ===== Form Styles ===== */
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.form-group input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 14px;
+  outline: none;
+}
+
+.form-group input:focus {
+  border-color: #1a73e8;
+  box-shadow: 0 0 0 2px #e3efff;
+}
+
+.email-field {
+  display: flex;
+  gap: 8px;
+}
+
+.verify-btn {
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.password-heading {
+  margin-top: 20px;
+  color: #1a73e8;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ===== Buttons ===== */
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.cancel-btn,
+.save-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.cancel-btn {
+  background: #f3f4f6;
+  color: #333;
+}
+
+.save-btn {
+  background: #1a73e8;
+  color: #fff;
+}
+
+.save-btn:hover {
+  background: #185ac9;
+}
+
+/* ===== Logout Button ===== */
 .logout-section {
-  margin-top: 40px;
+  margin-top: 30px;
   display: flex;
   justify-content: center;
 }
@@ -125,19 +242,17 @@
 .logout-btn {
   background-color: #ffebeb;
   color: #d32f2f;
-  font-weight: 500;
   border: none;
   border-radius: 12px;
   padding: 10px 18px;
   cursor: pointer;
-  transition: background 0.2s;
 }
 
 .logout-btn:hover {
-  background-color: #ffd6d6;
+  background-color: #ffdcdc;
 }
 
-/* Logout Modal */
+/* ===== Modal ===== */
 .logout-modal {
   position: fixed;
   top: 0;
@@ -148,85 +263,49 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
 }
 
 .logout-card {
   background: #fff;
   border-radius: 16px;
   padding: 24px;
-  width: 90%;
-  max-width: 380px;
   text-align: center;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  max-width: 360px;
 }
 
-.logout-card h3 {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 8px;
-  color: #222;
-}
-
-.logout-card p {
-  font-size: 14px;
-  color: #555;
-  margin-bottom: 20px;
-}
-
-.logout-actions {
-  display: flex;
-  justify-content: space-between;
-}
-
-.cancel-btn,
-.confirm-btn {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-weight: 500;
-}
-
-.cancel-btn {
-  background: #f3f4f6;
-  color: #333;
-  margin-right: 8px;
-}
-
-.confirm-btn {
-  background: #1a73e8;
-  color: #fff;
-}
-
-.confirm-btn:hover {
-  background: #185ac9;
-}
-
-/* Responsive Design */
+/* ===== Mobile Responsive ===== */
 @media (max-width: 768px) {
+  html, body {
+    height: auto;
+    overflow-y: auto; /* Enable scroll on mobile */
+  }
+
+  .profile-page {
+    padding: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    overflow-y: auto; /* Make page scrollable on mobile */
+    min-height: 100vh;
+  }
+
   .profile-content {
     padding: 24px;
     max-width: 95%;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   }
 
   .profile-info-card {
     flex-direction: column;
-    align-items: center;
     text-align: center;
   }
 
   .profile-img {
-    margin-right: 0;
-    margin-bottom: 10px;
+    margin: 0 0 10px 0;
   }
 
-  .edit-btn {
-    width: 100%;
-  }
-
-  .option {
-    padding: 12px 16px;
+  .form-row {
+    flex-direction: column;
   }
 }
