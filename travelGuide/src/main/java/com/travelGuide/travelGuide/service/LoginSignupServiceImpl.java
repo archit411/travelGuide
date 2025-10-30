@@ -9,7 +9,9 @@ import com.travelGuide.travelGuide.Pojo.SignUpResponseBody;
 import com.travelGuide.travelGuide.constants.Constants;
 import com.travelGuide.travelGuide.jwt.JwtUtil;
 import com.travelGuide.travelGuide.model.SignUpModel;
+import com.travelGuide.travelGuide.model.UserProfile;
 import com.travelGuide.travelGuide.repositories.LoginSignUpRepository;
+import com.travelGuide.travelGuide.repositories.UserProfileRepository;
 
 import jakarta.servlet.http.HttpSession;
 
@@ -21,6 +23,9 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private UserProfileRepository userProfileRepository;
 	
 	@Autowired
 	private JwtUtil jwtUtil;
@@ -62,6 +67,17 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 					response.setErrorMsg(Constants.ERROR_MESSAGE.REST_SUCCESS_MSG);
 					response.setMsisdn(createAndSaveSignUp.getMsisdn());
 					response.setUsername(createAndSaveSignUp.getUsername());
+					
+					//set user profile details 
+					UserProfile user = new UserProfile();
+					user.setfName(createAndSaveSignUp.getfName());
+					user.setlName(createAndSaveSignUp.getlName());
+					user.setMsisdn(createAndSaveSignUp.getMsisdn());
+					user.setUsername(createUserName);
+				
+					//save data in user profile db
+					userProfileRepository.save(user);
+					
 					
 				} else {
 					response = new SignUpResponseBody();

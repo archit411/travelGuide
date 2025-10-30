@@ -1,9 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiUser,
-  FiGift,
   FiBell,
-  FiLock,
   FiFileText,
   FiGlobe,
 } from "react-icons/fi";
@@ -14,20 +12,82 @@ import "./ProfilePage.css";
 export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState("main");
   const [logoutConfirm, setLogoutConfirm] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const [formData, setFormData] = useState({
-    firstName: "Henry",
-    lastName: "Wilson",
-    phone: "+91 9876543210",
-    email: "henry.wilson@example.com",
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+    username: "",
+    gender: "",
+    city: "",
+    state: "",
+    country: "",
   });
 
+  // 🔹 Fetch user profile data on component mount
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          setErrorMessage("Please login first");
+          return;
+        }
+
+        const response = await fetch("http://localhost:8080/profile/getUserDetails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 401) {
+          setErrorMessage("Please login first");
+          return;
+        }
+
+        const result = await response.json();
+
+        if (result.status === "SUCCESS") {
+          const data = result.data;
+          setFormData({
+            firstName: data.fName || "",
+            lastName: data.lName || "",
+            phone: data.msisdn || "",
+            email: data.emailId || "",
+            username: data.username || "",
+            gender: data.gender || "",
+            city: data.city || "",
+            state: data.state || "",
+            country: data.country || "",
+            currentPassword: "",
+            newPassword: "",
+            confirmPassword: "",
+          });
+        } else {
+          setErrorMessage("Please login first");
+        }
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+        setErrorMessage("Please login first");
+      }
+    };
+
+    fetchUserDetails();
+  }, []);
+
+  // 🔹 Handle field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🔹 Save changes
   const handleSave = () => {
     toast.success("Profile updated successfully ✅", {
       position: "top-center",
@@ -36,6 +96,7 @@ export default function ProfilePage() {
     });
   };
 
+  // 🔹 Verify Email button
   const handleVerifyEmail = () => {
     toast.info("Verification link sent to your email 📩", {
       position: "top-center",
@@ -44,6 +105,7 @@ export default function ProfilePage() {
     });
   };
 
+  // 🔹 Logout handler
   const handleLogout = () => {
     localStorage.clear();
     setLogoutConfirm(false);
@@ -59,6 +121,13 @@ export default function ProfilePage() {
 
   return (
     <div className="profile-page no-scroll">
+      {/* 🚨 Red error line on top if not logged in */}
+      {errorMessage && (
+        <div className="error-banner">
+          {errorMessage}
+        </div>
+      )}
+
       <div className="profile-content">
         <h2 className="profile-title">
           {activeSection === "main" ? "Profile" : "Personal Information"}
@@ -69,13 +138,13 @@ export default function ProfilePage() {
           <>
             <div className="profile-info-card">
               <img
-                src="https://via.placeholder.com/70"
-                alt="Profile"
+                src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                alt="Default Profile"
                 className="profile-img"
               />
               <div className="profile-text">
-                <h3>Hello, {formData.firstName}</h3>
-                <p>New work</p>
+                <h3>Hello, {formData.firstName || "Guest"}</h3>
+                <p>{formData.city || "No city info"}</p>
               </div>
             </div>
 
@@ -90,14 +159,6 @@ export default function ProfilePage() {
                 </div>
                 <span className="arrow">›</span>
               </div>
-
-              {/* <div className="option">
-                <div className="left">
-                  <FiGift className="icon" />
-                  <span>Loyalty Program</span>
-                </div>
-                <span className="arrow">›</span>
-              </div> */}
 
               <div className="option">
                 <div className="left">
@@ -115,13 +176,6 @@ export default function ProfilePage() {
                 <span className="arrow">›</span>
               </div>
 
-              <div className="option">
-                <div className="left">
-                  <FiGlobe className="icon" />
-                  <span>Language</span>
-                </div>
-                <span className="language">English ›</span>
-              </div>
             </div>
 
             <div className="logout-section">

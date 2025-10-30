@@ -424,3 +424,12 @@ body, .no-scroll {
     padding: 9px 0;
   }
 }
+
+.error-banner {
+  background-color: #ffdddd;
+  color: #b00020;
+  text-align: center;
+  padding: 10px;
+  font-weight: 500;
+  border-bottom: 2px solid #b00020;
+}
