@@ -9,6 +9,7 @@ export default function AddPost({ onClose, onAddStory }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState("");
+  const [btn, setBtn] = useState(false); // ✅ FIXED
   const [temperature, setTemperature] = useState(
     `${Math.floor(Math.random() * 10) + 20}`
   );
@@ -25,23 +26,14 @@ export default function AddPost({ onClose, onAddStory }) {
   const token = localStorage.getItem("token");
   const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // ✅ Detect WebView or In-App Browser
   const isWebView = (() => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
-
-    // Common WebView signatures
     if (/(FBAN|FBAV|Instagram|Line|Twitter|Electron|wv)/i.test(userAgent)) return true;
-
-    // Android WebView
     if (/; wv\)/.test(userAgent)) return true;
-
-    // iOS PWA / WebView
     if (window.navigator.standalone) return true;
-
     return false;
   })();
 
-  // ✅ Check camera permission before accessing
   const checkCameraPermission = async () => {
     if (!("permissions" in navigator)) return true;
     try {
@@ -56,11 +48,9 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
-  // ✅ Start camera (only on mobile or WebView)
   const startCamera = async () => {
     if (!isMobileDevice && !isWebView) {
       setAlertMsg("📵 Camera is only available on mobile devices or in-app browsers.");
-      // Optional: auto-open file picker for desktop
       document.querySelector('input[type="file"]')?.click();
       return;
     }
@@ -82,7 +72,6 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
-  // ✅ Capture photo
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
@@ -101,7 +90,6 @@ export default function AddPost({ onClose, onAddStory }) {
     });
   };
 
-  // ✅ Stop camera
   const stopCamera = () => {
     const stream = videoRef.current?.srcObject;
     if (stream) {
@@ -115,7 +103,6 @@ export default function AddPost({ onClose, onAddStory }) {
     return () => stopCamera();
   }, []);
 
-  // ✅ Handle file upload
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.size <= 10 * 1024 * 1024) {
@@ -126,7 +113,6 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
-  // ✅ Submit story
   const handleSubmit = async () => {
     if (!file || !location.trim()) {
       setAlertMsg("Please upload or capture an image and add a valid location.");
@@ -141,6 +127,8 @@ export default function AddPost({ onClose, onAddStory }) {
       });
       return;
     }
+
+    setBtn(true); // ✅ Disable button immediately
 
     try {
       const formData = new FormData();
@@ -167,6 +155,7 @@ export default function AddPost({ onClose, onAddStory }) {
           text: "Please login again.",
         });
         localStorage.removeItem("token");
+        setBtn(false); // ✅ Re-enable on error
         return;
       }
 
@@ -196,6 +185,7 @@ export default function AddPost({ onClose, onAddStory }) {
           title: "Upload Failed",
           text: data.errorMsg || "Please try again.",
         });
+        setBtn(false); // ✅ Re-enable on failure
       }
     } catch (err) {
       console.error("Upload error:", err);
@@ -204,6 +194,7 @@ export default function AddPost({ onClose, onAddStory }) {
         title: "Server Error",
         text: "Unable to upload story. Please try again later.",
       });
+      setBtn(false); // ✅ Re-enable on network error
     }
   };
 
@@ -211,7 +202,6 @@ export default function AddPost({ onClose, onAddStory }) {
     <>
       <div className="popup-overlay">
         <div className="popup-card">
-          {/* Header */}
           <div className="popup-header">
             <button className="popup-close" onClick={onClose}>
               <FiX />
@@ -220,7 +210,6 @@ export default function AddPost({ onClose, onAddStory }) {
             <p>Share your travel experience</p>
           </div>
 
-          {/* Body */}
           <div className="popup-body">
             {!isCameraActive ? (
               <>
@@ -263,7 +252,6 @@ export default function AddPost({ onClose, onAddStory }) {
               </div>
             )}
 
-            {/* Destination */}
             <div className="form-section">
               <label>Destination</label>
               <input
@@ -274,7 +262,6 @@ export default function AddPost({ onClose, onAddStory }) {
               />
             </div>
 
-            {/* Temperature */}
             <div className="form-section">
               <label>Current Temperature</label>
               <input
@@ -286,7 +273,6 @@ export default function AddPost({ onClose, onAddStory }) {
               <small>Auto-generated — editable if needed</small>
             </div>
 
-            {/* Crowd */}
             <div className="form-section">
               <label>Crowd Level</label>
               <div className="crowd-options">
@@ -302,7 +288,6 @@ export default function AddPost({ onClose, onAddStory }) {
               </div>
             </div>
 
-            {/* Rating */}
             <div className="form-section">
               <label>Your Rating</label>
               <div className="rating-stars">
@@ -319,7 +304,6 @@ export default function AddPost({ onClose, onAddStory }) {
               <small>{rating ? `${rating}/5 stars` : "Tap a star to rate"}</small>
             </div>
 
-            {/* Caption */}
             <div className="form-section">
               <label>Caption (Optional)</label>
               <textarea
@@ -331,10 +315,13 @@ export default function AddPost({ onClose, onAddStory }) {
             </div>
           </div>
 
-          {/* Footer */}
           <div className="popup-footer">
-            <button className="btn btn--primary full" onClick={handleSubmit}>
-              Post Update
+            <button
+              disabled={btn} // ✅ disable while uploading
+              className={`btn btn--primary full ${btn ? "disabled" : ""}`}
+              onClick={handleSubmit}
+            >
+              {btn ? "Posting..." : "Post Update"}
             </button>
             <button className="btn btn--cancel full" onClick={onClose}>
               Cancel
@@ -343,7 +330,6 @@ export default function AddPost({ onClose, onAddStory }) {
         </div>
       </div>
 
-      {/* Alerts */}
       <ModernAlert message={alertMsg} onClose={() => setAlertMsg("")} />
     </>
   );

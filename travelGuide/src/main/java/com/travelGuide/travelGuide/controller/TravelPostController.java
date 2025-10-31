@@ -6,6 +6,8 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -122,5 +124,37 @@ public class TravelPostController {
 			return postResponse;
 		}
 	}
+	@PostMapping("/getUserPosts")
+	public List<TravelPostRespBody> getUserPosts(@RequestHeader("Authorization") String authHeader) {
+	    List<TravelPostRespBody> responseList = new ArrayList<>();
+	    try {
+	        String token = authHeader.substring(7);
+	        String msisdn = jwtUtil.extractUsername(token);
+
+	        List<TravelPost> posts = travelPostRepository.findByMsisdnOrderByCreatedOnDesc(msisdn);
+
+	        for (TravelPost post : posts) {
+	            TravelPostRespBody resp = new TravelPostRespBody();
+	            resp.setCaption(post.getCaption());
+	            resp.setCreatedOn(post.getCreatedOn());
+	            resp.setCrowdLevel(post.getCrowdLevel());
+	            resp.setDestination(post.getDestination());
+	            resp.setImage(post.getImageUrl());
+	            resp.setTemprature(post.getTemperature());
+	            resp.setMsisdn(post.getmsisdn());
+	            resp.setUserRating(post.getUserRating());
+	            resp.setUsername(post.getUsername());
+	            resp.setStatus("SUCCESS");
+	            responseList.add(resp);
+	        }
+
+	        return responseList;
+
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return responseList;
+	    }
+	}
+
 	
 }

@@ -4,12 +4,12 @@ import {
   FiHome,
   FiBookmark,
   FiUser,
+  FiX,
 } from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
-
 
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
@@ -43,6 +43,99 @@ function PlaceCard({ place }) {
     </div>
   );
 }
+function StoryViewer({ stories, currentIndex, onClose }) {
+  const [index, setIndex] = useState(currentIndex);
+  const [animKey, setAnimKey] = useState(Date.now());
+  const currentStory = stories[index];
+
+  // ⏱ Auto move to next story
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (index < stories.length - 1) setIndex(index + 1);
+      else onClose();
+    }, 15000);
+    return () => clearTimeout(timer);
+  }, [index]);
+
+  // 🔁 Reset animation when story changes
+  useEffect(() => setAnimKey(Date.now()), [index]);
+
+  if (!currentStory) return null;
+
+  return (
+    <div className="story-viewer-overlay" onClick={onClose}>
+      <div
+        className="story-viewer-card fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* ❌ Close Button */}
+        <button className="story-close-btn" onClick={onClose}>
+          <FiX size={22} />
+        </button>
+
+        {/* 🔹 Progress Bars */}
+        <div className="multi-progress">
+          {stories.map((_, i) => (
+            <div key={i} className="progress-track">
+              {i < index && <div className="progress-filled done"></div>}
+              {i === index && (
+                <div
+                  key={animKey}
+                  className="progress-filled active"
+                  onAnimationEnd={() => {
+                    if (index < stories.length - 1) setIndex(index + 1);
+                    else onClose();
+                  }}
+                ></div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* 🖼 Story Image */}
+        <img
+          src={currentStory.image}
+          alt={currentStory.location}
+          className="story-viewer-image"
+        />
+
+        {/* 📍 Info Overlay */}
+        <div className="story-info-overlay">
+          <h3>📍 {currentStory.location}</h3>
+          {currentStory.comment && (
+            <p className="story-caption">
+              {currentStory.comment.length > 100
+                ? currentStory.comment.slice(0, 100) + "..."
+                : currentStory.comment}
+            </p>
+          )}
+          <div className="story-meta">
+            {currentStory.temperature && (
+              <span>🌡️ {currentStory.temperature}°C</span>
+            )}
+            {currentStory.crowd && <span>👥 {currentStory.crowd}</span>}
+            {currentStory.rating > 0 && (
+              <span>⭐ {currentStory.rating}/5</span>
+            )}
+          </div>
+        </div>
+
+        {/* ⬅➡ Tap zones */}
+        <div
+          className="tap-left"
+          onClick={() => index > 0 && setIndex(index - 1)}
+        ></div>
+        <div
+          className="tap-right"
+          onClick={() =>
+            index < stories.length - 1 ? setIndex(index + 1) : onClose()
+          }
+        ></div>
+      </div>
+    </div>
+  );
+}
+
 
 /* 🌍 Main Component */
 export default function HomePage() {
@@ -51,19 +144,54 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
   const [month, setMonth] = useState("");
   const [stories, setStories] = useState([]);
+  const [selectedStory, setSelectedStory] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const navigate = useNavigate();
 
-  // 🗓️ Get current month
   useEffect(() => {
     const localMonth = new Date().toLocaleString("default", { month: "long" });
     setMonth(localMonth);
   }, []);
 
-  // 🌍 Fetch top places for the month
+  useEffect(() => {
+    const fetchUserStories = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) return console.error("Failed to fetch user stories");
+
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setStories(
+            data.map((story) => ({
+              image: story.image,
+              location: story.destination,
+              temperature: story.temprature,
+              crowd: story.crowdLevel,
+              comment: story.caption,
+              rating: story.userRating,
+            }))
+          );
+        }
+      } catch (err) {
+        console.error("Error fetching stories:", err);
+      }
+    };
+
+    fetchUserStories();
+  }, []);
+
   useEffect(() => {
     if (!month) return;
-
     const fetchTopPlaces = async () => {
       setLoading(true);
       try {
@@ -87,10 +215,8 @@ export default function HomePage() {
     fetchTopPlaces();
   }, [month]);
 
-  // ➕ Add new story
   const addStory = (story) => setStories((prev) => [story, ...prev]);
 
-  // 🧭 Flatten places from response
   const places = topPlaces
     .flatMap((region) => [
       region.placeOne && {
@@ -108,7 +234,7 @@ export default function HomePage() {
 
   return (
     <div className="tp">
-      {/* 🌍 Header */}
+      {/* 🌍 Header (without Add button) */}
       <header className="tp-header">
         <div className="tp-brand">
           <img className="brand-logo" src="src/assets/logo.png" alt="TripPulse" />
@@ -117,9 +243,6 @@ export default function HomePage() {
             <div className="brand-sub">Discover • Plan • Go</div>
           </div>
         </div>
-        <button className="btn btn--primary" onClick={() => setShowAddModal(true)}>
-          + Add Update
-        </button>
       </header>
 
       {/* 🔍 Search Bar */}
@@ -131,28 +254,38 @@ export default function HomePage() {
       </div>
 
       {/* 📸 Stories Section */}
-      {stories.length > 0 && (
-        <div className="stories-section">
-          <h3>Your Stories</h3>
-          <div className="stories-grid">
-            {stories.map((s, i) => (
-              <div key={i} className="story-card">
-                <img src={s.image} alt={s.location} />
-                <div className="story-overlay">
-                  <p className="story-loc">📍 {s.location}</p>
-                </div>
-              </div>
-            ))}
+      <div className="stories-section">
+        <h3>Your Stories</h3>
+        <div className="stories-grid">
+          {/* 🟣 Add Story Bubble */}
+          <div
+            className="story-card your-story"
+            onClick={() => setShowAddModal(true)}
+          >
+            <div className="add-icon">＋</div>
           </div>
-        </div>
-      )}
 
-      {/* 🏞️ Top Places Section */}
+          {/* 🔹 User Stories */}
+          {stories.map((s, i) => (
+            <div
+              key={i}
+              className="story-card"
+              onClick={() => setSelectedStory({ index: i, stories })}
+            >
+              <img src={s.image} alt={s.location} />
+              <div className="story-overlay">
+                <p className="story-loc">{s.location}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 🏞️ Top Places */}
       <section className="tp-highlights">
         <div className="section-head">
           <h2>{month ? `${month}'s Top Places` : "Loading..."}</h2>
         </div>
-
         <div className="place-grid">
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
@@ -185,9 +318,18 @@ export default function HomePage() {
         ))}
       </nav>
 
-      {/* ➕ Add Post Modal */}
+      {/* ➕ Add Story Modal */}
       {showAddModal && (
         <AddPost onClose={() => setShowAddModal(false)} onAddStory={addStory} />
+      )}
+
+      {/* 👀 Story Viewer */}
+      {selectedStory && (
+        <StoryViewer
+          stories={selectedStory.stories}
+          currentIndex={selectedStory.index}
+          onClose={() => setSelectedStory(null)}
+        />
       )}
     </div>
   );
