@@ -1,5 +1,7 @@
 package com.travelGuide.travelGuide.service;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,87 +17,27 @@ import com.travelGuide.travelGuide.repositories.UserProfileRepository;
 public class UserProfileServiceImpl implements UserProfileService {
 
 	@Autowired
-	private LoginSignUpRepository loginSignUpRepository;
-
-	@Autowired
 	private UserProfileRepository userProfileRepository;
 
-	public BaseResponse<UserProfile> getUserDetails(String msisdn) {
+	@Autowired
+	private LoginSignUpRepository loginSignUpRepository;
 
-		BaseResponse<UserProfile> response = null;
+	public BaseResponse saveUserDetails(String emailId) {
+		BaseResponse response = null;
 		try {
-			if (msisdn == null || msisdn == "") {
-
-				response = new BaseResponse<UserProfile>();
-				response.setData(null);
+			if (emailId == null || emailId.trim().isEmpty()) {
+				response = new BaseResponse();
+				response.setDescription("emailId is null");
 				response.setStatus("FAILURE");
-				response.setDescription("msisdn is null");
-				response.setStatusCode("105");
-
-				return response;
-			}
-
-			UserProfile userProfile = userProfileRepository.findByMsisdn(msisdn);
-
-			if (userProfile == null) {
-				response = new BaseResponse<UserProfile>();
-				response.setData(null);
-				response.setStatus("FAILURE");
-				response.setDescription("no record found for this msisdn");
 				response.setStatusCode("106");
 
 				return response;
 			}
 
-			response = new BaseResponse<UserProfile>();
-
-			response.setData(userProfile);
-			response.setDescription("user data fetched");
-			response.setStatus("SUCCESS");
-			response.setStatusCode("100");
-
-			return response;
-		} catch (Exception e) {
-			e.printStackTrace();
-			response = new BaseResponse<UserProfile>();
-
-			response.setData(null);
-			response.setDescription("Exception Occured");
-			response.setStatus("FAILURE");
-			response.setStatusCode("106");
-			return response;
-		}
-	}
-
-	public BaseResponse<UserProfileRespBody> createAndGetUserProfileByEmail(String emailId) {
-		BaseResponse<UserProfileRespBody> response = null;
-		UserProfileRespBody responseBody = null;
-		try {
-			if(emailId==null) {
-				response = new BaseResponse<UserProfileRespBody>();
-				response.setData(null);
-				response.setStatus("FAILURE");
-				response.setDescription("emaild is null");
-				response.setStatusCode("105");
-
-				return response;
-			}
-
-			UserProfile profileDetails = userProfileRepository.findByEmailId(emailId);
-			if(profileDetails!=null) {
-				responseBody = new UserProfileRespBody();
-				responseBody.setEmailId(profileDetails.getEmailId());
-				responseBody.setfName(profileDetails.getfName());
-				responseBody.setlName(profileDetails.getlName());
-				responseBody.setUsername(profileDetails.getUsername());
-				responseBody.setCity(profileDetails.getCity());
-				responseBody.setState(profileDetails.getState());
-				responseBody.setCountry(profileDetails.getCountry());
-				responseBody.setGender(profileDetails.getGender());
-
-				response = new BaseResponse<UserProfileRespBody>();
-				response.setData(responseBody);
-				response.setDescription("user profile saved");
+			UserProfile userProfile = userProfileRepository.findByEmailId(emailId);
+			if (userProfile != null) {
+				response = new BaseResponse();
+				response.setDescription("already have entry for this emailId");
 				response.setStatus("SUCCESS");
 				response.setStatusCode("100");
 
@@ -104,16 +46,14 @@ public class UserProfileServiceImpl implements UserProfileService {
 
 			SignUpModel model = loginSignUpRepository.findByEmailId(emailId);
 			if (model == null) {
-				response = new BaseResponse<UserProfileRespBody>();
-				response.setData(null);
+				response = new BaseResponse();
+				response.setDescription("sign up details not found");
 				response.setStatus("FAILURE");
-				response.setDescription("profile details not found for this email id");
 				response.setStatusCode("106");
 
 				return response;
 			}
 
-			//set model object to save data
 			UserProfile user = new UserProfile();
 			user.setEmailId(model.getEmailId());
 			user.setfName(model.getfName());
@@ -121,75 +61,66 @@ public class UserProfileServiceImpl implements UserProfileService {
 			user.setUsername(model.getUsername());
 
 			userProfileRepository.save(user);
-
-			//set response body
-			responseBody = new UserProfileRespBody();
-			responseBody.setEmailId(model.getEmailId());
-			responseBody.setfName(model.getfName());
-			responseBody.setlName(model.getlName());
-			responseBody.setUsername(model.getUsername());
-			
-			response = new BaseResponse<UserProfileRespBody>();
-			response.setData(responseBody);
-			response.setDescription("user profile saved");
+			response = new BaseResponse();
+			response.setDescription("User Details Saved");
 			response.setStatus("SUCCESS");
 			response.setStatusCode("100");
 
 			return response;
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			return response;
 		}
 	}
+	
+	public BaseResponse<UserProfileRespBody> getLoggedInUsrDetails(String identifier){
+		
+		BaseResponse<UserProfileRespBody> response = null;
+		try {
+			
+			if(identifier==null || identifier.trim().isEmpty()) {
+				response = new BaseResponse<UserProfileRespBody>();
+				response.setDescription("emailId or phone no. not passed");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
 
-//	public BaseResponse<UserProfileRespBody> getUserProfileByEmail(String emailId) {
-//		BaseResponse<UserProfileRespBody> response = null;
-//		try {
-//
-//			if(emailId==null) {
-//				response = new BaseResponse<UserProfileRespBody>();
-//				response.setData(null);
-//				response.setStatus("FAILURE");
-//				response.setDescription("emaild is null");
-//				response.setStatusCode("105");
-//
-//				return response;
-//			}
-//			
-//			UserProfile userDetails = userProfileRepository.findByEmailId(emailId);
-//			if(userDetails==null) {
-//				response = new BaseResponse<UserProfileRespBody>();
-//				response.setData(null);
-//				response.setStatus("FAILURE");
-//				response.setDescription("user details not found for this emaild id");
-//				response.setStatusCode("106");
-//
-//				return response;
-//			}
-//			
-//			UserProfileRespBody responseBody = new UserProfileRespBody();
-//			responseBody.setEmailId(userDetails.getEmailId());
-//			responseBody.setfName(userDetails.getfName());
-//			responseBody.setlName(userDetails.getlName());
-//			responseBody.setUsername(userDetails.getUsername());
-//			
-//			response = new BaseResponse<UserProfileRespBody>();
-//			response.setData(responseBody);
-//			response.setDescription("profile fetched");
-//			response.setStatus("SUCCESS");
-//			response.setStatusCode("100");
-//			
-//			return response;
-//		} catch (Exception e) {
-//			response = new BaseResponse<UserProfileRespBody>();
-//
-//			response.setData(null);
-//			response.setDescription("Exception Occured");
-//			response.setStatus("FAILURE");
-//			response.setStatusCode("106");
-//			return response;
-//
-//		}
-//	}
+				return response;
+			}
+			
+			Optional<UserProfile> userProfile = userProfileRepository.findByEmailIdOrMsisdn(identifier, identifier);
+			if(!userProfile.isPresent()) {
+				response = new BaseResponse<UserProfileRespBody>();
+				response.setDescription("user details not found");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
+
+				return response;
+			}
+			
+			UserProfileRespBody resp = new UserProfileRespBody();
+			resp.setEmailId(userProfile.get().getEmailId());
+			resp.setfName(userProfile.get().getfName());
+			resp.setlName(userProfile.get().getlName());
+			resp.setUsername(userProfile.get().getUsername());
+			resp.setCity(userProfile.get().getCity());
+			resp.setCountry(userProfile.get().getCountry());
+			resp.setGender(userProfile.get().getGender());
+			resp.setState(userProfile.get().getState());
+			resp.setMsisdn(userProfile.get().getMsisdn());
+			
+			response = new BaseResponse<UserProfileRespBody>();
+			response.setData(resp);
+			response.setDescription("user details fetched");
+			response.setStatus("SUCCESS");
+			response.setStatusCode("100");
+			
+			return response;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return response;
+		}
+		
+	}
 
 }

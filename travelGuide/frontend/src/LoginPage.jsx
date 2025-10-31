@@ -32,7 +32,7 @@ const LoginPage = () => {
   // ✅ Handle input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" }); // clear specific error when typing
+    setErrors({ ...errors, [e.target.name]: "" });
   };
 
   // ✅ Reusable toast (for Google or normal login)
@@ -61,7 +61,6 @@ const LoginPage = () => {
     e.preventDefault();
     setErrors({ msisdn: "", password: "" });
 
-    // 🔹 Basic phone validation
     if (!/^\d{10}$/.test(formData.msisdn)) {
       setErrors({
         msisdn: "Please enter a valid 10-digit phone number",
@@ -81,21 +80,17 @@ const LoginPage = () => {
       const data = await response.json();
 
       if (data.errorCode === "100") {
-        // ✅ Successful login
         if (data.token) {
           localStorage.setItem("token", data.token);
           localStorage.setItem("username", data.userName);
         }
 
-        // ✅ Show toast (TripPulse logo)
         showWelcomeToast(data.userName, "trip");
 
-        // Navigate after short delay
         setTimeout(() => {
           navigate("/homepage", { state: { username: data.userName } });
         }, 1000);
       } else if (data.errorCode === "106") {
-        // ❌ Invalid credentials
         setErrors({
           msisdn: "",
           password: "Incorrect phone number or password",
@@ -127,6 +122,20 @@ const LoginPage = () => {
       if (data.errorCode === "100") {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.userName);
+
+        // ✅ Immediately call /saveUserDetails after successful Google login
+        try {
+          await fetch("http://localhost:8080/profile/saveUserDetails", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${data.token}`,
+            },
+          });
+          console.log("✅ User details saved successfully.");
+        } catch (err) {
+          console.error("❌ Error while saving user details:", err);
+        }
 
         showWelcomeToast(data.userName, "google");
 
@@ -215,7 +224,6 @@ const LoginPage = () => {
           <button className="install-btn" onClick={showInstallPrompt}>
             📲 Install TripPulse
           </button>
-
         </div>
       </div>
     </GoogleOAuthProvider>
