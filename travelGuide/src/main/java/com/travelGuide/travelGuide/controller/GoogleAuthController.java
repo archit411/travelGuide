@@ -88,7 +88,7 @@ public class GoogleAuthController {
 			profileRepository.save(userProfile);
 		}
 
-		return ResponseEntity.ok(Map.of("errorCode", "100", "token", jwt, "userName", name));
+		return ResponseEntity.ok(Map.of("errorCode", "100", "token", jwt, "userName", name , "email" , email));
 	}
 
 }

@@ -1,7 +1,5 @@
 package com.travelGuide.travelGuide.Pojo;
 
-import jakarta.persistence.Column;
-
 public class UserProfileRespBody {
 
 	private String msisdn;

@@ -2,12 +2,15 @@ package com.travelGuide.travelGuide.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.travelGuide.travelGuide.Pojo.BaseResponse;
+import com.travelGuide.travelGuide.Pojo.UserProfileReqBody;
+import com.travelGuide.travelGuide.Pojo.UserProfileRespBody;
 import com.travelGuide.travelGuide.jwt.JwtUtil;
 import com.travelGuide.travelGuide.model.UserProfile;
 import com.travelGuide.travelGuide.service.UserProfileService;
@@ -37,6 +40,20 @@ public class UserProfileController {
 			e.printStackTrace();
 			return response;
 		}
+	}
+	
+	@PostMapping("/createAndGetUserProfile")
+	public BaseResponse<UserProfileRespBody> CreateAndGetUserProfile(@RequestParam String emailId) {
+		
+		BaseResponse<UserProfileRespBody> response = null;
+		try {
+			response = userProfileService.createAndGetUserProfileByEmail(emailId);
+			return response;
+		}catch(Exception e) {
+			e.printStackTrace();
+			return response;
+		}
+		
 	}
 	
 }
