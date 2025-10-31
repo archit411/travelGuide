@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import ModernAlert from "./ModernAlert";
 import "./home.css";
 
-export default function AddStoryModal({ onClose, onAddStory }) {
+export default function AddPost({ onClose, onAddStory }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [location, setLocation] = useState("");
@@ -17,19 +17,57 @@ export default function AddStoryModal({ onClose, onAddStory }) {
   const [rating, setRating] = useState(0);
   const [isCameraActive, setIsCameraActive] = useState(false);
   const [alertMsg, setAlertMsg] = useState("");
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
   const username = localStorage.getItem("username") || "aj_archit";
-  const msisdn = localStorage.getItem("msisdn") || "0987654321";
+  const token = localStorage.getItem("token");
   const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-  // Start camera (mobile only)
+  // ✅ Detect WebView or In-App Browser
+  const isWebView = (() => {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
+
+    // Common WebView signatures
+    if (/(FBAN|FBAV|Instagram|Line|Twitter|Electron|wv)/i.test(userAgent)) return true;
+
+    // Android WebView
+    if (/; wv\)/.test(userAgent)) return true;
+
+    // iOS PWA / WebView
+    if (window.navigator.standalone) return true;
+
+    return false;
+  })();
+
+  // ✅ Check camera permission before accessing
+  const checkCameraPermission = async () => {
+    if (!("permissions" in navigator)) return true;
+    try {
+      const result = await navigator.permissions.query({ name: "camera" });
+      if (result.state === "denied") {
+        setAlertMsg("⚠️ Please enable camera permission in browser settings.");
+        return false;
+      }
+      return true;
+    } catch {
+      return true;
+    }
+  };
+
+  // ✅ Start camera (only on mobile or WebView)
   const startCamera = async () => {
-    if (!isMobileDevice) {
-      setAlertMsg("📱 Camera access is only available on mobile devices.");
+    if (!isMobileDevice && !isWebView) {
+      setAlertMsg("📵 Camera is only available on mobile devices or in-app browsers.");
+      // Optional: auto-open file picker for desktop
+      document.querySelector('input[type="file"]')?.click();
       return;
     }
+
+    const hasPermission = await checkCameraPermission();
+    if (!hasPermission) return;
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "environment" },
@@ -40,28 +78,30 @@ export default function AddStoryModal({ onClose, onAddStory }) {
       }
     } catch (err) {
       console.error("Camera error:", err);
-      setAlertMsg("Unable to access camera. Please check permissions.");
+      setAlertMsg("Unable to access camera. Please check browser permissions.");
     }
   };
 
-  // Capture photo
+  // ✅ Capture photo
   const capturePhoto = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
     const ctx = canvas.getContext("2d");
+    if (!ctx) return;
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.toBlob((blob) => {
-      const file = new File([blob], "captured_image.png", { type: "image/png" });
-      setFile(file);
-      setPreview(URL.createObjectURL(file));
+      if (!blob) return;
+      const newFile = new File([blob], "captured_image.png", { type: "image/png" });
+      setFile(newFile);
+      setPreview(URL.createObjectURL(newFile));
       stopCamera();
     });
   };
 
-  // Stop camera
+  // ✅ Stop camera
   const stopCamera = () => {
     const stream = videoRef.current?.srcObject;
     if (stream) {
@@ -75,9 +115,9 @@ export default function AddStoryModal({ onClose, onAddStory }) {
     return () => stopCamera();
   }, []);
 
-  // File upload
+  // ✅ Handle file upload
   const handleFileChange = (e) => {
-    const selectedFile = e.target.files[0];
+    const selectedFile = e.target.files?.[0];
     if (selectedFile && selectedFile.size <= 10 * 1024 * 1024) {
       setFile(selectedFile);
       setPreview(URL.createObjectURL(selectedFile));
@@ -86,14 +126,13 @@ export default function AddStoryModal({ onClose, onAddStory }) {
     }
   };
 
-  // Submit story
+  // ✅ Submit story
   const handleSubmit = async () => {
     if (!file || !location.trim()) {
       setAlertMsg("Please upload or capture an image and add a valid location.");
       return;
     }
 
-    const token = localStorage.getItem("token");
     if (!token) {
       Swal.fire({
         icon: "error",
@@ -113,16 +152,14 @@ export default function AddStoryModal({ onClose, onAddStory }) {
       formData.append("userRating", rating);
       formData.append("username", username);
 
-      // ✅ Correct backend endpoint & Authorization
       const res = await fetch("http://localhost:8080/api/travel/upload", {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${token}`, // send JWT to backend
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
 
-      // Handle expired or invalid token
       if (res.status === 401) {
         Swal.fire({
           icon: "error",
@@ -174,6 +211,7 @@ export default function AddStoryModal({ onClose, onAddStory }) {
     <>
       <div className="popup-overlay">
         <div className="popup-card">
+          {/* Header */}
           <div className="popup-header">
             <button className="popup-close" onClick={onClose}>
               <FiX />
@@ -182,6 +220,7 @@ export default function AddStoryModal({ onClose, onAddStory }) {
             <p>Share your travel experience</p>
           </div>
 
+          {/* Body */}
           <div className="popup-body">
             {!isCameraActive ? (
               <>
@@ -292,6 +331,7 @@ export default function AddStoryModal({ onClose, onAddStory }) {
             </div>
           </div>
 
+          {/* Footer */}
           <div className="popup-footer">
             <button className="btn btn--primary full" onClick={handleSubmit}>
               Post Update
@@ -303,6 +343,7 @@ export default function AddStoryModal({ onClose, onAddStory }) {
         </div>
       </div>
 
+      {/* Alerts */}
       <ModernAlert message={alertMsg} onClose={() => setAlertMsg("")} />
     </>
   );
