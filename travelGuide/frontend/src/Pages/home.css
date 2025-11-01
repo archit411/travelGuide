@@ -1,4 +1,3 @@
-
 :root {
   --bg: #ffffff;
   --ink: #0f1115;
@@ -21,6 +20,9 @@ body {
   overflow-y: auto !important;
 }
 
+/* ===============================
+   🌍 PAGE LAYOUT
+================================= */
 .tp {
   min-height: 100vh;
   display: flex;
@@ -28,6 +30,9 @@ body {
   background: var(--bg);
 }
 
+/* ===============================
+   🔹 HEADER
+================================= */
 .tp-header {
   display: flex;
   justify-content: space-between;
@@ -65,29 +70,9 @@ body {
   color: var(--muted);
 }
 
-/* 🔘 Buttons */
-.btn {
-  border: none;
-  cursor: pointer;
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-weight: 600;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.25s ease;
-}
-
-.btn--primary {
-  background: var(--accent);
-  color: #fff;
-}
-
-.btn--primary:hover {
-  opacity: 0.9;
-}
-
+/* ===============================
+   🔍 SEARCH BAR
+================================= */
 .tp-search {
   padding: 10px 20px;
   background: #fff;
@@ -115,6 +100,9 @@ body {
   color: var(--ink);
 }
 
+/* ===============================
+   🟣 STORIES SECTION
+================================= */
 .stories-section {
   padding: 1rem 1.5rem 0.5rem;
 }
@@ -138,7 +126,6 @@ body {
 .stories-grid::-webkit-scrollbar {
   display: none;
 }
-
 
 .story-card {
   width: 82px;
@@ -206,6 +193,9 @@ body {
   text-transform: capitalize;
 }
 
+/* ===============================
+   🏞️ PLACES GRID
+================================= */
 .place-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -264,10 +254,19 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
+/* ===============================
+   📸 STORY VIEWER
+================================= */
 .story-viewer-overlay {
   position: fixed;
   inset: 0;
@@ -324,7 +323,6 @@ body {
   color: #cbd5e1;
 }
 
-/* Progress bar */
 .multi-progress {
   display: flex;
   gap: 4px;
@@ -351,263 +349,14 @@ body {
 }
 
 @keyframes fillStory {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(6px);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.popup-card {
-  width: 95%;
-  max-width: 420px;
-  background: #ffffff;
-  border-radius: 18px;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
-  padding: 1.5rem 1.5rem 1rem;
-  position: relative;
-  overflow-y: auto;
-  max-height: 90vh;
-  animation: scaleIn 0.25s ease-out forwards;
-}
-
-/* Popup animations */
-@keyframes scaleIn {
-  from { transform: scale(0.95); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-.popup-close {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 34px;
-  height: 34px;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: 0.2s ease;
-}
-
-.popup-close:hover {
-  background: rgba(0, 0, 0, 0.6);
-}
-
-/* Upload section */
-.upload-placeholder {
-  border: 2px dashed #cbd5e1;
-  border-radius: 14px;
-  padding: 2rem 1rem;
-  text-align: center;
-  color: var(--muted);
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-}
-
-.upload-placeholder:hover {
-  border-color: var(--blue);
-  background: #f9fafb;
-}
-
-.upload-preview {
-  width: 100%;
-  height: 240px;
-  object-fit: cover;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-}
-
-.upload-actions {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.upload-btn {
-  flex: 1;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 0.8rem;
-  font-weight: 600;
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.upload-btn:hover {
-  background: var(--accent);
-  color: #fff;
-}
-
-/* Form inputs */
-.form-section {
-  margin-bottom: 1rem;
-}
-
-.form-section label {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 0.3rem;
-}
-
-.form-section input,
-.form-section textarea {
-  width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  padding: 0.7rem;
-  font-size: 0.9rem;
-  outline: none;
-}
-
-.form-section input:focus,
-.form-section textarea:focus {
-  border-color: var(--blue);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.crowd-options {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.crowd-chip {
-  flex: 1;
-  padding: 0.6rem;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  text-align: center;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-
-.crowd-chip.active {
-  background: var(--blue);
-  color: #fff;
-  border-color: var(--blue);
-}
-
-.rating-stars {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 0.3rem;
-}
-
-.popup-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.btn.full {
-  width: 100%;
-}
-
-.btn.btn--cancel {
-  background: #f3f4f6;
-  color: #1f2937;
-}
-
-.btn.btn--cancel:hover {
-  background: #e5e7eb;
-}
-
-/* ===============================
-   🧭 BOTTOM NAVIGATION
-================================= */
-.tp-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  display: flex;
-  justify-content: space-around;
-  padding: 0.6rem 0;
-  border-top: 1px solid #e6e9ef;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.04);
-  z-index: 100;
-}
-
-.nav-btn {
-  background: transparent;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #9ca3af;
-  font-size: 0.75rem;
-  cursor: pointer;
-}
-
-.nav-btn.active {
-  color: var(--accent);
-}
-
-.nav-icon {
-  font-size: 1.4rem;
-}
-
-.nav-btn.active .nav-icon {
-  color: var(--blue);
-}
-
-
-.tp-footer {
-  padding: 14px 20px;
-  color: var(--muted);
-  font-size: 13px;
-  text-align: center;
-  border-top: 1px solid var(--line);
-  background: #fff;
-}
-
-
-@media (max-width: 480px) {
-  .tp-header h1 {
-    font-size: 16px;
+  from {
+    width: 0%;
   }
-
-  .story-card {
-    width: 68px;
-    height: 68px;
-  }
-
-  .story-loc {
-    font-size: 0.7rem;
-  }
-
-  .popup-card {
-    max-width: 90%;
-    padding: 1rem;
-  }
-
-  .upload-preview {
-    height: 200px;
-  }
-
-  .tp-footer {
-    font-size: 12px;
+  to {
+    width: 100%;
   }
 }
+
 .story-close-btn {
   position: absolute;
   top: 12px;
@@ -629,4 +378,79 @@ body {
 .story-close-btn:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: scale(1.1);
+}
+
+/* ===============================
+   🧭 BOTTOM NAVIGATION
+================================= */
+.tp-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 8px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+}
+
+.nav-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: #6b7280;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.nav-btn.active {
+  color: #2563eb;
+}
+
+.nav-icon {
+  font-size: 1.3rem;
+}
+
+/* ===============================
+   ❤️ FOOTER
+================================= */
+.tp-footer {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  padding: 16px 0;
+  background: #f9fafb;
+  margin-bottom: 70px; /* space above bottom nav */
+  letter-spacing: 0.3px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ===============================
+   📱 RESPONSIVE
+================================= */
+@media (max-width: 480px) {
+  .tp-header h1 {
+    font-size: 16px;
+  }
+
+  .story-card {
+    width: 68px;
+    height: 68px;
+  }
+
+  .story-loc {
+    font-size: 0.7rem;
+  }
+
+  .tp-footer {
+    font-size: 12px;
+  }
 }

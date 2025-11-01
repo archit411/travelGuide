@@ -23,10 +23,16 @@ function SkeletonCard() {
 }
 
 /* 🔹 Place Card */
+/* 🔹 Place Card */
 function PlaceCard({ place }) {
+  const navigate = useNavigate();
   const { name, description, imageUrl } = place;
+
   return (
-    <div className="place-card-new">
+    <div
+      className="place-card-new"
+      onClick={() => navigate(`/destination/${encodeURIComponent(name)}`)}
+    >
       <div
         className="place-image"
         style={{
@@ -43,6 +49,7 @@ function PlaceCard({ place }) {
     </div>
   );
 }
+
 function StoryViewer({ stories, currentIndex, onClose }) {
   const [index, setIndex] = useState(currentIndex);
   const [animKey, setAnimKey] = useState(Date.now());
