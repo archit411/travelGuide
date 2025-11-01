@@ -28,9 +28,6 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 	private UserProfileRepository userProfileRepository;
 	
 	@Autowired
-	private SupabaseService supabaseService;
-	
-	@Autowired
 	private JwtUtil jwtUtil;
 
 	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request) {

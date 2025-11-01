@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
@@ -18,7 +19,8 @@ import java.security.Key;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "bXlfc3VwZXJfc2VjcmV0X2tleV93aGljaF9zaG91bGRfYmVfbG9uZz=="; // base64 encoded key
+	@Value("${JWT_SECRET}")
+    private static String SECRET_KEY; // base64 encoded key
 
     // Generate JWT token
     public String generateToken(String username) {

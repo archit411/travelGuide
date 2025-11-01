@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.travelGuide.travelGuide.Pojo.BaseResponse;
-import com.travelGuide.travelGuide.Pojo.UserProfileReqBody;
 import com.travelGuide.travelGuide.Pojo.UserProfileRespBody;
 import com.travelGuide.travelGuide.model.SignUpModel;
 import com.travelGuide.travelGuide.model.UserProfile;
