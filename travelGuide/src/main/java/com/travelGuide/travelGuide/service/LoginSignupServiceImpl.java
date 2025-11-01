@@ -28,6 +28,9 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 	private UserProfileRepository userProfileRepository;
 	
 	@Autowired
+	private SupabaseService supabaseService;
+	
+	@Autowired
 	private JwtUtil jwtUtil;
 
 	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request) {
@@ -36,7 +39,7 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 
 		try {
 
-			if (request != null) {
+			if (request != null || request.getMsisdn()!=null){
 
 				boolean checkDuplicate = checkDuplicate(request);
 				if (checkDuplicate) {
@@ -47,6 +50,19 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 					response.setUsername(null);
 					return response;
 				}
+				
+//				//otp verification flow
+//				String phoneE164 = "+91" + request.getMsisdn();
+//				
+//				boolean verified = supabaseService.isPhoneVerified(phoneE164);
+//				if(!verified) {
+//					response = new SignUpResponseBody();
+//					response.setErrorCode("106");
+//					response.setErrorMsg("phone no. verification failed");
+//					response.setMsisdn(request.getMsisdn());
+//					response.setUsername(null);
+//					return response;
+//				}
 
 				String createUserName = createUserName(request);
 				if (createUserName == null || createUserName == "") {

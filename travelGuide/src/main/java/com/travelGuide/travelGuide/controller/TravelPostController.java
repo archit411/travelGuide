@@ -125,13 +125,11 @@ public class TravelPostController {
 		}
 	}
 	@PostMapping("/getUserPosts")
-	public List<TravelPostRespBody> getUserPosts(@RequestHeader("Authorization") String authHeader) {
+	public List<TravelPostRespBody> getUserPosts() {
 	    List<TravelPostRespBody> responseList = new ArrayList<>();
 	    try {
-	        String token = authHeader.substring(7);
-	        String msisdn = jwtUtil.extractUsername(token);
-
-	        List<TravelPost> posts = travelPostRepository.findByMsisdnOrderByCreatedOnDesc(msisdn);
+	    	
+	        List<TravelPost> posts = travelPostRepository.findAll();
 
 	        for (TravelPost post : posts) {
 	            TravelPostRespBody resp = new TravelPostRespBody();

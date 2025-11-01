@@ -1,5 +1,6 @@
 package com.travelGuide.travelGuide.repositories;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,7 +18,7 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Intege
 	@Query(value="select * from user_profile where email_id=?1",nativeQuery =true)
 	UserProfile findByEmailId(String emailId);
 		
-	Optional<UserProfile> findByEmailIdOrMsisdn(String email , String msisdn);
+	List<UserProfile> findByEmailIdOrMsisdn(String email , String msisdn);
 	
 }
 

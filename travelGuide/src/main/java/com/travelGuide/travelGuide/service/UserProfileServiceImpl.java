@@ -1,5 +1,6 @@
 package com.travelGuide.travelGuide.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,26 +89,56 @@ public class UserProfileServiceImpl implements UserProfileService {
 				return response;
 			}
 			
-			Optional<UserProfile> userProfile = userProfileRepository.findByEmailIdOrMsisdn(identifier, identifier);
-			if(!userProfile.isPresent()) {
-				response = new BaseResponse<UserProfileRespBody>();
-				response.setDescription("user details not found");
-				response.setStatus("FAILURE");
-				response.setStatusCode("106");
+			List<UserProfile> userProfile = userProfileRepository.findByEmailIdOrMsisdn(identifier, identifier);
+			if(userProfile.isEmpty()) {
+				
+				List<SignUpModel> model = loginSignUpRepository.findByEmailIdOrMsisdn(identifier, identifier);
+				if(model.isEmpty()) {
+					response = new BaseResponse<UserProfileRespBody>();
+					response.setDescription("profile not found");
+					response.setStatus("FAILURE");
+					response.setStatusCode("106");
 
-				return response;
+					return response;
+				}else {
+					UserProfile profile = new UserProfile();
+					profile.setfName(model.get(0).getfName());
+					profile.setlName(model.get(0).getlName());
+					profile.setMsisdn(model.get(0).getMsisdn());
+					profile.setUsername(model.get(0).getUsername());
+					profile.setCity(null);
+					profile.setCountry(null);
+					profile.setGender(null);
+					profile.setEmailId(null);
+					profile.setState(null);
+					
+					userProfileRepository.save(profile);
+					
+					UserProfileRespBody resp = new UserProfileRespBody();
+					resp.setfName(userProfile.get(0).getfName());
+					resp.setlName(userProfile.get(0).getlName());
+					resp.setUsername(userProfile.get(0).getUsername());
+					resp.setMsisdn(userProfile.get(0).getMsisdn());
+					
+					response = new BaseResponse<UserProfileRespBody>();
+					response.setData(resp);
+					response.setDescription("user details fetched");
+					response.setStatus("SUCCESS");
+					response.setStatusCode("100");
+				}
+				
 			}
 			
 			UserProfileRespBody resp = new UserProfileRespBody();
-			resp.setEmailId(userProfile.get().getEmailId());
-			resp.setfName(userProfile.get().getfName());
-			resp.setlName(userProfile.get().getlName());
-			resp.setUsername(userProfile.get().getUsername());
-			resp.setCity(userProfile.get().getCity());
-			resp.setCountry(userProfile.get().getCountry());
-			resp.setGender(userProfile.get().getGender());
-			resp.setState(userProfile.get().getState());
-			resp.setMsisdn(userProfile.get().getMsisdn());
+			resp.setEmailId(userProfile.get(0).getEmailId());
+			resp.setfName(userProfile.get(0).getfName());
+			resp.setlName(userProfile.get(0).getlName());
+			resp.setUsername(userProfile.get(0).getUsername());
+			resp.setCity(userProfile.get(0).getCity());
+			resp.setCountry(userProfile.get(0).getCountry());
+			resp.setGender(userProfile.get(0).getGender());
+			resp.setState(userProfile.get(0).getState());
+			resp.setMsisdn(userProfile.get(0).getMsisdn());
 			
 			response = new BaseResponse<UserProfileRespBody>();
 			response.setData(resp);
