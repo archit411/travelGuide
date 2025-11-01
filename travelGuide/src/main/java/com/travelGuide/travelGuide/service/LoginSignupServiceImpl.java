@@ -13,8 +13,6 @@ import com.travelGuide.travelGuide.model.UserProfile;
 import com.travelGuide.travelGuide.repositories.LoginSignUpRepository;
 import com.travelGuide.travelGuide.repositories.UserProfileRepository;
 
-import jakarta.servlet.http.HttpSession;
-
 @Service
 public class LoginSignupServiceImpl implements LoginSignupService {
 
@@ -26,9 +24,6 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 	
 	@Autowired
 	private UserProfileRepository userProfileRepository;
-	
-	@Autowired
-	private SupabaseService supabaseService;
 	
 	@Autowired
 	private JwtUtil jwtUtil;
