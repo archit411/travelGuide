@@ -10,7 +10,6 @@ import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
-
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
   return (
