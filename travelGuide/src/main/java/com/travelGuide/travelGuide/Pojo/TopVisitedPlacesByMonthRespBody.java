@@ -9,6 +9,24 @@ public class TopVisitedPlacesByMonthRespBody {
 	private String placeTwo;
 	private String placeOneDescription;
 	private String placeTwoDescription;
+	private String image_url1;
+	private String image_url2;
+
+	public String getImage_url1() {
+		return image_url1;
+	}
+
+	public void setImage_url1(String image_url1) {
+		this.image_url1 = image_url1;
+	}
+
+	public String getImage_url2() {
+		return image_url2;
+	}
+
+	public void setImage_url2(String image_url2) {
+		this.image_url2 = image_url2;
+	}
 
 	public String getMonth() {
 		return month;

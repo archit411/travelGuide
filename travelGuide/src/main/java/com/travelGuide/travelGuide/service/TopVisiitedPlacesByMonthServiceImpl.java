@@ -71,6 +71,8 @@ public class TopVisiitedPlacesByMonthServiceImpl implements TopVisiitedPlacesByM
 					response.setPlaceTwoDescription(entry.getPlaceTwoDescription());
 					response.setRegion(entry.getRegion());
 					response.setWeather(entry.getWeather());
+					response.setImage_url1(entry.getImageUrl1());
+					response.setImage_url2(entry.getImage_url2());
 					
 					responseList.add(response);
 				}

@@ -38,6 +38,28 @@ public class TopVisitedByMonth {
 	
 	@Column(name="descr_two")
 	private String placeTwoDescription;
+	
+	@Column(name="image_url1")
+	private String imageUrl1;
+
+	@Column(name="image_url2")
+	private String image_url2;
+	
+	public String getImage_url2() {
+		return image_url2;
+	}
+	
+	public void setImage_url2(String image_url2) {
+		this.image_url2 = image_url2;
+	}
+
+	public String getImageUrl1() {
+		return imageUrl1;
+	}
+
+	public void setImageUrl1(String imageUrl1) {
+		this.imageUrl1 = imageUrl1;
+	}
 
 	public int getId() {
 		return id;
