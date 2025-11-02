@@ -20,7 +20,7 @@ import java.security.Key;
 public class JwtUtil {
 
 	@Value("${JWT_SECRET}")
-    private static String SECRET_KEY; // base64 encoded key
+    private String SECRET_KEY;
 
     // Generate JWT token
     public String generateToken(String username) {

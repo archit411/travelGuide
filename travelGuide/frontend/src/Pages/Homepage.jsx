@@ -10,6 +10,7 @@ import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
+
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
   return (
@@ -21,7 +22,6 @@ function SkeletonCard() {
   );
 }
 
-/* 🔹 Place Card */
 /* 🔹 Place Card */
 function PlaceCard({ place }) {
   const navigate = useNavigate();
@@ -36,7 +36,7 @@ function PlaceCard({ place }) {
         className="place-image"
         style={{
           backgroundImage: `url(${
-            imageUrl ||
+            imageUrl?.trim() ||
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
           })`,
         }}
@@ -49,6 +49,7 @@ function PlaceCard({ place }) {
   );
 }
 
+/* 🔹 Story Viewer */
 function StoryViewer({ stories, currentIndex, onClose }) {
   const [index, setIndex] = useState(currentIndex);
   const [animKey, setAnimKey] = useState(Date.now());
@@ -142,7 +143,6 @@ function StoryViewer({ stories, currentIndex, onClose }) {
   );
 }
 
-
 /* 🌍 Main Component */
 export default function HomePage() {
   const [active, setActive] = useState("home");
@@ -223,24 +223,25 @@ export default function HomePage() {
 
   const addStory = (story) => setStories((prev) => [story, ...prev]);
 
+  // ✅ FIXED: Map correct image URLs (image_url1, image_url2)
   const places = topPlaces
     .flatMap((region) => [
       region.placeOne && {
         name: region.placeOne,
         description: region.placeOneDescription,
-        imageUrl: region.placeOneImageUrl,
+        imageUrl: region.image_url1,
       },
       region.placeTwo && {
         name: region.placeTwo,
         description: region.placeTwoDescription,
-        imageUrl: region.placeTwoImageUrl,
+        imageUrl: region.image_url2,
       },
     ])
     .filter(Boolean);
 
   return (
     <div className="tp">
-      {/* 🌍 Header (without Add button) */}
+      {/* 🌍 Header */}
       <header className="tp-header">
         <div className="tp-brand">
           <img className="brand-logo" src="src/assets/logo.jpeg" alt="TripPulse" />
