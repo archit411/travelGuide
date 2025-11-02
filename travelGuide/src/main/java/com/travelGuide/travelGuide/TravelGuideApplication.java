@@ -10,7 +10,10 @@ public class TravelGuideApplication {
 
 	public static void main(String[] args) {
 		
-		Dotenv dotenv = Dotenv.load();
+		Dotenv dotenv = Dotenv.configure()
+			    .ignoreIfMissing()  // ✅ avoids crash if .env not found
+			    .load();
+
 
         // Set env variables so Spring can read them
         dotenv.entries().forEach(entry ->
