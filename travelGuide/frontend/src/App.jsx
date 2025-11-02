@@ -6,6 +6,8 @@ import ProfilePage from "./Pages/ProfilePage";
 import TripPulseHome from "./Pages/Homepage"; // Home component
 import DestinationPage from "./Pages/Destination";
 import LiveStories from "./Pages/LiveStories";
+import FoodPage from "./Pages/FoodPage";
+import SavedStories from "./Pages/SavedStories";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         {/* App main routes */}
         <Route path="/homepage" element={<TripPulseHome />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/food" element={<FoodPage />} />
+        <Route path="/saved" element={<SavedStories />} />
 <Route path="/destination/:id" element={<DestinationPage />} />
 <Route path="/livestories" element={<LiveStories/>} />
         {/* Catch-all */}
