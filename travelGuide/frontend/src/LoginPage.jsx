@@ -43,7 +43,7 @@ const LoginPage = () => {
       <img src="${
         source === "google"
           ? "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-          : "src/assets/logo.png"
+          : "src/assets/logo.jpeg"
       }" 
         alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
@@ -158,10 +158,10 @@ const LoginPage = () => {
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-logo">
-            <img src="src/assets/logo.png" alt="TripPulse Logo" />
+            <img src="src/assets/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
-          <h2 className="auth-heading">Welcome to TripPulse</h2>
+          <h2 className="auth-heading">Welcome to TripEasy4U</h2>
           <p className="auth-subtext">Sign in to explore live travel insights</p>
 
           <form className="auth-form" onSubmit={handleSubmit}>

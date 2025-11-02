@@ -104,7 +104,7 @@ export default function SignupPage() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="src/assets/logo.png" alt="TripPulse Logo" />
+          <img src="src/assets/logo.jpeg" alt="TripPulse Logo" />
         </div>
 
         <h2 className="auth-heading">Create your TripPulse Account</h2>
