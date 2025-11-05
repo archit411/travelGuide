@@ -19,15 +19,15 @@ public class OtpController {
 	@Autowired EmailService emailService;
 	
 	@PostMapping("/sendOtp")
-	public String sendEmailOtp(@RequestParam String email) {
+	public String sendEmailOtp(@RequestParam String emailId) {
 		
-		if(email==null || email.isEmpty()) {
+		if(emailId==null || emailId.isEmpty()) {
 			return "email is null";
 		}
 		
-		String otp = otpService.generateOtp(email);
-		emailService.sendOtpEmail(email, otp);
-		return "otpSentTo "+email;
+		String otp = otpService.generateOtp(emailId);
+		emailService.sendOtpEmail(emailId, otp);
+		return "otpSentTo "+emailId;
 	}
 	
 }

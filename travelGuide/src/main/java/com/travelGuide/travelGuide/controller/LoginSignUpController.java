@@ -39,11 +39,11 @@ public class LoginSignUpController {
 	}
 
 	@PostMapping("/login")
-	public SignUpResponseBody loginMsisdn(@RequestParam String emailId, @RequestParam String password) {
+	public SignUpResponseBody loginMsisdn(@RequestParam String email, @RequestParam String password) {
 
 		SignUpResponseBody response = null;
 		try {
-			response = loginSignupService.login(emailId, password);
+			response = loginSignupService.login(email, password);
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -1,25 +1,25 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Confetti from "react-confetti";
 import Swal from "sweetalert2";
+import Confetti from "react-confetti";
 import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import "./Auth.css";
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
+    fName: "",
+    lName: "",
+    emailId: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
-  const [showConfetti, setShowConfetti] = useState(false);
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
-  const [otpValue, setOtpValue] = useState("");
-  const [isVerifying, setIsVerifying] = useState(false);
-  const navigate = useNavigate();
+  const [otpValues, setOtpValues] = useState(Array(6).fill(""));
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
 
@@ -30,122 +30,104 @@ export default function SignupPage() {
 
   // ✅ Send OTP
   const handleSendOtp = async () => {
-    if (!isValidEmail(formData.email)) {
-      setErrors({ ...errors, email: "Enter a valid email address" });
-      return;
-    }
+    const { fName, lName, emailId, password } = formData;
 
-    setIsVerifying(true);
-    try {
-      const res = await fetch(
-        `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(formData.email)}`,
-        { method: "POST" }
-      );
-      const msg = await res.text();
-
-      if (msg.includes("otpSentTo")) {
-        setOtpSent(true);
-        Swal.fire({
-          icon: "success",
-          title: "OTP Sent 📩",
-          text: `Check your inbox for the OTP sent to ${formData.email}`,
-          timer: 2000,
-          showConfirmButton: false,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Failed to Send OTP ❌",
-          text: "Could not send verification email.",
-        });
-      }
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Network error while sending OTP.",
-      });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  // ✅ Verify OTP
-  const handleVerifyOtp = async () => {
-    if (!otpValue.trim()) {
-      setErrors({ ...errors, otp: "Enter the OTP sent to your email" });
-      return;
-    }
-
-    setIsVerifying(true);
-    try {
-      const res = await fetch(
-        `http://localhost:8080/api/verifyOtp?email=${encodeURIComponent(
-          formData.email
-        )}&otp=${otpValue}`,
-        { method: "POST" }
-      );
-      const msg = await res.text();
-
-      if (msg.includes("OTP verified")) {
-        setIsEmailVerified(true);
-        Swal.fire({
-          icon: "success",
-          title: "Email Verified ✅",
-          text: "You can now complete signup.",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Invalid OTP ❌",
-          text: "Please check and try again.",
-        });
-      }
-    } catch (err) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Could not verify OTP.",
-      });
-    } finally {
-      setIsVerifying(false);
-    }
-  };
-
-  // ✅ Signup
-  const handleSignup = async () => {
     let newErrors = {};
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!isValidEmail(formData.email)) newErrors.email = "Valid email required";
+    if (!fName.trim()) newErrors.fName = "First name is required";
+    if (!lName.trim()) newErrors.lName = "Last name is required";
+    if (!isValidEmail(emailId)) newErrors.emailId = "Enter a valid email";
     if (
-      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(formData.password)
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
     )
       newErrors.password =
-        "Password must be 8+ chars, include uppercase, number & special character";
+        "Password must be 8+ chars, include uppercase, number & special char";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+        `http://localhost:8080/api/sendOtp?emailId=${encodeURIComponent(emailId)}`,
+        { method: "POST" }
+      );
+      const msg = await res.text();
+
+      if (msg && msg.toLowerCase().includes("otp")) {
+        setOtpSent(true);
+        Swal.fire({
+          icon: "success",
+          title: "OTP Sent!",
+          text: `Check your inbox for OTP sent to ${emailId}`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Send OTP",
+          text: "Could not send OTP. Try again.",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+        text: "Please check your connection.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ✅ Handle OTP Input
+  const handleOtpChange = (value, index) => {
+    if (!/^[0-9]?$/.test(value)) return;
+
+    const newOtp = [...otpValues];
+    newOtp[index] = value;
+    setOtpValues(newOtp);
+
+    // auto-focus next field
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
+  };
+
+  // ✅ Signup (after OTP entered)
+  const handleSignup = async () => {
+    const otp = otpValues.join("");
+    if (otpValues.some(v => v === "") || otp.length !== 6){
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid OTP",
+        text: "Please enter all 6 digits of OTP.",
+      });
+      return;
+    }
+
     const signupPayload = {
-      fName: formData.firstName,
-      lName: formData.lastName,
+      emailId: formData.emailId,
+      fName: formData.fName,
+      lName: formData.lName,
       password: formData.password,
-      email: formData.email,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupPayload),
-      });
+      setIsLoading(true);
+      const response = await fetch(
+        `http://localhost:8080/api/signup?otp=${encodeURIComponent(otp)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(signupPayload),
+        }
+      );
 
       const data = await response.json();
+
       if (!response.ok || data.errorCode !== "100") {
         Swal.fire({
           icon: "error",
@@ -174,6 +156,8 @@ export default function SignupPage() {
         title: "Error",
         text: "Something went wrong. Try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -183,7 +167,7 @@ export default function SignupPage() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="src/assets/logo.jpeg" alt="TripPulse Logo" />
+          <img src="src/assets/logo.jpeg" alt="TripEasy4U Logo" />
         </div>
 
         <h2 className="auth-heading">Create Your TripEasy4U Account</h2>
@@ -195,12 +179,12 @@ export default function SignupPage() {
             <FiUser className="input-icon" />
             <input
               type="text"
-              name="firstName"
+              name="fName"
               placeholder="First Name"
-              value={formData.firstName}
+              value={formData.fName}
               onChange={handleChange}
             />
-            {errors.firstName && <p className="input-error">{errors.firstName}</p>}
+            {errors.fName && <p className="input-error">{errors.fName}</p>}
           </div>
 
           {/* Last Name */}
@@ -208,89 +192,27 @@ export default function SignupPage() {
             <FiUser className="input-icon" />
             <input
               type="text"
-              name="lastName"
+              name="lName"
               placeholder="Last Name"
-              value={formData.lastName}
+              value={formData.lName}
               onChange={handleChange}
             />
-            {errors.lastName && <p className="input-error">{errors.lastName}</p>}
+            {errors.lName && <p className="input-error">{errors.lName}</p>}
           </div>
 
-          {/* Email + Verify */}
-          <div className="input-group email-group">
+          {/* Email */}
+          <div className="input-group">
             <FiMail className="input-icon" />
             <input
               type="email"
-              name="email"
-              placeholder="Enter Email"
-              value={formData.email}
+              name="emailId"
+              placeholder="Email ID"
+              value={formData.emailId}
               onChange={handleChange}
-              disabled={isEmailVerified}
+              disabled={otpSent}
             />
-            <button
-              type="button"
-              className={`verify-btn ${isEmailVerified ? "verified" : ""}`}
-              onClick={handleSendOtp}
-              disabled={isVerifying || isEmailVerified}
-            >
-              {isEmailVerified ? "✅ Verified" : isVerifying ? "Sending..." : "Verify"}
-            </button>
-            {errors.email && <p className="input-error">{errors.email}</p>}
+            {errors.emailId && <p className="input-error">{errors.emailId}</p>}
           </div>
-
-          {otpSent && !isEmailVerified && (
-  <div className="otp-section fade-in">
-    <label className="otp-label">Enter the 6-digit OTP sent to your email</label>
-
-    {/* OTP Input Boxes */}
-    <div className="otp-input-row">
-      {Array.from({ length: 6 }).map((_, i) => (
-        <input
-          key={i}
-          type="text"
-          maxLength="1"
-          className="otp-digit"
-          value={otpValue[i] || ""}
-          onChange={(e) => {
-            const newOtp = otpValue.split("");
-            newOtp[i] = e.target.value.replace(/[^0-9]/g, "");
-            setOtpValue(newOtp.join(""));
-
-            // Auto-focus next box
-            if (e.target.value && e.target.nextSibling) {
-              e.target.nextSibling.focus();
-            }
-
-            // ✅ Auto-verify once 6 digits are filled
-            if (newOtp.join("").length === 6) {
-              handleVerifyOtp();
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Backspace" && !e.target.value && e.target.previousSibling) {
-              e.target.previousSibling.focus();
-            }
-          }}
-        />
-      ))}
-    </div>
-
-    {/* Verify Button */}
-    <div className="otp-btn-container">
-      <button
-        type="button"
-        className="verify-btn otp-verify-btn"
-        onClick={handleVerifyOtp}
-        disabled={isVerifying}
-      >
-        {isVerifying ? "Verifying..." : "Verify OTP"}
-      </button>
-    </div>
-
-    {errors.otp && <p className="input-error">{errors.otp}</p>}
-  </div>
-)}
-
 
           {/* Password */}
           <div className="input-group">
@@ -301,19 +223,54 @@ export default function SignupPage() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
+              disabled={otpSent}
             />
             {errors.password && <p className="input-error">{errors.password}</p>}
           </div>
 
-          {/* Sign Up */}
-          <button
-            type="button"
-            className="sign-in-btn"
-            onClick={handleSignup}
-            disabled={!isEmailVerified}
-          >
-            Sign Up
-          </button>
+          {/* Send OTP */}
+          {!otpSent && (
+            <button
+              type="button"
+              className="sign-in-btn"
+              onClick={handleSendOtp}
+              disabled={isLoading}
+            >
+              {isLoading ? "Sending..." : "Send OTP"}
+            </button>
+          )}
+
+          {/* OTP Section */}
+          {otpSent && (
+            <div className="otp-section fade-in">
+              <label className="otp-label">Enter the 6-digit OTP sent to your email</label>
+              <div className="otp-input-row">
+                {otpValues.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    maxLength="1"
+                    className="otp-digit"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, i)}
+                  />
+                ))}
+              </div>
+
+              {/* Show SignUp button when 6 digits entered */}
+              {otpValues.join("").length === 6 && (
+                <button
+                  type="button"
+                  className="sign-in-btn otp-verify-btn"
+                  onClick={handleSignup}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating Account..." : "Sign Up"}
+                </button>
+              )}
+            </div>
+          )}
         </form>
 
         <p className="auth-footer">
