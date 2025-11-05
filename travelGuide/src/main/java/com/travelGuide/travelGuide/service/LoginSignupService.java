@@ -5,8 +5,8 @@ import com.travelGuide.travelGuide.Pojo.SignUpResponseBody;
 
 public interface LoginSignupService {
 
-	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request);
+	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request,String otp);
 	
-	public SignUpResponseBody login(String msisdn , String password);
+	public SignUpResponseBody login(String emailId , String password);
 	
 }
