@@ -1,3 +1,4 @@
+// FoodPage.jsx
 import React from "react";
 import "./FoodPage.css";
 
@@ -34,8 +35,8 @@ export default function FoodPage() {
       <header className="food-header">
         <h1>🍽️ Explore the World Through Food</h1>
         <p>
-          From local street bites to global gourmet — discover cuisines that
-          define every destination.
+          From local street bites to global gourmet — dive into cuisines that define
+          every culture and destination.
         </p>
       </header>
 
@@ -44,11 +45,13 @@ export default function FoodPage() {
           <div className="food-card" key={index}>
             <div className="food-image">
               <img src={food.image} alt={food.name} />
+              <div className="food-overlay">
+                <button className="explore-btn">Explore More</button>
+              </div>
             </div>
             <div className="food-info">
               <h2>{food.name}</h2>
               <p>{food.desc}</p>
-              <button className="explore-btn">Explore More</button>
             </div>
           </div>
         ))}
