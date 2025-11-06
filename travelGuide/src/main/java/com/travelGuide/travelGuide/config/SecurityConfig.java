@@ -29,7 +29,7 @@ public class SecurityConfig {
 		}) // ✅ enable CORS globally
 				.csrf(csrf -> csrf.disable())
 				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.requestMatchers("/api/login", "/api/signup", "/api/test", "/api/auth/google" , "api/sendOtp").permitAll()
+				.requestMatchers("/api/login", "/api/signup", "/api/test", "/api/auth/google" , "/api/sendOtp").permitAll()
 				.anyRequest().authenticated())
 				.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

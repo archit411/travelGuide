@@ -32,9 +32,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   const a =
     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos((lat1 * Math.PI) / 180) *
-      Math.cos((lat2 * Math.PI) / 180) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
+    Math.cos((lat2 * Math.PI) / 180) *
+    Math.sin(dLon / 2) *
+    Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   return (R * c).toFixed(1); // km
 }
@@ -54,8 +54,8 @@ function PlaceCard({ place, userLocation }) {
     const a =
       Math.sin(dLat / 2) ** 2 +
       Math.cos(toRad(lat1)) *
-        Math.cos(toRad(lat2)) *
-        Math.sin(dLon / 2) ** 2;
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) ** 2;
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return (R * c).toFixed(1);
   }
@@ -125,10 +125,9 @@ function PlaceCard({ place, userLocation }) {
       <div
         className="place-image"
         style={{
-          backgroundImage: `url(${
-            imageUrl?.trim() ||
+          backgroundImage: `url(${imageUrl?.trim() ||
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
-          })`,
+            })`,
         }}
       ></div>
 
@@ -411,26 +410,27 @@ export default function HomePage() {
             <h1>TripEasy4U</h1>
             <div className="brand-sub">Discover • Plan • Go</div>
           </div>
+          {/* 📍 Location Display */}
+          <div>
+            {locationError ? (
+              <p className="error-text">⚠️ {locationError}</p>
+            ) : city ? (
+              <div className="location-chip fade-in">
+                <i className="fa-solid fa-location-dot location-pin"></i>
+                <span className="location-text">
+                  {city}
+                  {location?.state ? `, ${location.state}` : ""}
+                  {location?.country ? `, ${location.country}` : ""}
+                </span>
+              </div>
+            ) : (
+              <div className="location-chip loading">Detecting your location...</div>
+            )}
+          </div>
         </div>
       </header>
 
-      {/* 📍 Location Display */}
-      <div className="location-wrapper">
-        {locationError ? (
-          <p className="error-text">⚠️ {locationError}</p>
-        ) : city ? (
-          <div className="location-chip fade-in">
-            <i className="fa-solid fa-location-dot location-pin"></i>
-            <span className="location-text">
-              {city}
-              {location?.state ? `, ${location.state}` : ""}
-              {location?.country ? `, ${location.country}` : ""}
-            </span>
-          </div>
-        ) : (
-          <div className="location-chip loading">Detecting your location...</div>
-        )}
-      </div>
+
 
       {/* 🔍 Search Bar */}
       <div className="tp-search">
@@ -471,8 +471,8 @@ export default function HomePage() {
           {loading
             ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
             : places.map((place, i) => (
-                <PlaceCard key={i} place={place} userLocation={location} />
-              ))}
+              <PlaceCard key={i} place={place} userLocation={location} />
+            ))}
         </div>
       </section>
 
