@@ -11,6 +11,7 @@ import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import SearchOverlay from "./SearchOverlay";
 
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
@@ -245,6 +246,7 @@ export default function HomePage() {
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState("");
   const [city, setCity] = useState("");
+  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
   const navigate = useNavigate();
 
   /* 📅 Detect month */
@@ -434,11 +436,11 @@ export default function HomePage() {
 
       {/* 🔍 Search Bar */}
       <div className="tp-search">
-        <div className="search">
-          <FiSearch />
-          <input placeholder="Search destinations..." />
-        </div>
-      </div>
+  <div className="search" onClick={() => setShowSearchOverlay(true)}>
+    <FiSearch />
+    <input placeholder="Search destinations..." readOnly />
+  </div>
+</div>
 
       {/* 📸 Stories Section */}
       <div className="stories-section">
@@ -510,6 +512,13 @@ export default function HomePage() {
           onClose={() => setSelectedStory(null)}
         />
       )}
+      {showSearchOverlay && (
+  <SearchOverlay
+    onClose={() => setShowSearchOverlay(false)}
+    userLocation={location}
+  />
+)}
+
     </div>
   );
 }
