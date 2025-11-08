@@ -35,7 +35,7 @@ export default function ProfilePage() {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/profile/getUserDetails", {
+        const response = await fetch("${BASE_URL}/profile/getUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export default function ProfilePage() {
         return;
       }
 
-      const url = `http://localhost:8080/profile/changePassword?oldPass=${encodeURIComponent(
+      const url = `${BASE_URL}/profile/changePassword?oldPass=${encodeURIComponent(
         formData.currentPassword
       )}&newPass=${encodeURIComponent(formData.newPassword)}`;
 

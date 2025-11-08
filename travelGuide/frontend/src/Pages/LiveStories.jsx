@@ -13,7 +13,7 @@ export default function LiveStories() {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        const res = await fetch("${BASE_URL}/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

@@ -4,6 +4,8 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -74,7 +76,7 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/login?email=${encodeURIComponent(
+        `${BASE_URL}/api/login?email=${encodeURIComponent(
           formData.email
         )}&password=${encodeURIComponent(formData.password)}`,
         {
@@ -117,7 +119,7 @@ const LoginPage = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const googleToken = credentialResponse.credential;
-      const res = await fetch("http://localhost:8080/api/auth/google", {
+      const res = await fetch("${BASE_URL}/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: googleToken }),
@@ -131,7 +133,7 @@ const LoginPage = () => {
 
         // ✅ Immediately call /saveUserDetails after successful Google login
         try {
-          await fetch("http://localhost:8080/profile/saveUserDetails", {
+          await fetch("${BASE_URL}/profile/saveUserDetails", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

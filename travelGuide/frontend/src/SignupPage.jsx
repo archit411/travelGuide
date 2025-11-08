@@ -50,7 +50,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const res = await fetch(
-  `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+  `${BASE_URL}/api/sendOtp?email=${encodeURIComponent(emailId)}`,
   { method: "POST" }
 );
 
@@ -119,7 +119,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/signup?otp=${encodeURIComponent(otp)}`,
+        `${BASE_URL}/api/signup?otp=${encodeURIComponent(otp)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
