@@ -1,6 +1,7 @@
 package com.travelGuide.travelGuide.jwt;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,43 +19,58 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-	@Autowired
-	private JwtUtil jwtUtil;
+    @Autowired
+    private JwtUtil jwtUtil;
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    // ✅ List of endpoints that should bypass JWT validation
+    private static final List<String> PUBLIC_ENDPOINTS = List.of(
+            "/api/login",
+            "/api/signup",
+            "/api/sendOtp",
+            "/api/auth/google",
+            "/api/test",
+            "/actuator/health"
+    );
 
-		String requestURI = request.getRequestURI();
-		
-		if (requestURI.startsWith("/api/login") || requestURI.startsWith("/api/signup")
-				|| requestURI.startsWith("/api/sendOtp") || requestURI.startsWith("/api/auth/google")
-				|| requestURI.startsWith("/api/test")) {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-			filterChain.doFilter(request, response);
-			return;
-		}
+        String requestURI = request.getRequestURI();
 
-		final String authHeader = request.getHeader("Authorization");
-		String username = null;
-		String token = null;
+        // ✅ Skip JWT validation for public endpoints
+        if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
-		// Check header starts with "Bearer "
-		if (authHeader != null && authHeader.startsWith("Bearer ")) {
-			token = authHeader.substring(7); // remove "Bearer "
-			username = jwtUtil.extractUsername(token);
-		}
+        final String authHeader = request.getHeader("Authorization");
+        String username = null;
+        String token = null;
 
-		// If username found and not already authenticated
-		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-			if (jwtUtil.isTokenValid(token, username)) {
-				UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-						new User(username, "", new java.util.ArrayList<>()), null, new java.util.ArrayList<>());
-				authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-				SecurityContextHolder.getContext().setAuthentication(authToken);
-			}
-		}
-		filterChain.doFilter(request, response);
-	}
+        // ✅ If no Authorization header, skip validation
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
+        // Extract JWT token and username
+        token = authHeader.substring(7);
+        username = jwtUtil.extractUsername(token);
+
+        // Validate token and set authentication
+        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (jwtUtil.isTokenValid(token, username)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        new User(username, "", new java.util.ArrayList<>()),
+                        null,
+                        new java.util.ArrayList<>()
+                );
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
+
+        filterChain.doFilter(request, response);
+    }
 }
