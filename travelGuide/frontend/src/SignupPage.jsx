@@ -50,9 +50,10 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const res = await fetch(
-        `http://localhost:8080/api/sendOtp?emailId=${encodeURIComponent(emailId)}`,
-        { method: "POST" }
-      );
+  `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+  { method: "POST" }
+);
+
       const msg = await res.text();
 
       if (msg && msg.toLowerCase().includes("otp")) {
