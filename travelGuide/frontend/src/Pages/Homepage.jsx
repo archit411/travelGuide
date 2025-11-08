@@ -10,11 +10,9 @@ import { FaUtensils } from "react-icons/fa";
 import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
-<<<<<<< HEAD
-=======
+
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import SearchOverlay from "./SearchOverlay";
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
 
 /* 🔹 Skeleton Loader */
 function SkeletonCard() {
@@ -27,29 +25,8 @@ function SkeletonCard() {
   );
 }
 
-<<<<<<< HEAD
 /* 🔹 Place Card */
-function PlaceCard({ place }) {
-=======
-/* 🌍 Haversine formula to calculate distance in km */
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-  const R = 6371; // Earth's radius in km
-  const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos((lat1 * Math.PI) / 180) *
-    Math.cos((lat2 * Math.PI) / 180) *
-    Math.sin(dLon / 2) *
-    Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return (R * c).toFixed(1); // km
-}
-
-/* 🔹 Place Card with travel modes */
 function PlaceCard({ place, userLocation }) {
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
   const navigate = useNavigate();
   const { name, description, imageUrl, lat, lng } = place;
   const [distance, setDistance] = useState(null);
@@ -134,14 +111,7 @@ function PlaceCard({ place, userLocation }) {
       <div
         className="place-image"
         style={{
-<<<<<<< HEAD
-          backgroundImage: `url(${
-            imageUrl?.trim() ||
-=======
-          backgroundImage: `url(${imageUrl?.trim() ||
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
-            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
-            })`,
+          backgroundImage: `url(${imageUrl?.trim() || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"})`,
         }}
       ></div>
 
@@ -169,10 +139,6 @@ function PlaceCard({ place, userLocation }) {
   );
 }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
 /* 🔹 Story Viewer */
 function StoryViewer({ stories, currentIndex, onClose }) {
   const [index, setIndex] = useState(currentIndex);
@@ -186,7 +152,7 @@ function StoryViewer({ stories, currentIndex, onClose }) {
       else onClose();
     }, 15000);
     return () => clearTimeout(timer);
-  }, [index]);
+  }, [index, stories, onClose]);
 
   useEffect(() => setAnimKey(Date.now()), [index]);
 
@@ -406,21 +372,15 @@ export default function HomePage() {
         name: region.placeOne,
         description: region.placeOneDescription,
         imageUrl: region.image_url1,
-<<<<<<< HEAD
-=======
         lat: region.latitude1,
         lng: region.longitude1,
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
       },
       region.placeTwo && {
         name: region.placeTwo,
         description: region.placeTwoDescription,
         imageUrl: region.image_url2,
-<<<<<<< HEAD
-=======
         lat: region.latitude2,
         lng: region.longitude2,
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
       },
     ])
     .filter(Boolean);
@@ -455,15 +415,13 @@ export default function HomePage() {
         </div>
       </header>
 
-
-
       {/* 🔍 Search Bar */}
       <div className="tp-search">
-  <div className="search" onClick={() => setShowSearchOverlay(true)}>
-    <FiSearch />
-    <input placeholder="Search destinations..." readOnly />
-  </div>
-</div>
+        <div className="search" onClick={() => setShowSearchOverlay(true)}>
+          <FiSearch />
+          <input placeholder="Search destinations..." readOnly />
+        </div>
+      </div>
 
       {/* 📸 Stories Section */}
       <div className="stories-section">
@@ -536,12 +494,11 @@ export default function HomePage() {
         />
       )}
       {showSearchOverlay && (
-  <SearchOverlay
-    onClose={() => setShowSearchOverlay(false)}
-    userLocation={location}
-  />
-)}
-
+        <SearchOverlay
+          onClose={() => setShowSearchOverlay(false)}
+          userLocation={location}
+        />
+      )}
     </div>
   );
 }
