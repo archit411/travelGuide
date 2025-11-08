@@ -27,12 +27,9 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 	
 	@Autowired
 	private JwtUtil jwtUtil;
-<<<<<<< HEAD
-=======
 	
 	@Autowired
 	private OtpService otpService;
->>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
 
 	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request , String otp) {
 
