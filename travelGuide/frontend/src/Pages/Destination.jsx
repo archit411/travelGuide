@@ -19,7 +19,6 @@ export default function DestinationPage() {
   const { id } = useParams();
   const [destination, setDestination] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
-
   const [stories, setStories] = useState([]);
   const [loadingStories, setLoadingStories] = useState(true);
 
@@ -111,7 +110,6 @@ export default function DestinationPage() {
         setLoadingStories(false);
       }
     }
-
     fetchStories();
   }, [id]);
 
@@ -243,11 +241,7 @@ export default function DestinationPage() {
                 <div className="featured-list">
                   {destination.featured.map((p, i) => (
                     <div key={i} className="featured-card">
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="featured-img"
-                      />
+                      <img src={p.image} alt={p.name} className="featured-img" />
                       <div className="featured-details">
                         <h4>{p.name}</h4>
                         <p>{p.description}</p>
@@ -268,43 +262,131 @@ export default function DestinationPage() {
           </>
         )}
 
-        {/* ===== Live Stories Section ===== */}
         {activeTab === "livestories" && (
-          <div className="live-stories-section">
-            <h3>Traveler Stories from {destination.name}</h3>
+  <div className="live-stories-section">
+    <h3>Traveler Stories from {destination.name}</h3>
 
-            {loadingStories ? (
-              <p className="loading-text">Loading stories...</p>
-            ) : stories.length === 0 ? (
-              <p className="empty-text">
-                No live stories yet. Be the first to share your experience!
-              </p>
-            ) : (
-              <div className="live-stories-grid">
-                {stories.map((story, i) => (
-                  <div key={i} className="story-card-view">
-                    <img
-                      src={story.image}
-                      alt={story.destination}
-                      className="story-card-img"
-                    />
-                    <div className="story-card-content">
-                      <h4>📍 {story.destination}</h4>
-                      <p className="story-card-caption">
-                        {story.caption?.length > 100
-                          ? story.caption.slice(0, 100) + "..."
-                          : story.caption}
-                      </p>
-                      <div className="story-card-meta">
-                        <span>🌡️ {story.temprature}°C</span>
-                        <span>👥 {story.crowdLevel}</span>
-                        <span>⭐ {story.userRating}/5</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+    <div className="story-card-list">
+      {/* === Story 1 === */}
+      <div className="story-image-card">
+        <img
+          src="https://images.unsplash.com/photo-1600787911210-31dcb594b9dc?auto=format&fit=crop&w=1200&q=80"
+          alt="Solang Valley"
+        />
+        <div className="story-overlay-top">
+          <div className="story-user">
+            <div className="user-avatar">P</div>
+            <div>
+              <p className="username">Priya S.</p>
+              <p className="time">1h ago</p>
+            </div>
+          </div>
+          <span className="crowd-chip low">👥 Low</span>
+        </div>
+
+        <div className="story-overlay-bottom">
+          <div className="temp-chip">🌤 10°C</div>
+          <h4>Solang Valley</h4>
+          <p className="caption">
+            Amazing paragliding experience! Worth every penny.
+          </p>
+          <div className="likes">❤️ 89</div>
+        </div>
+      </div>
+
+      {/* === Story 2 === */}
+      <div className="story-image-card">
+        <img
+          src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
+          alt="Old Manali"
+        />
+        <div className="story-overlay-top">
+          <div className="story-user">
+            <div className="user-avatar">R</div>
+            <div>
+              <p className="username">Rahul M.</p>
+              <p className="time">3h ago</p>
+            </div>
+          </div>
+          <span className="crowd-chip medium">👥 Medium</span>
+        </div>
+
+        <div className="story-overlay-bottom">
+          <div className="temp-chip">🌤 13°C</div>
+          <h4>Old Manali</h4>
+          <p className="caption">
+            Peaceful cafes and great vibes in Old Manali.
+          </p>
+          <div className="likes">❤️ 56</div>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
+
+
+        {/* ===== Crowd Calendar Section ===== */}
+        {activeTab === "crowdcalendar" && (
+          <div className="crowd-calendar-section">
+            <h3>This Week's Prediction</h3>
+            <div className="crowd-bars">
+              {[
+                { day: "Mon", level: "Low" },
+                { day: "Tue", level: "Low" },
+                { day: "Wed", level: "Medium" },
+                { day: "Thu", level: "Medium" },
+                { day: "Fri", level: "High" },
+                { day: "Sat", level: "High" },
+                { day: "Sun", level: "High" },
+              ].map(({ day, level }) => (
+                <div key={day} className={`crowd-bar ${level.toLowerCase()}`}>
+                  <div className="bar-rect"></div>
+                  <p>{day}</p>
+                  <span>{level}</span>
+                </div>
+              ))}
+            </div>
+
+            <div className="crowd-insights">
+              <h3>Crowd Insights</h3>
+              <p>Based on 234 user reports and historical data:</p>
+              <ul>
+                <li>• Weekends see 3× more visitors than weekdays</li>
+                <li>• Best time to visit: Tuesday – Thursday</li>
+                <li>• Mall Road is busiest between 4–8 PM</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* ===== Food & Cafes Section ===== */}
+        {activeTab === "food&stay" && (
+          <div className="food-section">
+            <div className="add-eatery-card">
+              <button className="add-btn">＋ Add Eatery</button>
+              <p>Know a great spot? Share it with travelers!</p>
+            </div>
+
+            <div className="eatery-card">
+              <img
+                src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38"
+                alt="Cafe 1947"
+              />
+              <div className="eatery-details">
+                <div className="rating">⭐ 4.5</div>
+                <h3>Café 1947</h3>
+                <p className="highlight">Must Try: Italian Pizza & Live Music</p>
+                <div className="meta">
+                  <p>📍 Old Manali</p>
+                  <p>🕒 10 AM – 11 PM</p>
+                </div>
+                <div className="tags">
+                  <span>Café</span>
+                  <span>Italian</span>
+                  <span>Live Music</span>
+                </div>
               </div>
-            )}
+            </div>
           </div>
         )}
       </div>

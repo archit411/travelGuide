@@ -27,45 +27,46 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 	
 	@Autowired
 	private JwtUtil jwtUtil;
+<<<<<<< HEAD
+=======
+	
+	@Autowired
+	private OtpService otpService;
+>>>>>>> f0e2c030965a38f1fcabd0422a137e4e895e57aa
 
-	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request) {
+	public SignUpResponseBody signUpAndGetUsername(SignUpRequestBody request , String otp) {
 
 		SignUpResponseBody response = null;
 
 		try {
 
-			if (request != null || request.getMsisdn()!=null){
+			if (request != null || request.getEmailId()!=null){
 
 				boolean checkDuplicate = checkDuplicate(request);
 				if (checkDuplicate) {
 					response = new SignUpResponseBody();
 					response.setErrorCode(Constants.ERROR_CODES.REST_DUPLICATE_ENTRY);
 					response.setErrorMsg(Constants.ERROR_MESSAGE.REST_DUPLICATE_ENTRY_MSG);
-					response.setMsisdn(null);
+					response.setEmailId(null);
 					response.setUsername(null);
 					return response;
 				}
 				
-//				//otp verification flow
-//				String phoneE164 = "+91" + request.getMsisdn();
-//				
-//				boolean verified = supabaseService.isPhoneVerified(phoneE164);
-//				if(!verified) {
-//					response = new SignUpResponseBody();
-//					response.setErrorCode("106");
-//					response.setErrorMsg("phone no. verification failed");
-//					response.setMsisdn(request.getMsisdn());
-//					response.setUsername(null);
-//					return response;
-//				}
+				//otp check
+				boolean isValidOtp = otpService.verifyOtp(request.getEmailId(), otp);
+				if(!isValidOtp) {
+					response = new SignUpResponseBody();
+					response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
+					response.setErrorMsg("otp verification failed");
+					return response;
+				}
 
 				String createUserName = createUserName(request);
 				if (createUserName == null || createUserName == "") {
 					response = new SignUpResponseBody();
 					response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
 					response.setErrorMsg(Constants.ERROR_MESSAGE.USERNAME_NOT_GENERATED);
-					response.setMsisdn(null);
-					response.setUsername(null);
+					return response;
 				}
 
 				// to set sign up model and save data in db
@@ -76,15 +77,16 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 					response = new SignUpResponseBody();
 					response.setErrorCode(Constants.ERROR_CODES.REST_SUCCESS_CODE);
 					response.setErrorMsg(Constants.ERROR_MESSAGE.REST_SUCCESS_MSG);
-					response.setMsisdn(createAndSaveSignUp.getMsisdn());
 					response.setUsername(createAndSaveSignUp.getUsername());
+					response.setEmailId(request.getEmailId());
+					
 					
 					//set user profile details 
 					UserProfile user = new UserProfile();
 					user.setfName(createAndSaveSignUp.getfName());
 					user.setlName(createAndSaveSignUp.getlName());
-					user.setMsisdn(createAndSaveSignUp.getMsisdn());
 					user.setUsername(createUserName);
+					user.setEmailId(request.getEmailId());
 				
 					//save data in user profile db
 					userProfileRepository.save(user);
@@ -94,15 +96,16 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 					response = new SignUpResponseBody();
 					response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
 					response.setErrorMsg(Constants.ERROR_MESSAGE.REST_FAILURE_MSG);
-					response.setMsisdn(null);
-					response.setUsername(null);
+					return response;
 				}
 			} else {
 				response = new SignUpResponseBody();
 				response.setErrorMsg(Constants.ERROR_MESSAGE.REST_INVALID_REQUEST_BODY);
 				response.setErrorCode(Constants.ERROR_CODES.REST_INVALID_PARAM_PASSED);
-				response.setMsisdn(null);
+				response.setEmailId(null);
 				response.setUsername(null);
+				
+				return response;
 			}
 			return response;
 		} catch (Exception e) {
@@ -110,7 +113,7 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 			response = new SignUpResponseBody();
 			response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
 			response.setErrorMsg(Constants.ERROR_MESSAGE.REST_FAILURE_MSG);
-			response.setMsisdn(null);
+			response.setEmailId(null);
 			response.setUsername(null);
 
 			return response;
@@ -145,8 +148,8 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 
 					signUpModel.setfName(request.getfName());
 					signUpModel.setlName(request.getlName());
-					signUpModel.setMsisdn(request.getMsisdn());
 					signUpModel.setUsername(username);
+					signUpModel.setEmailId(request.getEmailId());
 
 					// to encode password before save in to db
 					String encodedPassword = passwordEncoder.encode(request.getPassword());
@@ -166,21 +169,22 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 
 	public boolean checkDuplicate(SignUpRequestBody request) {
 
-		SignUpModel objectMsisdn = loginSignupRepository.findByMsisdn(request.getMsisdn());
+		//SignUpModel objectMsisdn = loginSignupRepository.findByMsisdn(request.getMsisdn());
+		SignUpModel objectEmailId = loginSignupRepository.findByEmailId(request.getEmailId());
 
-		if (objectMsisdn != null) {
+		if (objectEmailId!=null) {
 			return true;
 		}
 
 		return false;
 	}
 
-	public SignUpResponseBody login(String msisdn, String password) {
+	public SignUpResponseBody login(String emailId, String password) {
 		SignUpResponseBody response = null;
 		try {
 
-			if (msisdn != null || msisdn != "" || password != null || password != "") {
-				SignUpModel modelObject = loginSignupRepository.findByMsisdn(msisdn);
+			if (emailId != null || emailId != "" || password != null || password != "") {
+				SignUpModel modelObject = loginSignupRepository.findByEmailId(emailId);
 				if (modelObject == null) {
 					response = new SignUpResponseBody();
 					response.setErrorCode(Constants.ERROR_CODES.REST_FAILURE_CODE);
@@ -196,9 +200,9 @@ public class LoginSignupServiceImpl implements LoginSignupService {
 						response.setErrorCode(Constants.ERROR_CODES.REST_SUCCESS_CODE);
 						response.setErrorMsg(Constants.ERROR_MESSAGE.REST_SUCCESS_MSG);
 						response.setUsername(modelObject.getUsername());
-						response.setMsisdn(modelObject.getMsisdn());
+						response.setEmailId(emailId);
 						
-						String token = jwtUtil.generateToken(modelObject.getMsisdn());
+						String token = jwtUtil.generateToken(modelObject.getEmailId());
 						response.setToken(token);
 						
 					} else {

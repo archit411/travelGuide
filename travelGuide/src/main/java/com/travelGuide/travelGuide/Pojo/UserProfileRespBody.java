@@ -1,8 +1,6 @@
 package com.travelGuide.travelGuide.Pojo;
 
 public class UserProfileRespBody {
-
-	private String msisdn;
 	
 	private String emailId;
 	
@@ -20,13 +18,6 @@ public class UserProfileRespBody {
 	
 	private String country;
 
-	public String getMsisdn() {
-		return msisdn;
-	}
-
-	public void setMsisdn(String msisdn) {
-		this.msisdn = msisdn;
-	}
 
 	public String getEmailId() {
 		return emailId;

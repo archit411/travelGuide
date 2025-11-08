@@ -7,7 +7,18 @@ public class SignUpResponseBody {
 	private String msisdn;
 	private String username;
 	private String token;
+	private String emailId;
 	
+	
+	
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
 	public String getUsername() {
 		return username;
 	}

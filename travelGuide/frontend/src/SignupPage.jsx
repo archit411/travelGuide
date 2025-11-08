@@ -1,68 +1,134 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Confetti from "react-confetti";
 import Swal from "sweetalert2";
-import { FiUser, FiPhone, FiLock } from "react-icons/fi";
+import Confetti from "react-confetti";
+import { FiUser, FiMail, FiLock } from "react-icons/fi";
 import "./Auth.css";
 
 export default function SignupPage() {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    mobileNumber: "",
+    fName: "",
+    lName: "",
+    emailId: "",
     password: "",
   });
 
   const [errors, setErrors] = useState({});
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpValues, setOtpValues] = useState(Array(6).fill(""));
   const [showConfetti, setShowConfetti] = useState(false);
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
-  // ✅ Handle input change
+  const isValidEmail = (email) => /\S+@\S+\.\S+/.test(email);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  // ✅ Handle Signup button click
-  const handleSignup = async () => {
-    let newErrors = {};
+  // ✅ Send OTP
+  const handleSendOtp = async () => {
+    const { fName, lName, emailId, password } = formData;
 
-    // --- Frontend validation ---
-    if (!formData.firstName.trim()) newErrors.firstName = "First name is required";
-    if (!formData.lastName.trim()) newErrors.lastName = "Last name is required";
-    if (!/^\d{10}$/.test(formData.mobileNumber))
-      newErrors.mobileNumber = "Enter a valid 10-digit mobile number";
+    let newErrors = {};
+    if (!fName.trim()) newErrors.fName = "First name is required";
+    if (!lName.trim()) newErrors.lName = "Last name is required";
+    if (!isValidEmail(emailId)) newErrors.emailId = "Enter a valid email";
     if (
-      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(
-        formData.password
-      )
+      !/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(password)
     )
       newErrors.password =
-        "Password must have 8+ chars, 1 uppercase, 1 number, 1 special char";
+        "Password must be 8+ chars, include uppercase, number & special char";
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    // --- Prepare payload matching your backend ---
+    try {
+      setIsLoading(true);
+      const res = await fetch(
+  `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+  { method: "POST" }
+);
+
+      const msg = await res.text();
+
+      if (msg && msg.toLowerCase().includes("otp")) {
+        setOtpSent(true);
+        Swal.fire({
+          icon: "success",
+          title: "OTP Sent!",
+          text: `Check your inbox for OTP sent to ${emailId}`,
+          timer: 2000,
+          showConfirmButton: false,
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Failed to Send OTP",
+          text: "Could not send OTP. Try again.",
+        });
+      }
+    } catch (err) {
+      Swal.fire({
+        icon: "error",
+        title: "Network Error",
+        text: "Please check your connection.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // ✅ Handle OTP Input
+  const handleOtpChange = (value, index) => {
+    if (!/^[0-9]?$/.test(value)) return;
+
+    const newOtp = [...otpValues];
+    newOtp[index] = value;
+    setOtpValues(newOtp);
+
+    // auto-focus next field
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
+  };
+
+  // ✅ Signup (after OTP entered)
+  const handleSignup = async () => {
+    const otp = otpValues.join("");
+    if (otpValues.some(v => v === "") || otp.length !== 6){
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid OTP",
+        text: "Please enter all 6 digits of OTP.",
+      });
+      return;
+    }
+
     const signupPayload = {
-      fName: formData.firstName,
-      lName: formData.lastName,
+      emailId: formData.emailId,
+      fName: formData.fName,
+      lName: formData.lName,
       password: formData.password,
-      msisdn: formData.mobileNumber,
     };
 
     try {
-      const response = await fetch("http://localhost:8080/api/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupPayload),
-      });
+      setIsLoading(true);
+      const response = await fetch(
+        `http://localhost:8080/api/signup?otp=${encodeURIComponent(otp)}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(signupPayload),
+        }
+      );
 
       const data = await response.json();
 
-      // ✅ Handle success/failure (your API returns errorCode = "100" for success)
       if (!response.ok || data.errorCode !== "100") {
         Swal.fire({
           icon: "error",
@@ -72,12 +138,11 @@ export default function SignupPage() {
         return;
       }
 
-      // ✅ Signup successful
       setShowConfetti(true);
       Swal.fire({
         icon: "success",
         title: "Signup Successful 🎉",
-        text: "Welcome to TripPulse!",
+        text: "Welcome to TripEasy4U!",
         timer: 2000,
         showConfirmButton: false,
       });
@@ -86,29 +151,28 @@ export default function SignupPage() {
         setShowConfetti(false);
         navigate("/login");
       }, 2000);
-    } catch (err) {
-      console.error("Signup Error:", err);
+    } catch {
       Swal.fire({
         icon: "error",
         title: "Error",
         text: "Something went wrong. Try again.",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className="auth-wrapper">
-      {showConfetti && (
-        <Confetti width={window.innerWidth} height={window.innerHeight} />
-      )}
+      {showConfetti && <Confetti width={window.innerWidth} height={window.innerHeight} />}
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="src/assets/logo.png" alt="TripPulse Logo" />
+          <img src="src/assets/logo.jpeg" alt="TripEasy4U Logo" />
         </div>
 
-        <h2 className="auth-heading">Create your TripPulse Account</h2>
-        <p className="auth-subtext">Join to explore live travel insights</p>
+        <h2 className="auth-heading">Create Your TripEasy4U Account</h2>
+        <p className="auth-subtext">Join us to explore and share travel experiences</p>
 
         <form className="auth-form" onSubmit={(e) => e.preventDefault()}>
           {/* First Name */}
@@ -116,15 +180,12 @@ export default function SignupPage() {
             <FiUser className="input-icon" />
             <input
               type="text"
-              name="firstName"
+              name="fName"
               placeholder="First Name"
-              value={formData.firstName}
+              value={formData.fName}
               onChange={handleChange}
-              required
             />
-            {errors.firstName && (
-              <p className="input-error">{errors.firstName}</p>
-            )}
+            {errors.fName && <p className="input-error">{errors.fName}</p>}
           </div>
 
           {/* Last Name */}
@@ -132,32 +193,26 @@ export default function SignupPage() {
             <FiUser className="input-icon" />
             <input
               type="text"
-              name="lastName"
+              name="lName"
               placeholder="Last Name"
-              value={formData.lastName}
+              value={formData.lName}
               onChange={handleChange}
-              required
             />
-            {errors.lastName && (
-              <p className="input-error">{errors.lastName}</p>
-            )}
+            {errors.lName && <p className="input-error">{errors.lName}</p>}
           </div>
 
-          {/* Mobile Number */}
+          {/* Email */}
           <div className="input-group">
-            <FiPhone className="input-icon" />
+            <FiMail className="input-icon" />
             <input
-              type="tel"
-              name="mobileNumber"
-              placeholder="Mobile Number"
-              value={formData.mobileNumber}
+              type="email"
+              name="emailId"
+              placeholder="Email ID"
+              value={formData.emailId}
               onChange={handleChange}
-              pattern="\d{10}"
-              required
+              disabled={otpSent}
             />
-            {errors.mobileNumber && (
-              <p className="input-error">{errors.mobileNumber}</p>
-            )}
+            {errors.emailId && <p className="input-error">{errors.emailId}</p>}
           </div>
 
           {/* Password */}
@@ -169,17 +224,54 @@ export default function SignupPage() {
               placeholder="Password"
               value={formData.password}
               onChange={handleChange}
-              required
+              disabled={otpSent}
             />
-            {errors.password && (
-              <p className="input-error">{errors.password}</p>
-            )}
+            {errors.password && <p className="input-error">{errors.password}</p>}
           </div>
 
-          {/* Signup Button */}
-          <button type="button" className="sign-in-btn" onClick={handleSignup}>
-            Sign Up
-          </button>
+          {/* Send OTP */}
+          {!otpSent && (
+            <button
+              type="button"
+              className="sign-in-btn"
+              onClick={handleSendOtp}
+              disabled={isLoading}
+            >
+              {isLoading ? "Sending..." : "Send OTP"}
+            </button>
+          )}
+
+          {/* OTP Section */}
+          {otpSent && (
+            <div className="otp-section fade-in">
+              <label className="otp-label">Enter the 6-digit OTP sent to your email</label>
+              <div className="otp-input-row">
+                {otpValues.map((digit, i) => (
+                  <input
+                    key={i}
+                    id={`otp-${i}`}
+                    type="text"
+                    maxLength="1"
+                    className="otp-digit"
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, i)}
+                  />
+                ))}
+              </div>
+
+              {/* Show SignUp button when 6 digits entered */}
+              {otpValues.join("").length === 6 && (
+                <button
+                  type="button"
+                  className="sign-in-btn otp-verify-btn"
+                  onClick={handleSignup}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Creating Account..." : "Sign Up"}
+                </button>
+              )}
+            </div>
+          )}
         </form>
 
         <p className="auth-footer">

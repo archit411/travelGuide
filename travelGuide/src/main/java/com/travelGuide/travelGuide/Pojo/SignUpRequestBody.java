@@ -1,5 +1,6 @@
 package com.travelGuide.travelGuide.Pojo;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,9 +21,25 @@ public class SignUpRequestBody {
     )
 	private String password;
 
-	@NotBlank(message="mobile number is required")
-    @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
-	private String msisdn;
+	/*
+	 * @NotBlank(message="mobile number is required")
+	 * 
+	 * @Pattern(regexp = "\\d{10}", message = "Mobile number must be 10 digits")
+	 * private String msisdn;
+	 */
+	
+	@Email(message="inavalid email")
+	private String emailId;
+	
+	
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 
 	public String getfName() {
 		return fName;
@@ -48,14 +65,11 @@ public class SignUpRequestBody {
 		this.password = password;
 	}
 
-	public String getMsisdn() {
-		return msisdn;
-	}
-
-	public void setMsisdn(String msisdn) {
-		this.msisdn = msisdn;
-	}
-	
+	/*
+	 * public String getMsisdn() { return msisdn; }
+	 * 
+	 * public void setMsisdn(String msisdn) { this.msisdn = msisdn; }
+	 */	
 	
 	
 }

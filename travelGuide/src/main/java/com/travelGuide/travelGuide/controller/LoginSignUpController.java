@@ -23,13 +23,13 @@ public class LoginSignUpController {
 	private LoginSignupService loginSignupService;
 
 	@PostMapping("/signup")
-	public SignUpResponseBody getSignUpDetails(@Valid @RequestBody SignUpRequestBody request) {
+	public SignUpResponseBody getSignUpDetails(@Valid @RequestBody SignUpRequestBody request , @RequestParam String otp) {
 
 		SignUpResponseBody response = null;
 
 		try {
 			if (request != null) {
-				response = loginSignupService.signUpAndGetUsername(request);
+				response = loginSignupService.signUpAndGetUsername(request,otp);
 			}
 			return response;
 		} catch (Exception e) {
@@ -39,11 +39,11 @@ public class LoginSignUpController {
 	}
 
 	@PostMapping("/login")
-	public SignUpResponseBody loginMsisdn(@RequestParam String msisdn, @RequestParam String password) {
+	public SignUpResponseBody loginMsisdn(@RequestParam String email, @RequestParam String password) {
 
 		SignUpResponseBody response = null;
 		try {
-			response = loginSignupService.login(msisdn, password);
+			response = loginSignupService.login(email, password);
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();

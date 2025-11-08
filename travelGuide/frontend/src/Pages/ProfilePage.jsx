@@ -8,6 +8,7 @@ export default function ProfilePage() {
   const [activeSection, setActiveSection] = useState(null);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -24,6 +25,7 @@ export default function ProfilePage() {
     confirmPassword: "",
   });
 
+  // 🔹 Fetch user details on mount
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -68,35 +70,84 @@ export default function ProfilePage() {
     fetchUserDetails();
   }, []);
 
+  // 🔹 Handle input change
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    const updatedForm = { ...formData, [name]: value };
+    setFormData(updatedForm);
+
+    // Enable button only when all fields filled and passwords match
+    const allFilled =
+      updatedForm.currentPassword.trim() !== "" &&
+      updatedForm.newPassword.trim() !== "" &&
+      updatedForm.confirmPassword.trim() !== "";
+    const passwordsMatch = updatedForm.newPassword === updatedForm.confirmPassword;
+
+    setIsPasswordValid(allFilled && passwordsMatch);
   };
 
-  const handleSave = () => {
-    toast.success("Profile updated successfully ✅", {
+  // 🔹 Save Personal Info (for future backend API)
+  const handleSaveInfo = () => {
+    toast.success("Personal information updated successfully ✅", {
       position: "top-center",
       autoClose: 1500,
       transition: Slide,
     });
   };
 
-  const handlePasswordChange = () => {
-    if (!formData.currentPassword || !formData.newPassword || !formData.confirmPassword) {
-      toast.error("Please fill all password fields ⚠️");
-      return;
-    }
-    if (formData.newPassword !== formData.confirmPassword) {
-      toast.error("New passwords do not match ❌");
-      return;
-    }
+  // 🔹 Change Password API call
+  const handlePasswordChange = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        toast.error("Please login first ❌");
+        return;
+      }
 
-    toast.success("Password changed successfully 🔒", {
-      position: "top-center",
-      autoClose: 1500,
-      transition: Slide,
-    });
+      const url = `http://localhost:8080/profile/changePassword?oldPass=${encodeURIComponent(
+        formData.currentPassword
+      )}&newPass=${encodeURIComponent(formData.newPassword)}`;
+
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.status === "SUCCESS") {
+        toast.success(result.description || "Password changed successfully 🔒", {
+          position: "top-center",
+          autoClose: 1500,
+          transition: Slide,
+        });
+        setFormData({
+          ...formData,
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+        setIsPasswordValid(false);
+      } else {
+        toast.error(result.description || "Password change failed ❌", {
+          position: "top-center",
+          autoClose: 2000,
+          transition: Slide,
+        });
+      }
+    } catch (error) {
+      console.error("Error while changing password:", error);
+      toast.error("Something went wrong ❌", {
+        position: "top-center",
+        autoClose: 2000,
+        transition: Slide,
+      });
+    }
   };
 
+  // 🔹 Logout
   const handleLogout = () => {
     localStorage.clear();
     setLogoutConfirm(false);
@@ -110,15 +161,6 @@ export default function ProfilePage() {
 
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
-  };
-
-  // 🔹 Temporary verify button handler
-  const handleVerifyEmail = () => {
-    toast.info("Verification link sent to your email 📩", {
-      position: "top-center",
-      autoClose: 2000,
-      transition: Slide,
-    });
   };
 
   return (
@@ -140,7 +182,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs Section */}
         <div className="profile-options">
           {/* PERSONAL INFO */}
           <div className="option" onClick={() => toggleSection("personal-info")}>
@@ -152,7 +194,50 @@ export default function ProfilePage() {
           </div>
           {activeSection === "personal-info" && (
             <div className="expandable-section">
-              <h3 className="info-heading">Edit Your Details</h3>
+              <h3 className="info-heading">Your Details</h3>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>First Name</label>
+                  <input type="text" name="firstName" value={formData.firstName} readOnly />
+                </div>
+                <div className="form-group">
+                  <label>Last Name</label>
+                  <input type="text" name="lastName" value={formData.lastName} readOnly />
+                </div>
+              </div>
+              <div className="form-group">
+                <label>Email</label>
+                <input type="email" name="email" value={formData.email} readOnly />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>City</label>
+                  <input type="text" name="city" value={formData.city} readOnly />
+                </div>
+                <div className="form-group">
+                  <label>State</label>
+                  <input type="text" name="state" value={formData.state} readOnly />
+                </div>
+                <div className="form-group">
+                  <label>Country</label>
+                  <input type="text" name="country" value={formData.country} readOnly />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* CHANGE PERSONAL INFO */}
+          <div className="option" onClick={() => toggleSection("edit-personal-info")}>
+            <div className="left">
+              <FiUser className="icon" />
+              <span>Change Personal Information</span>
+            </div>
+            <span className="arrow">{activeSection === "edit-personal-info" ? "▼" : "›"}</span>
+          </div>
+
+          {activeSection === "edit-personal-info" && (
+            <div className="expandable-section">
+              <h3 className="info-heading">Update Your Details</h3>
 
               <div className="form-row">
                 <div className="form-group">
@@ -175,27 +260,6 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="form-group">
-                <label>Phone Number</label>
-                <input type="tel" name="phone" value={formData.phone} onChange={handleChange} />
-              </div>
-
-              {/* EMAIL FIELD + VERIFY BUTTON */}
-              <div className="form-group email-group">
-                <label>Email</label>
-                <div className="email-field">
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                  />
-                  <button type="button" className="verify-btn" onClick={handleVerifyEmail}>
-                    Verify
-                  </button>
-                </div>
-              </div>
-
               <div className="form-row">
                 <div className="form-group">
                   <label>City</label>
@@ -207,15 +271,20 @@ export default function ProfilePage() {
                 </div>
                 <div className="form-group">
                   <label>Country</label>
-                  <input type="text" name="country" value={formData.country} onChange={handleChange} />
+                  <input
+                    type="text"
+                    name="country"
+                    value={formData.country}
+                    onChange={handleChange}
+                  />
                 </div>
               </div>
 
-              {/* <div className="button-group">
-                <button className="save-btn" onClick={handleSave}>
+              <div className="button-group">
+                <button className="save-btn" onClick={handleSaveInfo}>
                   Save Changes
                 </button>
-              </div> */}
+              </div>
             </div>
           )}
 
@@ -227,6 +296,7 @@ export default function ProfilePage() {
             </div>
             <span className="arrow">{activeSection === "change-password" ? "▼" : "›"}</span>
           </div>
+
           {activeSection === "change-password" && (
             <div className="expandable-section">
               <h3 className="info-heading">Change Password</h3>
@@ -262,7 +332,11 @@ export default function ProfilePage() {
               </div>
 
               <div className="button-group">
-                <button className="save-btn" onClick={handlePasswordChange}>
+                <button
+                  className={`save-btn ${!isPasswordValid ? "disabled-btn" : ""}`}
+                  onClick={handlePasswordChange}
+                  disabled={!isPasswordValid}
+                >
                   Update Password
                 </button>
               </div>
@@ -283,17 +357,20 @@ export default function ProfilePage() {
             </div>
           )}
 
-          {/* TERMS */}
+          {/* ABOUT ME / TERMS */}
           <div className="option" onClick={() => toggleSection("terms")}>
             <div className="left">
               <FiFileText className="icon" />
-              <span>Terms & Conditions</span>
+              <span>About Me / Terms & Conditions</span>
             </div>
             <span className="arrow">{activeSection === "terms" ? "▼" : "›"}</span>
           </div>
           {activeSection === "terms" && (
             <div className="expandable-section">
-              <p>Here you can show your terms & conditions content 📄</p>
+              <p>
+                This section can include an About Me description, app info, or your Terms &
+                Conditions content 📄
+              </p>
             </div>
           )}
         </div>
@@ -305,6 +382,7 @@ export default function ProfilePage() {
         </div>
       </div>
 
+      {/* Logout Confirmation Modal */}
       {logoutConfirm && (
         <div className="logout-modal">
           <div className="logout-card">

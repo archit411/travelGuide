@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { FiPhone, FiLock } from "react-icons/fi";
+import { FiMail, FiLock } from "react-icons/fi";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
 const LoginPage = () => {
-  const [formData, setFormData] = useState({ msisdn: "", password: "" });
-  const [errors, setErrors] = useState({ msisdn: "", password: "" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
+  const [errors, setErrors] = useState({ email: "", password: "" });
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const navigate = useNavigate();
 
@@ -35,6 +35,10 @@ const LoginPage = () => {
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
+  // ✅ Simple email validation regex
+  const validateEmail = (email) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   // ✅ Reusable toast (for Google or normal login)
   const showWelcomeToast = (userName, source = "trip") => {
     const toast = document.createElement("div");
@@ -43,7 +47,7 @@ const LoginPage = () => {
       <img src="${
         source === "google"
           ? "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-          : "src/assets/logo.png"
+          : "src/assets/logo.jpeg"
       }" 
         alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
@@ -56,21 +60,23 @@ const LoginPage = () => {
     }, 3000);
   };
 
-  // ✅ Handle phone/password login
+  // ✅ Handle email/password login
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErrors({ msisdn: "", password: "" });
+    setErrors({ email: "", password: "" });
 
-    if (!/^\d{10}$/.test(formData.msisdn)) {
+    if (!validateEmail(formData.email)) {
       setErrors({
-        msisdn: "Please enter a valid 10-digit phone number",
+        email: "Please enter a valid email address",
       });
       return;
     }
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/login?msisdn=${formData.msisdn}&password=${formData.password}`,
+        `http://localhost:8080/api/login?email=${encodeURIComponent(
+          formData.email
+        )}&password=${encodeURIComponent(formData.password)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -92,8 +98,8 @@ const LoginPage = () => {
         }, 1000);
       } else if (data.errorCode === "106") {
         setErrors({
-          msisdn: "",
-          password: "Incorrect phone number or password",
+          email: "",
+          password: "Incorrect email or password",
         });
       } else {
         setErrors({
@@ -158,25 +164,24 @@ const LoginPage = () => {
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-logo">
-            <img src="src/assets/logo.png" alt="TripPulse Logo" />
+            <img src="src/assets/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
-          <h2 className="auth-heading">Welcome to TripPulse</h2>
+          <h2 className="auth-heading">Welcome to TripEasy4U</h2>
           <p className="auth-subtext">Sign in to explore live travel insights</p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
             <div className="input-group">
-              <FiPhone className="input-icon" />
+              <FiMail className="input-icon" />
               <input
-                type="tel"
-                name="msisdn"
-                placeholder="Enter phone number"
-                value={formData.msisdn}
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
                 onChange={handleChange}
-                maxLength="10"
                 required
               />
-              {errors.msisdn && <p className="input-error">{errors.msisdn}</p>}
+              {errors.email && <p className="input-error">{errors.email}</p>}
             </div>
 
             <div className="input-group">

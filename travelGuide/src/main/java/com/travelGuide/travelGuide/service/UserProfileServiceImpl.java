@@ -4,10 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.travelGuide.travelGuide.Pojo.BaseResponse;
-import com.travelGuide.travelGuide.Pojo.UserProfileReqBody;
 import com.travelGuide.travelGuide.Pojo.UserProfileRespBody;
 import com.travelGuide.travelGuide.model.SignUpModel;
 import com.travelGuide.travelGuide.model.UserProfile;
@@ -22,6 +22,9 @@ public class UserProfileServiceImpl implements UserProfileService {
 
 	@Autowired
 	private LoginSignUpRepository loginSignUpRepository;
+	
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	public BaseResponse saveUserDetails(String emailId) {
 		BaseResponse response = null;
@@ -118,7 +121,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 					resp.setfName(userProfile.get(0).getfName());
 					resp.setlName(userProfile.get(0).getlName());
 					resp.setUsername(userProfile.get(0).getUsername());
-					resp.setMsisdn(userProfile.get(0).getMsisdn());
 					
 					response = new BaseResponse<UserProfileRespBody>();
 					response.setData(resp);
@@ -138,7 +140,6 @@ public class UserProfileServiceImpl implements UserProfileService {
 			resp.setCountry(userProfile.get(0).getCountry());
 			resp.setGender(userProfile.get(0).getGender());
 			resp.setState(userProfile.get(0).getState());
-			resp.setMsisdn(userProfile.get(0).getMsisdn());
 			
 			response = new BaseResponse<UserProfileRespBody>();
 			response.setData(resp);
@@ -152,6 +153,63 @@ public class UserProfileServiceImpl implements UserProfileService {
 			return response;
 		}
 		
+	}
+	
+	public BaseResponse<UserProfileRespBody> changePassword(String email , String oldPass , String newPass){
+		BaseResponse<UserProfileRespBody> response = null;
+		try {
+			if(oldPass==null || oldPass=="" || newPass==null || newPass=="") {
+				response = new BaseResponse();
+				response.setDescription("one of the password field is null");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
+
+				return response;
+			}
+			
+			SignUpModel user = loginSignUpRepository.findByEmailId(email);
+			if(user==null) {
+				response = new BaseResponse();
+				response.setDescription("no user found with this email id");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
+
+				return response;
+			}
+			
+			boolean isPasswordValid = passwordEncoder.matches(oldPass, user.getPassword());
+			if(!isPasswordValid) {
+				response = new BaseResponse();
+				response.setDescription("entered the wrong old password");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
+
+				return response;
+			}
+			
+			String password = passwordEncoder.encode(newPass);
+			int updatedRows =  loginSignUpRepository.updatePassword(email, password);
+			if(updatedRows==0) {
+				response = new BaseResponse();
+				response.setDescription("password change faailed");
+				response.setStatus("FAILURE");
+				response.setStatusCode("106");
+
+				return response;
+			}
+			
+			response = new BaseResponse();
+			response.setDescription("password changed for emailId : "+email);
+			response.setStatus("SUCCESS");
+			response.setStatusCode("100");
+			
+			return response;
+		}catch(Exception e) {
+			e.printStackTrace();
+			response = new BaseResponse();
+			response.setDescription("exception occured");
+			return response;
+		}
 	}
 
 }
