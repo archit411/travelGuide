@@ -17,30 +17,47 @@ import com.travelGuide.travelGuide.jwt.JwtAuthenticationEntryPoint;
 @Configuration
 public class SecurityConfig {
 
-	@Autowired
-	private JwtAuthFilter jwtAuthFilter;
+    @Autowired
+    private JwtAuthFilter jwtAuthFilter;
 
-	@Autowired
-	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    @Autowired
+    private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.cors(cors -> {
-		}) // ✅ enable CORS globally
-				.csrf(csrf -> csrf.disable())
-				.authorizeHttpRequests(auth -> auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-				.requestMatchers("/api/login", "/api/signup", "/api/test", "/api/auth/google" , "/api/sendOtp").permitAll()
-				.anyRequest().authenticated())
-				.exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(cors -> {}) // ✅ enable CORS globally
+            .csrf(csrf -> csrf.disable())
+            .authorizeHttpRequests(auth -> auth
+                // ✅ Allow OPTIONS for preflight requests
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                // ✅ Permit all public endpoints (no JWT needed)
+                .requestMatchers(
+                    "/api/login",
+                    "/api/signup",
+                    "/api/sendOtp",
+                    "/api/test",
+                    "/api/auth/google",
+                    "/actuator/**"   // ✅ make actuator public
+                ).permitAll()
 
-		return http.build();
-	}
+                // ✅ Everything else secured
+                .anyRequest().authenticated()
+            )
+            // ✅ Proper unauthorized handler
+            .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
+            // ✅ No sessions — JWT only
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-		return config.getAuthenticationManager();
-	}
+        // ✅ Register our JWT filter before UsernamePasswordAuthenticationFilter
+        http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }

@@ -22,14 +22,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
-    // ✅ List of endpoints that should bypass JWT validation
+    // ✅ Public endpoints that bypass JWT validation
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-            "/api/login",
-            "/api/signup",
-            "/api/sendOtp",
-            "/api/auth/google",
-            "/api/test",
-            "/actuator/health"
+        "/api/login",
+        "/api/signup",
+        "/api/sendOtp",
+        "/api/auth/google",
+        "/api/test",
+        "/actuator"
     );
 
     @Override
@@ -38,27 +38,23 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         String requestURI = request.getRequestURI();
 
-        // ✅ Skip JWT validation for public endpoints
+        // ✅ Skip JWT validation for all public endpoints (including actuator)
         if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         final String authHeader = request.getHeader("Authorization");
-        String username = null;
-        String token = null;
 
-        // ✅ If no Authorization header, skip validation
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            // ✅ No token → continue without auth (let security handle protected ones)
             filterChain.doFilter(request, response);
             return;
         }
 
-        // Extract JWT token and username
-        token = authHeader.substring(7);
-        username = jwtUtil.extractUsername(token);
+        String token = authHeader.substring(7);
+        String username = jwtUtil.extractUsername(token);
 
-        // Validate token and set authentication
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtil.isTokenValid(token, username)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
