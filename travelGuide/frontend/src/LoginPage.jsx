@@ -4,7 +4,6 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -76,12 +75,13 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(
-        `${BASE_URL}/api/login?email=${encodeURIComponent(
+        `https://travelguide-1-21sw.onrender.com/api/login?email=${encodeURIComponent(
           formData.email
         )}&password=${encodeURIComponent(formData.password)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
+          mode: "cors", 
         }
       );
 
@@ -119,10 +119,11 @@ const LoginPage = () => {
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const googleToken = credentialResponse.credential;
-      const res = await fetch("${BASE_URL}/api/auth/google", {
+      const res = await fetch("https://travelguide-1-21sw.onrender.com/api/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ credential: googleToken }),
+         mode: "cors", 
       });
 
       const data = await res.json();
@@ -133,12 +134,13 @@ const LoginPage = () => {
 
         // ✅ Immediately call /saveUserDetails after successful Google login
         try {
-          await fetch("${BASE_URL}/profile/saveUserDetails", {
+          await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
               Authorization: `Bearer ${data.token}`,
             },
+             mode: "cors", 
           });
           console.log("✅ User details saved successfully.");
         } catch (err) {

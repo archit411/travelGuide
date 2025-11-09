@@ -50,7 +50,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const res = await fetch(
-  `${BASE_URL}/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+  `https://travelguide-1-21sw.onrender.com/api/sendOtp?email=${encodeURIComponent(emailId)}`,
   { method: "POST" }
 );
 
@@ -119,7 +119,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `${BASE_URL}/api/signup?otp=${encodeURIComponent(otp)}`,
+        `https://travelguide-1-21sw.onrender.com/api/signup?otp=${encodeURIComponent(otp)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

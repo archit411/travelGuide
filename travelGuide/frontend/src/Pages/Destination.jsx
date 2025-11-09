@@ -88,7 +88,7 @@ export default function DestinationPage() {
     async function fetchStories() {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("${BASE_URL}/api/travel/getUserPosts", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

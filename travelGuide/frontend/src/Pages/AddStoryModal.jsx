@@ -140,7 +140,7 @@ export default function AddPost({ onClose, onAddStory }) {
       formData.append("userRating", rating);
       formData.append("username", username);
 
-      const res = await fetch("${BASE_URL}/api/travel/upload", {
+      const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/upload", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
