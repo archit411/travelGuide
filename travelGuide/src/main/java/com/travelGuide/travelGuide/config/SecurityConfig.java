@@ -1,5 +1,7 @@
 package com.travelGuide.travelGuide.config;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,30 +30,38 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .cors(cors -> {}) // ✅ enable CORS globally
+            .cors(cors -> cors.configurationSource(request -> {
+                var corsConfig = new org.springframework.web.cors.CorsConfiguration();
+                corsConfig.setAllowedOriginPatterns(List.of(
+                    "http://localhost:5173",
+                    "https://rococo-boba-180bdb.netlify.app"
+                ));
+                corsConfig.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                corsConfig.setAllowedHeaders(List.of("*"));
+                corsConfig.setAllowCredentials(true);
+                return corsConfig;
+            }))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-            	    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            	    .requestMatchers(
-            	        "/api/login",
-            	        "/api/signup",
-            	        "/api/sendOtp",
-            	        "/api/auth/google",
-            	        "/api/test",
-            	        "/actuator/**"
-            	    ).permitAll()
-            	    .anyRequest().authenticated()
-            	)
-            // ✅ Proper unauthorized handler
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(
+                    "/api/login",
+                    "/api/signup",
+                    "/api/sendOtp",
+                    "/api/auth/google",
+                    "/api/test",
+                    "/actuator/**"
+                ).permitAll()
+                .anyRequest().authenticated()
+            )
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
-            // ✅ No sessions — JWT only
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // ✅ Register our JWT filter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
