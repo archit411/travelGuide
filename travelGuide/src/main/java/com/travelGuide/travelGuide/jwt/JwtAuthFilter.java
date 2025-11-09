@@ -39,9 +39,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String requestURI = request.getRequestURI();
+        System.out.println("🔍 Incoming request: " + requestURI);
 
         // ✅ Skip JWT validation for all public endpoints (including actuator)
         if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith)) {
+            System.out.println("✅ Bypassing JWT for: " + requestURI);
             filterChain.doFilter(request, response);
             return;
         }
