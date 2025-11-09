@@ -24,12 +24,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     // ✅ Public endpoints that bypass JWT validation
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-        "/api/login",
-        "/api/signup",
-        "/api/sendOtp",
-        "/api/auth/google",
-        "/api/test",
-        "/actuator"
+    		 "/api/login",
+             "/api/signup",
+             "/api/sendOtp",
+             "/api/auth/google",
+             "/api/test",
+             "/actuator",
+             "/actuator/",
+             "/actuator/health"
     );
 
     @Override
@@ -39,7 +41,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         // ✅ Skip JWT validation for all public endpoints (including actuator)
-        if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::contains)) {
+        if (PUBLIC_ENDPOINTS.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
