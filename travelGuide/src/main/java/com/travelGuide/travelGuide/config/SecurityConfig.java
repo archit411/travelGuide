@@ -29,22 +29,17 @@ public class SecurityConfig {
             .cors(cors -> {}) // ✅ enable CORS globally
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                // ✅ Allow OPTIONS for preflight requests
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                // ✅ Permit all public endpoints (no JWT needed)
-                .requestMatchers(
-                    "/api/login",
-                    "/api/signup",
-                    "/api/sendOtp",
-                    "/api/test",
-                    "/api/auth/google",
-                    "/actuator/**"   // ✅ make actuator public
-                ).permitAll()
-
-                // ✅ Everything else secured
-                .anyRequest().authenticated()
-            )
+            	    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            	    .requestMatchers(
+            	        "/api/login",
+            	        "/api/signup",
+            	        "/api/sendOtp",
+            	        "/api/auth/google",
+            	        "/api/test",
+            	        "/actuator/**"
+            	    ).permitAll()
+            	    .anyRequest().authenticated()
+            	)
             // ✅ Proper unauthorized handler
             .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
             // ✅ No sessions — JWT only
