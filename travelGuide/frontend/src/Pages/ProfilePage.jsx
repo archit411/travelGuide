@@ -380,7 +380,7 @@ export default function ProfilePage() {
     <i className="fa-solid fa-right-from-bracket logout-icon"></i>
     <span>Log Out</span>
   </div>
-  <i className="fa-solid fa-chevron-right logout-arrow"></i>
+   <span className="arrow">{activeSection === "terms" ? "▼" : "›"}</span>
 </div>
 
       </div>
