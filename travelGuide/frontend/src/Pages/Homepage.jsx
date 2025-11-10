@@ -26,82 +26,9 @@ function SkeletonCard() {
 }
 
 /* 🔹 Place Card */
-function PlaceCard({ place, userLocation }) {
+function PlaceCard({ place }) {
   const navigate = useNavigate();
-  const { name, description, imageUrl, lat, lng } = place;
-  const [distance, setDistance] = useState(null);
-
-  // ✅ Accurate distance calculation
-  function preciseDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = (deg) => (deg * Math.PI) / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(lat1)) *
-      Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return (R * c).toFixed(1);
-  }
-
-  useEffect(() => {
-    async function fetchCoordsAndDistance() {
-      if (!userLocation || !name) return;
-
-      let placeLat = lat;
-      let placeLng = lng;
-
-      // 🧭 Try cached coordinates first
-      const cached = localStorage.getItem(`coords_${name}`);
-      if (cached) {
-        const { lat: cachedLat, lng: cachedLng } = JSON.parse(cached);
-        placeLat = cachedLat;
-        placeLng = cachedLng;
-      }
-
-      // 🌍 If missing, fetch from OpenStreetMap
-      if (!placeLat || !placeLng) {
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-              name
-            )}`
-          );
-          const data = await res.json();
-          if (data[0]) {
-            placeLat = parseFloat(data[0].lat);
-            placeLng = parseFloat(data[0].lon);
-            localStorage.setItem(
-              `coords_${name}`,
-              JSON.stringify({ lat: placeLat, lng: placeLng })
-            );
-          }
-        } catch (err) {
-          console.warn("Could not fetch coordinates for:", name);
-        }
-      }
-
-      // ✅ Calculate distance
-      if (placeLat && placeLng) {
-        const km = preciseDistance(
-          userLocation.lat,
-          userLocation.lng,
-          placeLat,
-          placeLng
-        );
-        setDistance(km);
-      }
-    }
-
-    fetchCoordsAndDistance();
-  }, [userLocation, name, lat, lng]);
-
-  // ✈️ Derived travel mode distances
-  const carDistance = distance ? (distance * 1.3).toFixed(0) : null;
-  const trainDistance = distance ? (distance * 1.1).toFixed(0) : null;
-  const flightDistance = distance ? (distance / 1.05).toFixed(0) : null;
+  const { name, description, imageUrl } = place;
 
   return (
     <div
@@ -111,33 +38,21 @@ function PlaceCard({ place, userLocation }) {
       <div
         className="place-image"
         style={{
-          backgroundImage: `url(${imageUrl?.trim() || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"})`,
+          backgroundImage: `url(${
+            imageUrl?.trim() ||
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
+          })`,
         }}
       ></div>
 
       <div className="place-info">
         <h4 className="place-title">📍 {name}</h4>
-
-        {/* ✅ Show travel modes only when distance known */}
-        {distance && (
-          <div className="travel-modes">
-            <div className="mode">
-              <i className="fa-solid fa-car"></i> {carDistance} km
-            </div>
-            <div className="mode">
-              <i className="fa-solid fa-train"></i> {trainDistance} km
-            </div>
-            <div className="mode">
-              <i className="fa-solid fa-plane"></i> {flightDistance} km
-            </div>
-          </div>
-        )}
-
         <p className="place-desc">{description || "No description available."}</p>
       </div>
     </div>
   );
 }
+
 
 /* 🔹 Story Viewer */
 function StoryViewer({ stories, currentIndex, onClose }) {

@@ -25,6 +25,18 @@ export default function AddPost({ onClose, onAddStory }) {
   const username = localStorage.getItem("username") || "aj_archit";
   const token = localStorage.getItem("token");
   const isMobileDevice = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+useEffect(() => {
+  // Lock body scroll and prevent width shift
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.body.style.overflow = "hidden";
+  document.body.style.paddingRight = `${scrollbarWidth}px`;
+
+  return () => {
+    // Restore scroll when modal closes
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+  };
+}, []);
 
   const isWebView = (() => {
     const userAgent = navigator.userAgent || navigator.vendor || window.opera || "";
@@ -49,28 +61,38 @@ export default function AddPost({ onClose, onAddStory }) {
   };
 
   const startCamera = async () => {
-    if (!isMobileDevice && !isWebView) {
-      setAlertMsg("📵 Camera is only available on mobile devices or in-app browsers.");
-      document.querySelector('input[type="file"]')?.click();
-      return;
-    }
+  // Detect if mobile or tablet device
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    const hasPermission = await checkCameraPermission();
-    if (!hasPermission) return;
+  // Detect WebView (e.g., Instagram, Facebook, etc.)
+  const isWebView =
+    /(FBAN|FBAV|Instagram|Line|Twitter|Electron|wv)/i.test(navigator.userAgent) ||
+    /; wv\)/.test(navigator.userAgent) ||
+    window.navigator.standalone;
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setIsCameraActive(true);
-      }
-    } catch (err) {
-      console.error("Camera error:", err);
-      setAlertMsg("Unable to access camera. Please check browser permissions.");
+  if (!isMobile && !isWebView) {
+    setAlertMsg("📵 Camera access is not allowed on web view. Please use this feature on mobile.");
+    return;
+  }
+
+  // ✅ Continue for mobile devices only
+  const hasPermission = await checkCameraPermission();
+  if (!hasPermission) return;
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: "environment" },
+    });
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+      setIsCameraActive(true);
     }
-  };
+  } catch (err) {
+    console.error("Camera error:", err);
+    setAlertMsg("Unable to access camera. Please check browser permissions.");
+  }
+};
 
   const capturePhoto = () => {
     const video = videoRef.current;

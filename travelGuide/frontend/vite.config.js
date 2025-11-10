@@ -20,17 +20,17 @@ export default defineConfig({
         orientation: "portrait",
         icons: [
           {
-            src: "logo.jpeg",
+            src: "/logo.jpeg",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "logo.jpeg",
+            src: "/logo.jpeg",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "logo.jpeg",
+            src: "/logo.jpeg",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",

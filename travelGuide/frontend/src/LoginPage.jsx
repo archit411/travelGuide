@@ -4,43 +4,68 @@ import { FiMail, FiLock } from "react-icons/fi";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import "./Auth.css";
 
-
 const LoginPage = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState({ email: "", password: "" });
   const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallSteps, setShowInstallSteps] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
   const navigate = useNavigate();
 
-  // ✅ Capture PWA install event
+  // ✅ Capture PWA install prompt
   useEffect(() => {
-    window.addEventListener("beforeinstallprompt", (e) => {
+    const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-    });
+    };
+
+    const handleAppInstalled = () => {
+      setIsInstalled(true);
+      localStorage.setItem("tripPulseInstalled", "true");
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    if (localStorage.getItem("tripPulseInstalled") === "true") {
+      setIsInstalled(true);
+    }
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
   }, []);
 
-  // ✅ Custom PWA install prompt
+  // ✅ Show install prompt or manual steps
   const showInstallPrompt = async () => {
     if (deferredPrompt) {
       deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
+      const choiceResult = await deferredPrompt.userChoice;
+
+      if (choiceResult.outcome === "accepted") {
+        setIsInstalled(true);
+        localStorage.setItem("tripPulseInstalled", "true");
+      }
+
       setDeferredPrompt(null);
     } else {
-      alert("Install prompt not available. Try again in Chrome or Edge.");
+      // If no native install support → show steps
+      setShowInstallSteps(true);
     }
   };
 
-  // ✅ Handle input changes
+  const handleHideSteps = () => {
+    setShowInstallSteps(false);
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: "" });
   };
 
-  // ✅ Simple email validation regex
-  const validateEmail = (email) =>
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
 
-  // ✅ Reusable toast (for Google or normal login)
   const showWelcomeToast = (userName, source = "trip") => {
     const toast = document.createElement("div");
     toast.className = "google-toast";
@@ -49,8 +74,7 @@ const LoginPage = () => {
         source === "google"
           ? "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
           : "src/assets/logo.jpeg"
-      }" 
-        alt="logo" class="google-logo" />
+      }" alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
     `;
     document.body.appendChild(toast);
@@ -61,15 +85,12 @@ const LoginPage = () => {
     }, 3000);
   };
 
-  // ✅ Handle email/password login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({ email: "", password: "" });
 
     if (!validateEmail(formData.email)) {
-      setErrors({
-        email: "Please enter a valid email address",
-      });
+      setErrors({ email: "Please enter a valid email address" });
       return;
     }
 
@@ -81,7 +102,7 @@ const LoginPage = () => {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          mode: "cors", 
+          mode: "cors",
         }
       );
 
@@ -99,32 +120,27 @@ const LoginPage = () => {
           navigate("/homepage", { state: { username: data.userName } });
         }, 1000);
       } else if (data.errorCode === "106") {
-        setErrors({
-          email: "",
-          password: "Incorrect email or password",
-        });
+        setErrors({ password: "Incorrect email or password" });
       } else {
-        setErrors({
-          password: "Something went wrong. Please try again later.",
-        });
+        setErrors({ password: "Something went wrong. Please try again later." });
       }
     } catch (error) {
-      setErrors({
-        password: "Unable to connect to the server. Please try again.",
-      });
+      setErrors({ password: "Unable to connect to the server. Please try again." });
     }
   };
 
-  // ✅ Google Login Success
   const handleGoogleSuccess = async (credentialResponse) => {
     try {
       const googleToken = credentialResponse.credential;
-      const res = await fetch("https://travelguide-1-21sw.onrender.com/api/auth/google", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential: googleToken }),
-         mode: "cors", 
-      });
+      const res = await fetch(
+        "https://travelguide-1-21sw.onrender.com/api/auth/google",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ credential: googleToken }),
+          mode: "cors",
+        }
+      );
 
       const data = await res.json();
 
@@ -132,20 +148,14 @@ const LoginPage = () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.userName);
 
-        // ✅ Immediately call /saveUserDetails after successful Google login
-        try {
-          await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${data.token}`,
-            },
-             mode: "cors", 
-          });
-          console.log("✅ User details saved successfully.");
-        } catch (err) {
-          console.error("❌ Error while saving user details:", err);
-        }
+        await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${data.token}`,
+          },
+          mode: "cors",
+        });
 
         showWelcomeToast(data.userName, "google");
 
@@ -160,8 +170,7 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleFailure = () =>
-    setErrors({ password: "Google Sign-In Failed" });
+  const handleGoogleFailure = () => setErrors({ password: "Google Sign-In Failed" });
 
   return (
     <GoogleOAuthProvider clientId="189568540017-edlbo7rlh95m7ne2q4ls7u3tg3ea41hd.apps.googleusercontent.com">
@@ -198,9 +207,7 @@ const LoginPage = () => {
                 onChange={handleChange}
                 required
               />
-              {errors.password && (
-                <p className="input-error">{errors.password}</p>
-              )}
+              {errors.password && <p className="input-error">{errors.password}</p>}
             </div>
 
             <button type="submit" className="sign-in-btn">
@@ -230,9 +237,36 @@ const LoginPage = () => {
             </Link>
           </p>
 
-          <button className="install-btn" onClick={showInstallPrompt}>
-            📲 Install TripPulse
-          </button>
+          {/* ✅ Install button (only if not installed) */}
+          {!isInstalled && (
+            <button className="install-btn" onClick={showInstallPrompt}>
+              📲 Install TripPulse
+            </button>
+          )}
+
+          {/* ✅ Manual install steps for unsupported browsers */}
+          {showInstallSteps && (
+            <div className="install-steps">
+              <h4>How to Install TripPulse</h4>
+              <ol>
+                <li>
+                  <strong>Android (Chrome):</strong> Tap the 3-dot menu → “Add to
+                  Home Screen”.
+                </li>
+                <li>
+                  <strong>iPhone (Safari):</strong> Tap the share icon → “Add to
+                  Home Screen”.
+                </li>
+                <li>
+                  <strong>Desktop (Chrome/Edge):</strong> Click the install icon in
+                  the address bar.
+                </li>
+              </ol>
+              <button className="close-steps-btn" onClick={handleHideSteps}>
+                Got it!
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </GoogleOAuthProvider>

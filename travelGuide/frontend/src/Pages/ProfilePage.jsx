@@ -375,31 +375,32 @@ export default function ProfilePage() {
           )}
         </div>
 
-        <div className="logout-section">
-          <button className="logout-btn" onClick={() => setLogoutConfirm(true)}>
-            🚪 Log Out
-          </button>
-        </div>
+     <div className="logout-option" onClick={() => setLogoutConfirm(true)}>
+  <div className="logout-left">
+    <i className="fa-solid fa-right-from-bracket logout-icon"></i>
+    <span>Log Out</span>
+  </div>
+  <i className="fa-solid fa-chevron-right logout-arrow"></i>
+</div>
+
       </div>
 
-      {/* Logout Confirmation Modal */}
       {logoutConfirm && (
-        <div className="logout-modal">
-          <div className="logout-card">
-            <h3>Log Out?</h3>
-            <p>Are you sure you want to log out?</p>
-            <div className="logout-actions">
-              <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
-                Cancel
-              </button>
-              <button className="confirm-btn" onClick={handleLogout}>
-                Yes, Log Out
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+  <div className="logout-modal">
+    <div className="logout-card">
+      <h3>Log Out?</h3>
+      <p>Are you sure you want to log out from TripEasy4U?</p>
+      <div className="logout-actions">
+        <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
+          Cancel
+        </button>
+        <button className="confirm-btn" onClick={handleLogout}>
+          Yes, Log Out
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       <ToastContainer />
     </div>
   );
