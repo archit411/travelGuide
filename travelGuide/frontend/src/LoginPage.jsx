@@ -242,7 +242,7 @@ const LoginPage = () => {
           {/* ✅ Install button (only if not installed) */}
           {!isInstalled && (
             <button className="install-btn" onClick={showInstallPrompt}>
-              📲 Install TripPulse
+              📲 Install TripEasy4U
             </button>
           )}
 
