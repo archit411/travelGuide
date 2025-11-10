@@ -137,6 +137,41 @@
   width: 18px;
   height: 18px;
 }
+/* ✅ Make Google Sign-In button full width on all screens */
+.google-btn-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.google-btn-wrapper > div {
+  width: 100% !important;
+  display: flex !important;
+  justify-content: center !important;
+}
+
+/* Force iframe full width and same height as Sign In button */
+.google-btn-wrapper iframe {
+  width: 100% !important;
+  height: 44px !important; /* Same height as your .sign-in-btn */
+  border-radius: 8px !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  transform: scale(1); /* Prevent Google from scaling on desktop */
+}
+
+/* Prevent shrinking or centering issues */
+.google-btn-wrapper div[style*="min-width"] {
+  min-width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Responsive fine-tuning for mobile */
+@media (max-width: 480px) {
+  .google-btn-wrapper iframe {
+    height: 42px !important;
+  }
+}
 
 /* Footer text */
 .auth-footer {

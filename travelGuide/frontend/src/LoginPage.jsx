@@ -219,16 +219,18 @@ const LoginPage = () => {
             <span>or continue with</span>
           </div>
 
-          <div className="social-login">
-            <GoogleLogin
-              onSuccess={handleGoogleSuccess}
-              onError={handleGoogleFailure}
-              shape="rectangular"
-              theme="outline"
-              text="signin_with"
-              width="240"
-            />
-          </div>
+        <div className="social-login">
+  <div className="google-btn-wrapper">
+    <GoogleLogin
+      onSuccess={handleGoogleSuccess}
+      onError={handleGoogleFailure}
+      shape="rectangular"
+      theme="outline"
+      text="signin_with"
+    />
+  </div>
+</div>
+
 
           <p className="auth-footer">
             Don’t have an account?{" "}
