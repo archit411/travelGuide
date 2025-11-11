@@ -24,6 +24,8 @@ body {
 }
 .location-chip{
   padding: 10px;
+  font-weight: 500;
+  font-size: small;
 }
 /* ===============================
    🌍 PAGE LAYOUT

@@ -384,8 +384,11 @@ const handleLogout = () => {
           {activeSection === "terms" && (
             <div className="expandable-section">
               <p>
-                This section can include an About Me description, app info, or your Terms &
-                Conditions content 📄
+                At TripEasy, travel planning is simple, smart, and fun! 🌍
+                Discover breathtaking destinations, plan your perfect getaway, and go explore — all in one place.
+                No more endless tabs or confusing maps — just Discover • Plan • Go ✈️💼🌄
+                From hidden gems to iconic spots, TripEasy makes every trip smoother and more memorable.
+                So pack light, dream big, and let TripEasy handle the rest! 💫
               </p>
             </div>
           )}
