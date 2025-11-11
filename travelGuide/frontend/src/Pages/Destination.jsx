@@ -12,106 +12,53 @@ import {
   FiCloud,
 } from "react-icons/fi";
 import "./destination.css";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 
 export default function DestinationPage() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const location = useLocation();
+  const placeData = location.state?.place; // ✅ Get place object if passed
   const [destination, setDestination] = useState(null);
   const [activeTab, setActiveTab] = useState("overview");
-  const [stories, setStories] = useState([]);
-  const [loadingStories, setLoadingStories] = useState(true);
 
-  // Mock destination
+  // ✅ Use clicked place data or fallback mock
   useEffect(() => {
-    const mockData = {
-      id: 1,
-      name: "Manali",
-      state: "Himachal Pradesh",
-      imageUrl:
-        "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
-      temperature: 12,
-      weather: "Partly Cloudy",
-      crowdLevel: "Medium",
-      about:
-        "Manali is a high-altitude Himalayan resort town known for its cool climate, snow-capped mountains, and adventure activities. A popular destination for both summer and winter tourism.",
-      bestMonths: "May - June, Oct - Feb",
-      gallery: [
-        "https://images.unsplash.com/photo-1617104176392-f1a8a1dbb5e5",
-        "https://images.unsplash.com/photo-1589394811462-1b2d8b3b55f2",
-        "https://images.unsplash.com/photo-1549887534-4e3a2a5b3c52",
-      ],
-      featured: [
-        {
-          name: "Solang Valley",
-          description:
-            "Adventure hub perfect for paragliding, zorbing, and skiing.",
-          distance: 14,
-          stories: 89,
-          image:
-            "https://images.unsplash.com/photo-1600787911210-31dcb594b9dc?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-          name: "Rohtang Pass",
-          description:
-            "High mountain pass with breathtaking snow-covered views.",
-          distance: 51,
-          stories: 124,
-          image:
-            "https://images.unsplash.com/photo-1583142305722-6e3e9b9ff9cf?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-          name: "Hadimba Temple",
-          description:
-            "Ancient temple surrounded by serene cedar forests and calm vibes.",
-          distance: 2,
-          stories: 67,
-          image:
-            "https://images.unsplash.com/photo-1610534551213-2ed74f0fdd09?auto=format&fit=crop&w=1200&q=80",
-        },
-        {
-          name: "Old Manali",
-          description:
-            "Bohemian cafes, local culture, and peaceful riverside stays.",
-          distance: 3,
-          stories: 156,
-          image:
-            "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80",
-        },
-      ],
-    };
-    setDestination(mockData);
-  }, [id]);
-
-  // Fetch uploaded travel stories for this destination
-  useEffect(() => {
-    async function fetchStories() {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const filtered = data.filter(
-            (s) =>
-              s.destination?.toLowerCase().trim() ===
-              id?.toLowerCase().trim()
-          );
-          setStories(filtered);
-        }
-      } catch (err) {
-        console.error("Error fetching live stories:", err);
-      } finally {
-        setLoadingStories(false);
-      }
+    if (placeData) {
+      setDestination({
+        name: placeData.name,
+        state: placeData.state || "India",
+        imageUrl:
+          placeData.imageUrl ||
+          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200",
+        about:
+          placeData.description ||
+          "Explore the beauty and culture of this amazing destination.",
+        temperature: 25,
+        weather: "Sunny",
+        crowdLevel: "Medium",
+        bestMonths: "October - March",
+        gallery: [placeData.imageUrl],
+        featured: [],
+      });
+    } else {
+      // fallback for direct route (no state)
+      setDestination({
+        name: decodeURIComponent(id),
+        state: "India",
+        imageUrl:
+          "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200",
+        about:
+          "Discover breathtaking views, vibrant culture, and unforgettable experiences.",
+        temperature: 25,
+        weather: "Sunny",
+        crowdLevel: "Medium",
+        bestMonths: "October - March",
+        gallery: [],
+        featured: [],
+      });
     }
-    fetchStories();
-  }, [id]);
+  }, [id, placeData]);
 
   if (!destination)
     return (
@@ -180,9 +127,8 @@ export default function DestinationPage() {
         )}
       </div>
 
-      {/* ===== Tab Content ===== */}
+      {/* ===== Content ===== */}
       <div className="dest-content">
-        {/* ===== Overview Section ===== */}
         {activeTab === "overview" && (
           <>
             <div className="about-card">
@@ -223,7 +169,7 @@ export default function DestinationPage() {
             </div>
 
             {/* Gallery */}
-            {destination.gallery && destination.gallery.length > 0 && (
+            {destination.gallery?.length > 0 && (
               <>
                 <h3 className="section-title">Gallery</h3>
                 <div className="image-gallery">
@@ -233,161 +179,7 @@ export default function DestinationPage() {
                 </div>
               </>
             )}
-
-            {/* Nearby Attractions */}
-            {destination.featured && destination.featured.length > 0 && (
-              <>
-                <h3 className="section-title">Nearby Attractions</h3>
-                <div className="featured-list">
-                  {destination.featured.map((p, i) => (
-                    <div key={i} className="featured-card">
-                      <img src={p.image} alt={p.name} className="featured-img" />
-                      <div className="featured-details">
-                        <h4>{p.name}</h4>
-                        <p>{p.description}</p>
-                        <div className="featured-meta">
-                          <span>
-                            <FiMapPin /> {p.distance} km
-                          </span>
-                          <span>
-                            <FiUsers /> {p.stories} stories
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
-            )}
           </>
-        )}
-
-        {activeTab === "livestories" && (
-  <div className="live-stories-section">
-    <h3>Traveler Stories from {destination.name}</h3>
-
-    <div className="story-card-list">
-      {/* === Story 1 === */}
-      <div className="story-image-card">
-        <img
-          src="https://images.unsplash.com/photo-1600787911210-31dcb594b9dc?auto=format&fit=crop&w=1200&q=80"
-          alt="Solang Valley"
-        />
-        <div className="story-overlay-top">
-          <div className="story-user">
-            <div className="user-avatar">P</div>
-            <div>
-              <p className="username">Priya S.</p>
-              <p className="time">1h ago</p>
-            </div>
-          </div>
-          <span className="crowd-chip low">👥 Low</span>
-        </div>
-
-        <div className="story-overlay-bottom">
-          <div className="temp-chip">🌤 10°C</div>
-          <h4>Solang Valley</h4>
-          <p className="caption">
-            Amazing paragliding experience! Worth every penny.
-          </p>
-          <div className="likes">❤️ 89</div>
-        </div>
-      </div>
-
-      {/* === Story 2 === */}
-      <div className="story-image-card">
-        <img
-          src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1200&q=80"
-          alt="Old Manali"
-        />
-        <div className="story-overlay-top">
-          <div className="story-user">
-            <div className="user-avatar">R</div>
-            <div>
-              <p className="username">Rahul M.</p>
-              <p className="time">3h ago</p>
-            </div>
-          </div>
-          <span className="crowd-chip medium">👥 Medium</span>
-        </div>
-
-        <div className="story-overlay-bottom">
-          <div className="temp-chip">🌤 13°C</div>
-          <h4>Old Manali</h4>
-          <p className="caption">
-            Peaceful cafes and great vibes in Old Manali.
-          </p>
-          <div className="likes">❤️ 56</div>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
-
-
-        {/* ===== Crowd Calendar Section ===== */}
-        {activeTab === "crowdcalendar" && (
-          <div className="crowd-calendar-section">
-            <h3>This Week's Prediction</h3>
-            <div className="crowd-bars">
-              {[
-                { day: "Mon", level: "Low" },
-                { day: "Tue", level: "Low" },
-                { day: "Wed", level: "Medium" },
-                { day: "Thu", level: "Medium" },
-                { day: "Fri", level: "High" },
-                { day: "Sat", level: "High" },
-                { day: "Sun", level: "High" },
-              ].map(({ day, level }) => (
-                <div key={day} className={`crowd-bar ${level.toLowerCase()}`}>
-                  <div className="bar-rect"></div>
-                  <p>{day}</p>
-                  <span>{level}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="crowd-insights">
-              <h3>Crowd Insights</h3>
-              <p>Based on 234 user reports and historical data:</p>
-              <ul>
-                <li>• Weekends see 3× more visitors than weekdays</li>
-                <li>• Best time to visit: Tuesday – Thursday</li>
-                <li>• Mall Road is busiest between 4–8 PM</li>
-              </ul>
-            </div>
-          </div>
-        )}
-
-        {/* ===== Food & Cafes Section ===== */}
-        {activeTab === "food&stay" && (
-          <div className="food-section">
-            <div className="add-eatery-card">
-              <button className="add-btn">＋ Add Eatery</button>
-              <p>Know a great spot? Share it with travelers!</p>
-            </div>
-
-            <div className="eatery-card">
-              <img
-                src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38"
-                alt="Cafe 1947"
-              />
-              <div className="eatery-details">
-                <div className="rating">⭐ 4.5</div>
-                <h3>Café 1947</h3>
-                <p className="highlight">Must Try: Italian Pizza & Live Music</p>
-                <div className="meta">
-                  <p>📍 Old Manali</p>
-                  <p>🕒 10 AM – 11 PM</p>
-                </div>
-                <div className="tags">
-                  <span>Café</span>
-                  <span>Italian</span>
-                  <span>Live Music</span>
-                </div>
-              </div>
-            </div>
-          </div>
         )}
       </div>
     </div>

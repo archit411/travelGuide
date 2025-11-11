@@ -28,12 +28,16 @@ function SkeletonCard() {
 /* 🔹 Place Card */
 function PlaceCard({ place }) {
   const navigate = useNavigate();
-  const { name, description, imageUrl } = place;
+  const { name, description, imageUrl, lat, lng } = place;
 
   return (
     <div
       className="place-card-new"
-      onClick={() => navigate(`/destination/${encodeURIComponent(name)}`)}
+      onClick={() =>
+        navigate(`/destination/${encodeURIComponent(name)}`, {
+          state: { place }, // ✅ Pass full place object
+        })
+      }
     >
       <div
         className="place-image"
@@ -47,11 +51,14 @@ function PlaceCard({ place }) {
 
       <div className="place-info">
         <h4 className="place-title">📍 {name}</h4>
-        <p className="place-desc">{description || "No description available."}</p>
+        <p className="place-desc">
+          {description || "No description available."}
+        </p>
       </div>
     </div>
   );
 }
+
 
 
 /* 🔹 Story Viewer */
@@ -222,7 +229,7 @@ export default function HomePage() {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -259,7 +266,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
+        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
