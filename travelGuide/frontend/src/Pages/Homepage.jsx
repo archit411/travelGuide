@@ -364,7 +364,7 @@ export default function HomePage() {
       {/* 🌍 Header */}
       <header className="tp-header">
         <div className="tp-brand">
-          <img className="brand-logo" src="public/logo.jpeg" alt="TripPulse" />
+          <img className="brand-logo" src="/logo.jpeg" alt="TripPulse" />
           <div>
             <h1>TripEasy4U</h1>
             <div className="brand-sub">Discover • Plan • Go</div>

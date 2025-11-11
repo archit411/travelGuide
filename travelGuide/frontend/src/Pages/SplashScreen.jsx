@@ -17,7 +17,7 @@ export default function SplashScreen() {
     <div className="splash-container">
       <div className="splash-content">
         <img
-          src="public/logo.jpeg"
+          src="/logo.jpeg"
           alt="tripEasy4U Logo"
           className="splash-logo"
         />

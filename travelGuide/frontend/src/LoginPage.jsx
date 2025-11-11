@@ -101,8 +101,8 @@ const showInstallPrompt = async () => {
     toast.innerHTML = `
       <img src="${
         source === "google"
-          ? "public/google.svg"
-          : "public/logo.jpeg"
+          ? "/google.svg"
+          : "/logo.jpeg"
       }" alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
     `;
@@ -206,7 +206,7 @@ const showInstallPrompt = async () => {
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-logo">
-            <img src="public/logo.jpeg" alt="TripPulse Logo" />
+            <img src="/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
           <h2 className="auth-heading">Welcome to TripEasy4U</h2>
