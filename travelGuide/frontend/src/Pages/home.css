@@ -1013,3 +1013,65 @@ body {
   color: #6b7280;
   line-height: 1.4;
 }
+.story-viewer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(6px);
+  animation: fadeIn 0.3s ease;
+}
+
+/* ✅ Full-screen story card that scales properly on all devices */
+.story-viewer-card {
+  position: relative;
+  width: 100%;
+  max-width: 420px;
+  height: 100vh; /* full height on mobile */
+  background: #000;
+  border-radius: 0; /* full bleed look like Instagram */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ✅ Image fits entire screen height properly */
+.story-viewer-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* show full image without cutting */
+  background-color: black;
+}
+
+/* ✅ Overlay content stays above image */
+.story-info-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 1rem 1.2rem;
+  background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.85));
+  color: #fff;
+  text-align: left;
+}
+
+/* Close button + progress bar stay visible */
+.story-close-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+}
