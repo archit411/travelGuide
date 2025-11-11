@@ -72,8 +72,27 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
+  // ✅ Destination Validation (Only alphabets and spaces)
+  const handleLocationChange = (e) => {
+    const input = e.target.value;
+    if (/^[A-Za-z\s]*$/.test(input)) {
+      setLocation(input);
+    } else {
+      setSnackbarMsg("⚠️ Destination should contain only alphabets.");
+    }
+  };
+
+  // ✅ Temperature Validation (Only numbers)
+  const handleTemperatureChange = (e) => {
+    const input = e.target.value;
+    if (/^\d*$/.test(input)) {
+      setTemperature(input);
+    } else {
+      setSnackbarMsg("⚠️ Temperature should be numeric only.");
+    }
+  };
+
   const handleSubmit = async () => {
-    // ✅ Validation for all required fields
     if (!file) return setSnackbarMsg("⚠️ Please upload or capture a photo.");
     if (!location.trim()) return setSnackbarMsg("⚠️ Destination is required.");
     if (!temperature.trim()) return setSnackbarMsg("⚠️ Temperature is required.");
@@ -179,23 +198,25 @@ export default function AddPost({ onClose, onAddStory }) {
             </div>
           )}
 
+          {/* ✅ Destination field - alphabets only */}
           <div className="form-section">
             <label>Destination *</label>
             <input
               type="text"
               placeholder="Enter location..."
               value={location}
-              onChange={(e) => setLocation(e.target.value)}
+              onChange={handleLocationChange}
             />
           </div>
 
+          {/* ✅ Temperature field - numeric only */}
           <div className="form-section">
-            <label>Current Temperature *</label>
+            <label>Current Temperature (°C) *</label>
             <input
               type="text"
               value={temperature}
-              onChange={(e) => setTemperature(e.target.value)}
-              placeholder="e.g., 26°C"
+              onChange={handleTemperatureChange}
+              placeholder="e.g., 26"
             />
           </div>
 
