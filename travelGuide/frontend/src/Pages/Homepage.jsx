@@ -42,10 +42,9 @@ function PlaceCard({ place }) {
       <div
         className="place-image"
         style={{
-          backgroundImage: `url(${
-            imageUrl?.trim() ||
+          backgroundImage: `url(${imageUrl?.trim() ||
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
-          })`,
+            })`,
         }}
       ></div>
 
@@ -317,25 +316,26 @@ export default function HomePage() {
             <h1>TripEasy4U</h1>
             <div className="brand-sub">Discover • Plan • Go</div>
           </div>
-          {/* 📍 Location Display */}
-          <div>
-            {locationError ? (
-              <p className="error-text">⚠️ {locationError}</p>
-            ) : city ? (
-              <div className="location-chip fade-in">
-                <i className="fa-solid fa-location-dot location-pin"></i>
-                <span className="location-text">
-                  {city}
-                  {location?.state ? `, ${location.state}` : ""}
-                  {location?.country ? `, ${location.country}` : ""}
-                </span>
-              </div>
-            ) : (
-              <div className="location-chip loading">Detecting your location...</div>
-            )}
-          </div>
+
         </div>
       </header>
+      {/* 📍 Location Display */}
+      <div>
+        {locationError ? (
+          <p className="error-text">⚠️ {locationError}</p>
+        ) : city ? (
+          <div className="location-chip fade-in">
+            <i className="fa-solid fa-location-dot location-pin"></i>
+            <span className="location-text">
+              {city}
+              {location?.state ? `, ${location.state}` : ""}
+              {location?.country ? `, ${location.country}` : ""}
+            </span>
+          </div>
+        ) : (
+          <div className="location-chip loading">Detecting your location...</div>
+        )}
+      </div>
 
       {/* 🔍 Search Bar */}
       <div className="tp-search">

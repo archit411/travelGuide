@@ -734,15 +734,13 @@ body {
 }
 
 .location-chip {
-  background: rgba(11, 43, 74, 0.08);
-  border-radius: 30px;
-  padding: 8px 18px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 500;
-  color: #0b2b4a;
-  box-shadow: 0 2px 4px rgba(11, 43, 74, 0.1);
 }
 
 .location-pin {
@@ -846,16 +844,6 @@ body {
 }
 
 /* 📍 Location chip styling */
-.location-chip {
-  background: #f3f4f6;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  color: #1f2937;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 
 .location-pin {
   color: #ef4444;
