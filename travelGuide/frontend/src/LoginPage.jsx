@@ -13,47 +13,76 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   // ✅ Capture PWA install prompt
-  useEffect(() => {
-    const handleBeforeInstallPrompt = (e) => {
-      e.preventDefault();
-      setDeferredPrompt(e);
-    };
+// ✅ Capture and manage PWA install prompt
+useEffect(() => {
+  const handleBeforeInstallPrompt = (e) => {
+    e.preventDefault();
+    setDeferredPrompt(e);
+  };
 
-    const handleAppInstalled = () => {
+  const handleAppInstalled = () => {
+    console.log("✅ App installed successfully!");
+    setIsInstalled(true);
+    localStorage.setItem("tripPulseInstalled", "true");
+
+    // Hide install button after success
+    setDeferredPrompt(null);
+  };
+
+  window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+  window.addEventListener("appinstalled", handleAppInstalled);
+
+  // Check if already installed earlier
+  if (localStorage.getItem("tripPulseInstalled") === "true") {
+    setIsInstalled(true);
+  }
+
+  return () => {
+    window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.removeEventListener("appinstalled", handleAppInstalled);
+  };
+}, []);
+
+// ✅ Trigger native install prompt or show manual instructions
+const showInstallPrompt = async () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    const choiceResult = await deferredPrompt.userChoice;
+
+    if (choiceResult.outcome === "accepted") {
+      console.log("📲 User accepted install prompt");
       setIsInstalled(true);
       localStorage.setItem("tripPulseInstalled", "true");
-    };
 
-    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.addEventListener("appinstalled", handleAppInstalled);
-
-    if (localStorage.getItem("tripPulseInstalled") === "true") {
-      setIsInstalled(true);
-    }
-
-    return () => {
-      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-      window.removeEventListener("appinstalled", handleAppInstalled);
-    };
-  }, []);
-
-  // ✅ Show install prompt or manual steps
-  const showInstallPrompt = async () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-
-      if (choiceResult.outcome === "accepted") {
-        setIsInstalled(true);
-        localStorage.setItem("tripPulseInstalled", "true");
-      }
-
+      // Hide button immediately
       setDeferredPrompt(null);
     } else {
-      // If no native install support → show steps
-      setShowInstallSteps(true);
+      console.log("❌ User dismissed install prompt");
     }
-  };
+  } else {
+    // Fallback for iOS/Safari — show manual steps
+    setShowInstallSteps(true);
+  }
+};
+
+
+  // ✅ Show install prompt or manual steps
+  // const showInstallPrompt = async () => {
+  //   if (deferredPrompt) {
+  //     deferredPrompt.prompt();
+  //     const choiceResult = await deferredPrompt.userChoice;
+
+  //     if (choiceResult.outcome === "accepted") {
+  //       setIsInstalled(true);
+  //       localStorage.setItem("tripPulseInstalled", "true");
+  //     }
+
+  //     setDeferredPrompt(null);
+  //   } else {
+  //     // If no native install support → show steps
+  //     setShowInstallSteps(true);
+  //   }
+  // };
 
   const handleHideSteps = () => {
     setShowInstallSteps(false);
@@ -72,8 +101,8 @@ const LoginPage = () => {
     toast.innerHTML = `
       <img src="${
         source === "google"
-          ? "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg"
-          : "src/assets/logo.jpeg"
+          ? "public/google.svg"
+          : "public/logo.jpeg"
       }" alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
     `;
@@ -177,7 +206,7 @@ const LoginPage = () => {
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-logo">
-            <img src="src/assets/logo.jpeg" alt="TripPulse Logo" />
+            <img src="public/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
           <h2 className="auth-heading">Welcome to TripEasy4U</h2>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FiSearch,
   FiHome,
@@ -60,22 +60,69 @@ function PlaceCard({ place }) {
 
 
 
-/* 🔹 Story Viewer */
 function StoryViewer({ stories, currentIndex, onClose }) {
   const [index, setIndex] = useState(currentIndex);
-  const [animKey, setAnimKey] = useState(Date.now());
+  const [progressList, setProgressList] = useState(
+    stories.map((_, i) => (i < currentIndex ? 100 : 0))
+  );
+  const duration = 15000; // 15 seconds per story
+  const timerRef = useRef(null);
+
   const currentStory = stories[index];
 
-  // Auto switch story
+  // Start progress timer
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (index < stories.length - 1) setIndex(index + 1);
-      else onClose();
-    }, 15000);
-    return () => clearTimeout(timer);
-  }, [index, stories, onClose]);
+    if (!currentStory) return;
 
-  useEffect(() => setAnimKey(Date.now()), [index]);
+    // Reset current story progress to 0
+    setProgressList((prev) =>
+      prev.map((p, i) => (i === index ? 0 : i < index ? 100 : 0))
+    );
+
+    let start = Date.now();
+
+    timerRef.current = setInterval(() => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min((elapsed / duration) * 100, 100);
+
+      setProgressList((prev) =>
+        prev.map((p, i) => (i === index ? progress : p))
+      );
+
+      if (progress >= 100) {
+        clearInterval(timerRef.current);
+        if (index < stories.length - 1) setIndex((prev) => prev + 1);
+        else onClose();
+      }
+    }, 100);
+
+    return () => clearInterval(timerRef.current);
+  }, [index, stories]);
+
+  const handleTap = (e) => {
+    const { clientX } = e;
+    const screenWidth = window.innerWidth;
+
+    clearInterval(timerRef.current);
+
+    if (clientX < screenWidth / 3) {
+      // Left → previous
+      setProgressList((prev) =>
+        prev.map((p, i) => (i === index ? 100 : i < index ? 100 : 0))
+      );
+      setIndex((prev) => (prev > 0 ? prev - 1 : prev));
+    } else if (clientX > (screenWidth * 2) / 3) {
+      // Right → next
+      setProgressList((prev) =>
+        prev.map((p, i) => (i <= index ? 100 : 0))
+      );
+      setIndex((prev) =>
+        prev < stories.length - 1 ? prev + 1 : prev
+      );
+    } else {
+      // Middle → pause/resume (optional)
+    }
+  };
 
   if (!currentStory) return null;
 
@@ -89,53 +136,59 @@ function StoryViewer({ stories, currentIndex, onClose }) {
           <FiX size={22} />
         </button>
 
+        {/* 🕒 Progress bar */}
         <div className="multi-progress">
           {stories.map((_, i) => (
             <div key={i} className="progress-track">
-              {i < index && <div className="progress-filled done"></div>}
-              {i === index && (
-                <div
-                  key={animKey}
-                  className="progress-filled active"
-                  onAnimationEnd={() => {
-                    if (index < stories.length - 1) setIndex(index + 1);
-                    else onClose();
-                  }}
-                ></div>
-              )}
+              <div
+                className={`progress-filled ${
+                  i < index ? "done" : i === index ? "active" : ""
+                }`}
+                style={{
+                  width: `${progressList[i]}%`,
+                  transition:
+                    i === index
+                      ? "width 0.1s linear"
+                      : "none",
+                }}
+              ></div>
             </div>
           ))}
         </div>
 
-        <img
-          src={currentStory.image}
-          alt={currentStory.location}
-          className="story-viewer-image"
-        />
+        {/* 📸 Story Image & Info */}
+        <div className="story-image-wrapper" onClick={handleTap}>
+          <img
+            src={currentStory.image}
+            alt={currentStory.location}
+            className="story-viewer-image"
+          />
 
-        <div className="story-info-overlay">
-          <h3>📍 {currentStory.location}</h3>
-          {currentStory.comment && (
-            <p className="story-caption">
-              {currentStory.comment.length > 100
-                ? currentStory.comment.slice(0, 100) + "..."
-                : currentStory.comment}
-            </p>
-          )}
-          <div className="story-meta">
-            {currentStory.temperature && (
-              <span>🌡️ {currentStory.temperature}°C</span>
+          <div className="story-info-overlay">
+            <h3>📍 {currentStory.location}</h3>
+            {currentStory.comment && (
+              <p className="story-caption">
+                {currentStory.comment.length > 100
+                  ? currentStory.comment.slice(0, 100) + "..."
+                  : currentStory.comment}
+              </p>
             )}
-            {currentStory.crowd && <span>👥 {currentStory.crowd}</span>}
-            {currentStory.rating > 0 && (
-              <span>⭐ {currentStory.rating}/5</span>
-            )}
+            <div className="story-meta">
+              {currentStory.temperature && (
+                <span>🌡️ {currentStory.temperature}°C</span>
+              )}
+              {currentStory.crowd && <span>👥 {currentStory.crowd}</span>}
+              {currentStory.rating > 0 && (
+                <span>⭐ {currentStory.rating}/5</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 
 /* 🌍 Main Component */
 export default function HomePage() {
@@ -228,7 +281,7 @@ export default function HomePage() {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -265,7 +318,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -311,7 +364,7 @@ export default function HomePage() {
       {/* 🌍 Header */}
       <header className="tp-header">
         <div className="tp-brand">
-          <img className="brand-logo" src="src/assets/logo.jpeg" alt="TripPulse" />
+          <img className="brand-logo" src="public/logo.jpeg" alt="TripPulse" />
           <div>
             <h1>TripEasy4U</h1>
             <div className="brand-sub">Discover • Plan • Go</div>

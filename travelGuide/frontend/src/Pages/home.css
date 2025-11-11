@@ -19,7 +19,12 @@ body {
   font-family: Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
   overflow-y: auto !important;
 }
-
+.location-pin{
+  color: red;
+}
+.location-chip{
+  padding: 10px;
+}
 /* ===============================
    🌍 PAGE LAYOUT
 ================================= */
@@ -104,108 +109,116 @@ body {
    🟣 STORIES SECTION
 ================================= */
 .stories-section {
-  padding: 1rem 1.5rem 0.5rem;
+  margin: 24px 16px;
+}
+.section-head{
+  padding: 10px;
 }
 
 .stories-section h3 {
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 0.8rem;
-  color: var(--accent);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 
 .stories-grid {
   display: flex;
-  gap: 1.2rem;
+  gap: 16px;
   overflow-x: auto;
-  padding-bottom: 0.8rem;
-  scrollbar-width: none;
-  scroll-snap-type: x mandatory;
+  padding-bottom: 10px;
+  scroll-behavior: smooth;
 }
 
 .stories-grid::-webkit-scrollbar {
   display: none;
 }
 
+/* ✅ Fixed story card */
 .story-card {
-  width: 82px;
-  height: 82px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  position: relative;
-  border: 3px solid transparent;
-  background-image: var(--gradient), var(--bg);
-  background-origin: border-box;
-  background-clip: content-box, border-box;
-  padding: 2px;
-  scroll-snap-align: start;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 78px;
   cursor: pointer;
-}
-
-.story-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.25);
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
 }
 
 .story-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 74px;
+  height: 74px;
   border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid transparent;
+  background: var(--gradient) padding-box, #fff border-box;
+  background-clip: content-box, border-box;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-/* 🟢 Add Story Bubble */
-.story-card.your-story {
-  border: 2px dashed #9ca3af;
-  background: #f9fafb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  transition: all 0.25s ease;
-}
-
-.story-card.your-story:hover {
-  background: #f3f4f6;
-  border-color: #6b7280;
+.story-card img:hover {
   transform: scale(1.05);
+  box-shadow: 0 6px 14px rgba(59, 130, 246, 0.25);
+}
+
+/* ✅ Text below the circle */
+.story-card .story-overlay {
+  position: static;
+  background: none;
+  color: #000;
+  font-size: 13px;
+  margin-top: 6px;
+  font-weight: 500;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ➕ Add story button */
+.story-card.your-story {
+  justify-content: center;
+}
+
+.story-card.your-story img {
+  display: none;
 }
 
 .story-card.your-story .add-icon {
-  font-size: 1.8rem;
-  color: var(--blue);
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 2px dashed #3b82f6;
+  color: #3b82f6;
+  font-size: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  transition: background 0.25s ease;
 }
 
-.story-overlay {
-  position: absolute;
-  bottom: -22px;
-  left: 50%;
-  transform: translateX(-50%);
-  text-align: center;
-  width: 100%;
+.story-card.your-story .add-icon:hover {
+  background: #eef2ff;
 }
 
-.story-loc {
-  color: var(--accent);
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: capitalize;
+/* Optional viewed ring */
+.story-card.viewed img {
+  border-color: #d1d5db;
+  background: none;
 }
 
 /* ===============================
    🏞️ PLACES GRID
 ================================= */
-/* 🏞️ Places grid layout */
 .place-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ✅ Responsive columns */
-  gap: 1.5rem; /* space between cards */
-  justify-items: center;
-  padding: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  padding: 20px;
 }
 
-/* 🖼️ Individual place cards */
 .place-card-new {
   width: 100%;
   max-width: 280px;
@@ -222,7 +235,6 @@ body {
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
 }
 
-/* Image inside card */
 .place-image {
   width: 100%;
   height: 180px;
@@ -230,7 +242,6 @@ body {
   background-position: center;
 }
 
-/* Info below image */
 .place-info {
   padding: 0.75rem 1rem;
   text-align: left;
@@ -245,16 +256,23 @@ body {
   font-size: 0.9rem;
   color: #555;
 }
-
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
+@media (max-width: 768px) {
+  .place-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 16px;
+    padding: 10px 16px;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  .place-grid::-webkit-scrollbar {
+    display: none; /* hide scrollbar for cleaner look */
+  }
+
+  .place-card-new {
+    flex: 0 0 240px; /* fixed card width on mobile */
+    scroll-snap-align: start;
   }
 }
 
@@ -422,7 +440,7 @@ body {
   color: #6b7280;
   padding: 16px 0;
   background: #f9fafb;
-  margin-bottom: 70px; /* space above bottom nav */
+  margin-bottom: 70px;
   letter-spacing: 0.3px;
   border-top: 1px solid #e5e7eb;
 }
@@ -435,579 +453,99 @@ body {
     font-size: 16px;
   }
 
-  .story-card {
-    width: 68px;
-    height: 68px;
+  .story-card img {
+    width: 66px;
+    height: 66px;
   }
 
-  .story-loc {
-    font-size: 0.7rem;
+  .story-card .story-overlay {
+    font-size: 11px;
   }
 
   .tp-footer {
     font-size: 12px;
   }
 }
-/* 🔹 Popup Overlay */
-.popup-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(6px);
-  z-index: 999999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* 🔹 Popup Card */
-.popup-card {
-  background: #ffffff;
-  border-radius: 20px;
-  width: 95%;
-  max-width: 420px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.25);
-  padding: 1.5rem;
-  animation: slideUp 0.35s ease-out;
-  position: relative;
-}
-
-/* Scrollbar hide for smooth scroll */
-.popup-card::-webkit-scrollbar {
-  display: none;
-}
-.popup-card {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* 🔹 Popup Header */
-.popup-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-  margin-bottom: 1.2rem;
-}
-
-.popup-header h2 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: #111827;
-}
-
-.popup-header p {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-/* Close button */
-.popup-close {
-  position: absolute;
-  top: 14px;
-  right: 16px;
-  background: transparent;
-  border: none;
-  color: #374151;
-  cursor: pointer;
-  font-size: 1.3rem;
-  transition: transform 0.2s ease;
-}
-.popup-close:hover {
-  transform: scale(1.2);
-}
-
-/* 🔹 Upload Preview / Placeholder */
-.upload-preview {
-  width: 100%;
-  border-radius: 14px;
-  object-fit: cover;
-  margin-bottom: 1rem;
-}
-
-.upload-placeholder {
-  border: 2px dashed #cbd5e1;
-  border-radius: 14px;
-  padding: 2rem 1rem;
-  text-align: center;
-  background: #f9fafb;
-  color: #6b7280;
-  transition: all 0.2s ease;
-}
-.upload-placeholder:hover {
-  background: #f3f4f6;
-  border-color: #94a3b8;
-}
-
-/* 🔹 Upload Action Buttons */
-.upload-actions {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 1.4rem;
-}
-.upload-btn {
-  flex: 1;
-  background: #111827;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  padding: 0.8rem;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.upload-btn:hover {
-  background: #1f2937;
-}
-
-/* 🔹 Form Sections */
-.form-section {
-  margin-bottom: 1.1rem;
-}
-.form-section label {
-  display: block;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 0.4rem;
-}
-.form-section input,
-.form-section textarea {
-  width: 100%;
-  border: 1.5px solid #d1d5db;
-  border-radius: 10px;
-  padding: 0.7rem 0.9rem;
-  font-size: 0.9rem;
-  color: #111827;
-  background: #fff;
-  transition: border-color 0.2s ease;
-}
-.form-section input:focus,
-.form-section textarea:focus {
-  border-color: #111827;
-  outline: none;
-}
-.form-section small {
-  color: #9ca3af;
-  font-size: 0.8rem;
-}
-
-/* 🔹 Crowd Options */
-.crowd-options {
-  display: flex;
-  gap: 8px;
-  margin-top: 4px;
-}
-.crowd-chip {
-  flex: 1;
-  text-align: center;
-  border: 1.5px solid #d1d5db;
-  border-radius: 8px;
-  padding: 0.5rem;
-  background: #f9fafb;
-  color: #374151;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.25s ease;
-}
-.crowd-chip.active {
-  background: #111827;
-  color: #fff;
-  border-color: #111827;
-}
-.crowd-chip:hover {
-  background: #1f2937;
-  color: #fff;
-}
-
-/* 🔹 Rating Stars */
-.rating-stars {
-  display: flex;
-  gap: 6px;
-  margin-bottom: 0.3rem;
-}
-
-/* 🔹 Popup Footer Buttons */
-.popup-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 1.2rem;
-}
-.btn {
-  border: none;
-  border-radius: 10px;
-  padding: 0.9rem;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.25s ease;
-}
-.btn--primary {
-  background: #111827;
-  color: white;
-}
-.btn--primary:hover {
-  background: #1f2937;
-}
-.btn--cancel {
-  background: #f3f4f6;
-  color: #374151;
-}
-.btn--cancel:hover {
-  background: #e5e7eb;
-}
-
-/* Disabled */
-.btn.disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-/* 🔹 Animations */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes slideUp {
-  from {
-    transform: translateY(60px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-/* 🔹 Camera Container */
-.camera-container {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-.camera-feed {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
-}
-.camera-controls {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  gap: 10px;
-}
-
-.place-distance {
-  font-size: 0.9rem;
-  color: #0b2b4a;
-  font-weight: 500;
-  margin-top: 6px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  opacity: 0.8;
-}
-
-.place-distance i {
-  color: #0077b6;
-}
-
-.location-wrapper {
-  display: flex;
-  justify-content: center;
-  margin-top: -5px;
-  margin-bottom: 10px;
-}
-
-.location-chip {
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.location-pin {
-  color: #e63946;
-  font-size: 1rem;
-}
-.place-title {
-  color: #0b2b4a;
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 4px;
-}
-
-.distance-line {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #0077b6;
-  font-weight: 600;
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-}
-
-.distance-icon {
-  font-size: 1rem;
-  color: #0077b6;
-}
-
-.place-desc {
-  font-size: 0.95rem;
-  color: #555;
-  line-height: 1.4;
-  margin-top: 2px;
-}
-.place-title {
-  color: #0b2b4a;
-  font-size: 1.1rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.place-distance {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: #0077b6;
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 6px;
-}
-
-.place-distance i {
-  font-size: 0.95rem;
-}
-
-.place-desc {
-  font-size: 0.95rem;
-  color: #444;
-  line-height: 1.4;
-}
-/* 🌍 Header improvements */
-.tp-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 16px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.tp-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.brand-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 10px;
-  object-fit: cover;
-}
-
-.tp-brand h1 {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0a1a2f;
-  margin: 0;
-}
-
-.brand-sub {
-  font-size: 12px;
-  color: #6b7280;
-  margin-top: 2px;
-}
-
-/* 📍 Location chip styling */
-
-.location-pin {
-  color: #ef4444;
-}
-
-/* 🔹 Stories Section */
-.stories-section {
-  padding: 12px 0 8px 16px;
-}
-
-.stories-section h3 {
-  font-weight: 600;
-  font-size: 18px;
-  margin-bottom: 10px;
-}
-
-.stories-grid {
-  display: flex;
-  gap: 16px;
-  overflow-x: auto;
-  padding-bottom: 10px;
-  scroll-behavior: smooth;
-}
-
-.stories-grid::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for clean look */
-}
-
-/* ✅ Add Story Button */
-.your-story {
-  width: 70px;
-  height: 70px;
-  min-width: 70px;
-  border: 2px dashed #3b82f6;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  background-color: #f9fafb;
-  transition: 0.2s ease;
-}
-
-.your-story:hover {
-  background-color: #eef2ff;
-}
-
-.add-icon {
-  font-size: 28px;
-  color: #3b82f6;
-  line-height: 0;
-}
-
+/* ✅ Story Card Layout Fix (Aligned Version) */
 .story-card {
-  width: 70px;
-  height: 70px;
-  min-width: 70px;
-  border-radius: 50%;
-  overflow: hidden;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* keep top-aligned for all */
+  width: 82px;
   flex-shrink: 0;
-}
-
-.story-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.story-overlay {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
-  padding: 5px 0;
-}
-
-.story-loc {
-  color: #fff;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-/* 🏞️ Top Places Section */
-.tp-highlights {
-  padding: 0 0 16px 16px;
-}
-
-.section-head h2 {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 12px;
-  color: #111827;
-}
-
-/* 🌍 Desktop/Web View — Grid Layout */
-.place-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  padding-right: 16px;
-  padding-top: 10px;
-}
-
-/* 🧭 Mobile View — Horizontal Scroll */
-@media (max-width: 768px) {
-  .place-grid {
-    display: flex;
-    gap: 16px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding-right: 16px;
-  }
-
-  .place-grid::-webkit-scrollbar {
-    display: none;
-  }
-
-  .place-card-new {
-    flex: 0 0 250px; /* Fixed width cards while scrolling */
-  }
-}
-
-/* 🏕️ Place Card Styles */
-.place-card-new {
-  width: 100%;
-  max-width: 280px;
-  background: #fff;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
   cursor: pointer;
+  background: transparent;
+  text-align: center;
 }
 
-.place-card-new:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+/* ✅ Image Styling (Equal size for all including + button) */
+.story-card img {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid transparent;
+  background: var(--gradient) padding-box, #fff border-box;
+  background-clip: content-box, border-box;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: block;
 }
 
-/* 🌄 Image */
-.place-image {
+.story-card img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+}
+
+/* ✅ Text perfectly below circle */
+.story-card .story-overlay {
+  margin-top: 6px;
+  text-align: center;
   width: 100%;
-  height: 160px;
-  background-size: cover;
-  background-position: center;
-}
-
-/* 🧭 Info */
-.place-info {
-  padding: 12px 14px;
-  text-align: left;
-}
-
-.place-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111827;
-  margin-bottom: 6px;
-}
-
-.place-desc {
   font-size: 13px;
-  color: #6b7280;
-  line-height: 1.4;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ✅ Fix Add Story button alignment and spacing */
+.story-card.your-story {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start; /* ensures same baseline as others */
+  width: 82px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.story-card.your-story .add-icon {
+  width: 74px;
+  height: 74px;
+  border-radius: 50%;
+  border: 2px dashed #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2563eb;
+  font-size: 28px;
+  background: #f9fafb;
+  transition: all 0.25s ease;
+}
+
+.story-card.your-story .add-icon:hover {
+  background: #eef2ff;
+  transform: scale(1.05);
+}
+
+/* ✅ Add Story text below (+) */
+.story-card.your-story .story-overlay {
+  margin-top: 6px;
+  color: #111;
+  font-weight: 600;
+  font-size: 13px;
+  text-align: center;
 }

@@ -146,18 +146,34 @@ export default function ProfilePage() {
       });
     }
   };
+// 🔹 Logout
+const handleLogout = () => {
+  localStorage.clear();
+  setLogoutConfirm(false);
 
-  // 🔹 Logout
-  const handleLogout = () => {
-    localStorage.clear();
-    setLogoutConfirm(false);
-    toast.success("You’ve been logged out successfully 👋", {
-      position: "top-center",
-      autoClose: 1800,
-      transition: Slide,
-    });
-    setTimeout(() => (window.location.href = "/login"), 1800);
-  };
+  toast.info("You’ve been logged out 👋", {
+    position: "bottom-center",
+    autoClose: 1800,
+    hideProgressBar: true,
+    closeOnClick: true,
+    pauseOnHover: false,
+    draggable: true,
+    transition: Slide,
+    style: {
+      backgroundColor: "#333",
+      color: "#fff",
+      borderRadius: "8px",
+      fontSize: "15px",
+      textAlign: "center",
+      padding: "12px 18px",
+    },
+  });
+
+  // Redirect after toast disappears
+  setTimeout(() => {
+    window.location.href = "/login";
+  }, 1800);
+};
 
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
