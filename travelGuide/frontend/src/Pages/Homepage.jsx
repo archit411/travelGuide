@@ -58,47 +58,69 @@ function PlaceCard({ place }) {
   );
 }
 
-
-
 function StoryViewer({ stories, currentIndex, onClose }) {
   const [index, setIndex] = useState(currentIndex);
   const [progressList, setProgressList] = useState(
     stories.map((_, i) => (i < currentIndex ? 100 : 0))
   );
-  const duration = 15000; // 15 seconds per story
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const duration = 15000; // 15s per story
   const timerRef = useRef(null);
 
   const currentStory = stories[index];
 
-  // Start progress timer
+  /* ✅ Preload next and previous story images */
+  useEffect(() => {
+    const preloadImage = (url) => {
+      if (!url) return;
+      const img = new Image();
+      img.src = url;
+    };
+
+    if (stories[index + 1]) preloadImage(stories[index + 1].image);
+    if (stories[index - 1]) preloadImage(stories[index - 1].image);
+  }, [index, stories]);
+
+  /* ✅ Start progress only after image loads */
   useEffect(() => {
     if (!currentStory) return;
 
-    // Reset current story progress to 0
+    // Reset progress state
     setProgressList((prev) =>
-      prev.map((p, i) => (i === index ? 0 : i < index ? 100 : 0))
+      prev.map((_, i) => (i < index ? 100 : i === index ? 0 : 0))
     );
 
-    let start = Date.now();
+    // Clear existing timer
+    if (timerRef.current) clearInterval(timerRef.current);
 
-    timerRef.current = setInterval(() => {
-      const elapsed = Date.now() - start;
-      const progress = Math.min((elapsed / duration) * 100, 100);
+    // Wait until image finishes loading
+    setImageLoaded(false);
+    const img = new Image();
+    img.src = currentStory.image;
+    img.onload = () => {
+      setImageLoaded(true);
 
-      setProgressList((prev) =>
-        prev.map((p, i) => (i === index ? progress : p))
-      );
+      const start = Date.now();
+      timerRef.current = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const progress = Math.min((elapsed / duration) * 100, 100);
 
-      if (progress >= 100) {
-        clearInterval(timerRef.current);
-        if (index < stories.length - 1) setIndex((prev) => prev + 1);
-        else onClose();
-      }
-    }, 100);
+        setProgressList((prev) =>
+          prev.map((p, i) => (i === index ? progress : p))
+        );
+
+        if (progress >= 100) {
+          clearInterval(timerRef.current);
+          if (index < stories.length - 1) setIndex((prev) => prev + 1);
+          else onClose();
+        }
+      }, 100);
+    };
 
     return () => clearInterval(timerRef.current);
-  }, [index, stories]);
+  }, [index, currentStory]);
 
+  /* ✅ Handle tap navigation (left / right) */
   const handleTap = (e) => {
     const { clientX } = e;
     const screenWidth = window.innerWidth;
@@ -106,21 +128,17 @@ function StoryViewer({ stories, currentIndex, onClose }) {
     clearInterval(timerRef.current);
 
     if (clientX < screenWidth / 3) {
-      // Left → previous
+      // Left tap → previous story
       setProgressList((prev) =>
-        prev.map((p, i) => (i === index ? 100 : i < index ? 100 : 0))
+        prev.map((p, i) => (i < index ? 100 : i === index ? 0 : 0))
       );
       setIndex((prev) => (prev > 0 ? prev - 1 : prev));
     } else if (clientX > (screenWidth * 2) / 3) {
-      // Right → next
+      // Right tap → next story
       setProgressList((prev) =>
         prev.map((p, i) => (i <= index ? 100 : 0))
       );
-      setIndex((prev) =>
-        prev < stories.length - 1 ? prev + 1 : prev
-      );
-    } else {
-      // Middle → pause/resume (optional)
+      setIndex((prev) => (prev < stories.length - 1 ? prev + 1 : prev));
     }
   };
 
@@ -132,11 +150,12 @@ function StoryViewer({ stories, currentIndex, onClose }) {
         className="story-viewer-card fade-in"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* ❌ Close Button */}
         <button className="story-close-btn" onClick={onClose}>
           <FiX size={22} />
         </button>
 
-        {/* 🕒 Progress bar */}
+        {/* 🕒 Progress Bar */}
         <div className="multi-progress">
           {stories.map((_, i) => (
             <div key={i} className="progress-track">
@@ -147,23 +166,24 @@ function StoryViewer({ stories, currentIndex, onClose }) {
                 style={{
                   width: `${progressList[i]}%`,
                   transition:
-                    i === index
-                      ? "width 0.1s linear"
-                      : "none",
+                    i === index ? "width 0.1s linear" : "none",
                 }}
               ></div>
             </div>
           ))}
         </div>
 
-        {/* 📸 Story Image & Info */}
+        {/* 📸 Story Image */}
         <div className="story-image-wrapper" onClick={handleTap}>
           <img
             src={currentStory.image}
             alt={currentStory.location}
-            className="story-viewer-image"
+            className={`story-viewer-image ${
+              imageLoaded ? "loaded" : ""
+            }`}
           />
 
+          {/* 📝 Info Overlay */}
           <div className="story-info-overlay">
             <h3>📍 {currentStory.location}</h3>
             {currentStory.comment && (
