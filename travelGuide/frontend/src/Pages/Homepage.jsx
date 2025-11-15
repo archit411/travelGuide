@@ -364,10 +364,15 @@ setCity(formattedLocation);
   </div>
 
   {/* TRIPEZ */}
-  <div className="sub-label-row">
-    <div className="blue-line"></div>
-    <span className="sub-label-text">TRIPEZ</span>
-  </div>
+     <div className="loc-row">
+        {locationError ? (
+          <div className="loc-error">⚠️ {locationError}</div>
+        ) : city ? (
+          <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{color: "#3b82f6"}}></i> {city}</div>
+        ) : (
+          <div className="loc-chip loading">Detecting your location...</div>
+        )}
+      </div>
 
   {/* Grid */}
   <div className="header-main-grid">
@@ -425,15 +430,7 @@ setCity(formattedLocation);
 
 
       {/* Location chip */}
-      <div className="loc-row">
-        {locationError ? (
-          <div className="loc-error">⚠️ {locationError}</div>
-        ) : city ? (
-          <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{color: "#3b82f6"}}></i> {city}</div>
-        ) : (
-          <div className="loc-chip loading">Detecting your location...</div>
-        )}
-      </div>
+   
 
       {/* --- TOP PLACES (moved earlier) --- */}
       <section className="featured">
@@ -487,24 +484,87 @@ setCity(formattedLocation);
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
       <nav className="bottom-nav">
-  {[
-    { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-    { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-    { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-  ].map((item) => (
-    <button
-      key={item.id}
-      className={`nav-btn ${active === item.id ? "active" : ""}`}
-      onClick={() => {
-        setActive(item.id);
-        navigate(item.path);
-      }}
-    >
-      <div className="nav-ic">{item.icon}</div>
-      <div className="nav-label">{item.label}</div>
-    </button>
-  ))}
+
+  {/* WEB VIEW NAV */}
+  {/* <div className="nav-web only-web">
+    {[
+      { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+      { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+      { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+    ].map((item) => (
+      <button
+        key={item.id}
+        className={`nav-btn ${active === item.id ? "active" : ""}`}
+        onClick={() => {
+          setActive(item.id);
+          navigate(item.path);
+        }}
+      >
+        <div className="nav-ic">{item.icon}</div>
+        <div className="nav-label">{item.label}</div>
+      </button>
+    ))}
+  </div> */}
+
+  {/* MOBILE VIEW NAV */}
+  <nav className="bottom-nav">
+  {/* WEB NAV ONLY */}
+  {window.innerWidth > 768 && (
+    <div className="nav-web">
+      {[
+        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+        { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+      ].map((item) => (
+        <button
+          key={item.id}
+          className={`nav-btn ${active === item.id ? "active" : ""}`}
+          onClick={() => {
+            setActive(item.id);
+            navigate(item.path);
+          }}
+        >
+          <div className="nav-ic">{item.icon}</div>
+          <div className="nav-label">{item.label}</div>
+        </button>
+      ))}
+    </div>
+  )}
+
+  {/* MOBILE NAV ONLY */}
+  {window.innerWidth <= 768 && (
+    <div className="nav-mobile">
+      {[
+        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+        { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+        { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
+        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+      ].map((item) => (
+        <button
+          key={item.id}
+          className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
+          onClick={() => {
+            if (item.id === "upload") {
+              setShowAdd(true);
+              return;
+            }
+            setActive(item.id);
+            navigate(item.path);
+          }}
+        >
+          <div className="nav-ic">{item.icon}</div>
+          <div className="nav-label">{item.label}</div>
+        </button>
+      ))}
+    </div>
+  )}
 </nav>
+
+
+</nav>
+
+
 
 
       {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}

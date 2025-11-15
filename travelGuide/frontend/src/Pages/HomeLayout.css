@@ -5,12 +5,12 @@
   background: #f7fbff;
   min-height: 100vh;
   color: #0b2339;
-  padding-bottom: 120px; /* space for bottom nav */
+  padding-bottom: 120px; 
 }
 
 /* location row */
 .loc-row {
-  padding: 8px 22px;
+  padding: 8px 10px;
 }
 
 .loc-chip {
@@ -41,4 +41,159 @@
   padding: 20px;
   color: #6b7280;
   margin-top: 24px;
+}
+/* =========================================================
+   🔵 MOBILE RESPONSIVE STYLES
+   Works for screens < 768px
+========================================================= */
+
+@media (max-width: 768px) {
+
+  /* HEADER CONTAINER */
+  .header-container {
+    padding: 24px 20px;
+    border-radius: 0 0 26px 26px;
+  }
+
+  /* TOP ROW */
+  .header-top {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .header-logo-big {
+    width: 38px;
+    height: 38px;
+  }
+
+  .header-main-brand {
+    font-size: 20px;
+  }
+
+  /* LOCATION CHIP INSIDE HEADER */
+  .loc-row {
+    margin-top: 16px;
+  }
+
+  .loc-chip {
+    width: fit-content;
+    font-size: 14px;
+    padding: 8px 14px;
+  }
+
+  /* GRID BECOMES SINGLE COLUMN */
+  .header-main-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-top: 30px;
+  }
+
+  /* TITLE */
+  .header-heading-large {
+    font-size: 40px;
+    line-height: 1.1;
+  }
+
+  .escape-text-big {
+    font-size: 42px;
+  }
+
+  /* RIGHT SIDE */
+  .header-right-col {
+    width: 100%;
+    transform: translateY(0);
+  }
+
+  /* SEARCH OPTIONS ROW = STACK */
+  .search-options-row {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* SEARCH CARDS */
+  .search-card.medium {
+    width: 100%;
+    min-height: 90px;
+
+    padding: 18px 20px;
+    border-radius: 18px;
+  }
+
+  .search-label {
+    font-size: 16px;
+  }
+
+  .search-placeholder {
+    font-size: 13px;
+  }
+
+  /* SEARCH BUTTON FULL WIDTH */
+  .header-search-btn.extra-wide {
+    width: 100% !important;
+    margin-top: 10px;
+    padding: 16px;
+    border-radius: 14px;
+  }
+
+  /* =========================================================
+     FEATURED DESTINATIONS — HORIZONTAL MOBILE SCROLL
+  ========================================================== */
+
+  .featured-grid {
+    display: flex !important;
+    overflow-x: auto;
+    gap: 14px;
+    padding-bottom: 10px;
+    scroll-snap-type: x mandatory;
+  }
+
+  .featured-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .featured-grid .place-card {
+    min-width: 240px !important;
+    max-width: 240px !important;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+  }
+
+  /* =========================================================
+     TODAY'S HIGHLIGHTS
+  ========================================================== */
+
+  .highlights-scroll {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .highlights-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .highlight-card {
+    min-width: 260px;
+    flex: 0 0 auto;
+  }
+
+  /* =========================================================
+     BOTTOM NAVIGATION
+  ========================================================== */
+
+  .bottom-nav {
+    justify-content: space-around;
+    padding: 12px 0;
+  }
+
+  .nav-btn {
+    padding: 0;
+  }
+
+  .nav-label {
+    font-size: 12px;
+  }
 }

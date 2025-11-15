@@ -1,21 +1,29 @@
-/* --------------------------------------------
-   HEADER CONTAINER
---------------------------------------------- */
+/* ============================================
+   HEADER CONTAINER (Desktop + Mobile)
+============================================ */
 .header-container {
   background: #ffffff;
-  border-radius: 28px;
- padding: 48px 60px;  
- margin-left: 20px;
- margin-right: 20px;
-  margin-top: 28px;
-  margin-bottom: 36px;
- transition: padding 0.2s ease;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  border-radius: 36px;
+  padding: 42px 48px;
+  margin: 28px 20px 36px 20px;
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s ease;
 }
 
-/* --------------------------------------------
-   TOP ROW (LOGO + ACTIONS)
---------------------------------------------- */
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 26px 20px;
+    border-radius: 26px;
+    margin-top: 14px;
+  }
+}
+
+
+/* ============================================
+   TOP ROW (Logo - TripEZ - Add Post - Profile)
+============================================ */
 .header-top {
   display: flex;
   justify-content: space-between;
@@ -46,7 +54,15 @@
   gap: 16px;
 }
 
-/* ADD POST BUTTON */
+/* Hide in mobile (handled in bottom navigation) */
+@media (max-width: 768px) {
+  .header-actions {
+    display: none !important;
+  }
+}
+
+
+/* ADD-POST button */
 .add-post-btn {
   display: flex;
   align-items: center;
@@ -61,7 +77,7 @@
   cursor: pointer;
 }
 
-/* PROFILE ICON */
+/* Profile bubble */
 .profile-circle {
   width: 40px;
   height: 40px;
@@ -74,9 +90,10 @@
   font-size: 16px;
 }
 
-/* --------------------------------------------
+
+/* ============================================
    TRIPEZ SUBTITLE
---------------------------------------------- */
+============================================ */
 .sub-label-row {
   margin-top: 26px;
   display: flex;
@@ -96,20 +113,29 @@
   color: #3b82f6;
 }
 
-/* --------------------------------------------
-   MAIN GRID (TITLE LEFT — SEARCH RIGHT)
---------------------------------------------- */
+
+/* ============================================
+   GRID: Left (text) — Right (chips + search)
+============================================ */
 .header-main-grid {
   display: grid;
   grid-template-columns: 1fr auto;
+  align-items: start;
   column-gap: 60px;
   margin-top: 35px;
-  align-items: start;
 }
 
-/* --------------------------------------------
+@media (max-width: 768px) {
+  .header-main-grid {
+    grid-template-columns: 1fr;
+    row-gap: 28px;
+  }
+}
+
+
+/* ============================================
    LEFT TITLE BLOCK
---------------------------------------------- */
+============================================ */
 .header-left-col {
   padding-top: 5px;
 }
@@ -117,8 +143,8 @@
 .header-heading-large {
   font-size: 70px;
   font-weight: 800;
-  color: #0f172a;
   margin: 0;
+  color: #0f172a;
   line-height: 1.05;
 }
 
@@ -129,9 +155,19 @@
   font-style: italic;
 }
 
-/* --------------------------------------------
-   RIGHT BLOCK (chips + search)
---------------------------------------------- */
+@media (max-width: 768px) {
+  .header-heading-large {
+    font-size: 44px;
+  }
+  .escape-text-big {
+    font-size: 48px;
+  }
+}
+
+
+/* ============================================
+   RIGHT SEARCH BLOCK
+============================================ */
 .header-right-col {
   display: flex;
   flex-direction: column;
@@ -140,40 +176,55 @@
   margin-top: 34px;
 }
 
-/* --------------------------------------------
-   CHIP ROW
---------------------------------------------- */
+
+/* ============================================
+   SEARCH CHIPS
+============================================ */
 .search-options-row {
   display: flex;
   gap: 20px;
 }
 
-/* -------- FIXED CHIP DESIGN -------- */
-.search-card.medium {
-  width: 200px;                         /* wider */
-  min-height: 90px;                    /* taller like reference */
-
-  display: flex;
-  align-items: flex-start;
-  flex-direction: row;
-  gap: 16px;
-
-  padding: 22px 26px;                   /* more inside padding */
-  background: #fafbfd;                  /* slightly whiter than before */
-  border-radius: 24px;                  /* smoother rounded corners */
-  border: 1px solid #e6ebf2;            /* lighter border */
-
-  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.04);
+@media (max-width: 768px) {
+  .search-options-row {
+    flex-direction: column;
+    gap: 14px;
+  }
 }
 
+/* --- Chip Card --- */
+.search-card.medium {
+  width: 200px;
+  min-height: 90px;
 
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
+
+  background: #fafbfd;
+  border-radius: 24px;
+  border: 1px solid #e6ebf2;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+}
+
+@media (max-width: 768px) {
+  .search-card.medium {
+    width: 100%;
+    padding: 20px 24px;
+    border-radius: 20px;
+  }
+}
+
+/* Icon */
 .icon-blue-outline {
   font-size: 26px;
   color: #3b82f6;
   margin-top: 4px;
 }
 
-/* Text inside chips */
+/* Texts */
 .search-card-text {
   display: flex;
   flex-direction: column;
@@ -191,21 +242,42 @@
   color: #9aa6b6;
 }
 
-/* --------------------------------------------
+@media (max-width: 768px) {
+  .search-label {
+    font-size: 16px;
+  }
+  .search-placeholder {
+    font-size: 14px;
+  }
+}
+
+
+/* ============================================
    SEARCH BUTTON
---------------------------------------------- */
+============================================ */
 .header-search-btn.extra-wide {
-  width: 500px;
+  width: 100%;
   padding: 20px;
+
   background: linear-gradient(90deg, #3b82f6, #2563eb);
   border: none;
   border-radius: 20px;
+
   color: white;
   font-size: 18px;
   font-weight: 600;
+
   display: flex;
   justify-content: center;
   gap: 12px;
-  align-items: center;
+
   box-shadow: 0 12px 34px rgba(37, 99, 235, 0.25);
+}
+
+@media (max-width: 768px) {
+  .header-search-btn.extra-wide {
+    padding: 18px;
+    border-radius: 18px;
+    font-size: 16px;
+  }
 }

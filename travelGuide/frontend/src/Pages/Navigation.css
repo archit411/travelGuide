@@ -1,46 +1,133 @@
-/* Navigation.css */
+/* ============================================
+   UNIVERSAL NAV BASE
+============================================ */
 .bottom-nav {
-    position: fixed;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 22px;
-    background: linear-gradient(90deg, rgba(6, 12, 36, 0.95), rgba(3, 9, 30, 0.95));
-    padding: 10px;
-    border-radius: 40px;
-    display: flex;
-    gap: 18px;
-    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.25);
-    z-index: 1000
+  position: fixed;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+
+  z-index: 99999;
+  pointer-events: auto;
 }
 
+/* Remove button outline */
 .nav-btn {
-    border: none;
-    background: transparent;
-    color: #9aa8c6;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    padding: 8px;
-    border-radius: 32px;
-    cursor: pointer
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+
+  color: #9aa8c6;
+  font-size: 13px;
+}
+
+.nav-btn .nav-ic {
+  font-size: 20px;
 }
 
 .nav-btn.active {
-    background: rgba(255, 255, 255, 0.06);
-    color: #fff
+  color: #ffffff;
 }
 
-.nav-ic {
-    font-size: 18px
+
+/* ============================================
+   WEB NAV (Desktop / Laptop)
+============================================ */
+@media (min-width: 769px) {
+  .nav-web {
+    display: flex;
+    background: rgba(15, 23, 42, 0.82);
+    backdrop-filter: blur(20px);
+
+    padding: 14px 34px;
+    border-radius: 40px;
+    gap: 40px;
+
+    box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.35);
+  }
+
+  .nav-mobile {
+    display: none !important;
+  }
 }
 
-@media(max-width:700px) {
-    .bottom-nav {
-        left: 12px;
-        transform: none;
-        width: calc(100% - 24px);
-        justify-content: space-around;
-        border-radius: 999px
-    }
+
+/* ============================================
+   MOBILE NAV (Premium Bottom Bar)
+============================================ */
+@media (max-width: 768px) {
+  /* Hide desktop nav */
+  .nav-web {
+    display: none !important;
+  }
+
+  /* Mobile pill container */
+  .nav-mobile {
+    width: 92vw;
+    background: rgba(6, 12, 36, 0.85);
+    backdrop-filter: blur(22px);
+    padding: 16px 26px;
+
+    border-radius: 44px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    position: relative;
+  }
+
+  /* Center Upload Button (Floating) */
+  .upload-btn {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+
+    width: 74px;
+    height: 74px;
+
+    background: linear-gradient(145deg, #4f8cff, #2563eb);
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    font-size: 28px;
+    color: #fff;
+
+    box-shadow: 0px 10px 28px rgba(37, 99, 235, 0.45);
+  }
+
+  .upload-btn .nav-label {
+    display: none;
+  }
 }
+
+
+/* ============================================
+   UTILITY VISIBILITY CLASSES
+============================================ */
+.only-web {
+  display: flex;
+}
+
+.only-mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .only-web {
+    display: none !important;
+  }
+  .only-mobile {
+    display: flex !important;
+  }
+}
+    
