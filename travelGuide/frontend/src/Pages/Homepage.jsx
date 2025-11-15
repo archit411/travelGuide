@@ -1,207 +1,171 @@
-import { useEffect, useRef, useState } from "react";
-import {
-  FiSearch,
-  FiHome,
-  FiBookmark,
-  FiUser,
-  FiX,
-} from "react-icons/fi";
+import React, { useEffect, useRef, useState } from "react";
+import { FiSearch, FiHome, FiUser, FiX } from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
-import "./home.css";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
-
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import SearchOverlay from "./SearchOverlay";
 
-/* 🔹 Skeleton Loader */
-function SkeletonCard() {
-  return (
-    <div className="skeleton-card shimmer">
-      <div className="skeleton-img"></div>
-      <div className="skeleton-text"></div>
-      <div className="skeleton-subtext"></div>
-    </div>
-  );
+// styles (ensure these files exist in src/Pages/styles/)
+import "./Header.css";
+import "./Hero.css";
+import "./Highlights.css";
+import "./Featured.css";
+import "./PlaceCard.css";
+import "./StoryCard.css";
+import "./StoryViewer.css";
+import "./Navigation.css";
+import "./HomeLayout.css";
+
+/* ----------------- Helpers ----------------- */
+function timeAgo(isoOrMs) {
+  if (!isoOrMs) return "Just now";
+  const t = typeof isoOrMs === "number" ? isoOrMs : Date.parse(isoOrMs);
+  if (Number.isNaN(t)) return "Just now";
+  const sec = Math.floor((Date.now() - t) / 1000);
+  if (sec < 60) return `${sec}s ago`;
+  if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
+  if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
+  return `${Math.floor(sec / 86400)}d ago`;
 }
 
-/* 🔹 Place Card */
+/* Avatar initial bubble */
+function Avatar({ name }) {
+  const initial = name ? name.trim()[0].toUpperCase() : "T";
+  return <div className="hl-avatar">{initial}</div>;
+}
+
+/* Crowd badge */
+function CrowdBadge({ level }) {
+  const text = (level || "").toString().toLowerCase();
+  if (["high", "h"].includes(text)) return <span className="crowd high">High</span>;
+  if (["medium", "med", "m"].includes(text)) return <span className="crowd medium">Medium</span>;
+  return <span className="crowd low">Low</span>;
+}
+
+/* Small skeleton used while loading */
+function SkeletonPlace({ style }) {
+  return <div className="skeleton-place" style={style}></div>;
+}
+
+/* Place card for Featured section */
 function PlaceCard({ place }) {
   const navigate = useNavigate();
-  const { name, description, imageUrl, lat, lng } = place;
+  const image =
+    place.imageUrl ||
+    place.image_url1 ||
+    place.image_url2 ||
+    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
 
   return (
     <div
-      className="place-card-new"
+      className="place-card featured-card"
       onClick={() =>
-        navigate(`/destination/${encodeURIComponent(name)}`, {
-          state: { place }, // ✅ Pass full place object
+        navigate(`/destination/${encodeURIComponent(place.name || "place")}`, {
+          state: { place },
         })
       }
     >
-      <div
-        className="place-image"
-        style={{
-          backgroundImage: `url(${imageUrl?.trim() ||
-            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200"
-            })`,
-        }}
-      ></div>
-
-      <div className="place-info">
-        <h4 className="place-title">📍 {name}</h4>
-        <p className="place-desc">
-          {description || "No description available."}
-        </p>
+      <div className="place-bg" style={{ backgroundImage: `url(${image})` }} />
+      <div className="place-overlay">
+        <div className="place-inner">
+          <div className="place-title">{place.name}</div>
+          {place.description && <div className="place-sub">{place.description}</div>}
+        </div>
       </div>
     </div>
   );
 }
 
-function StoryViewer({ stories, currentIndex, onClose }) {
-  const [index, setIndex] = useState(currentIndex);
-  const [progressList, setProgressList] = useState(
-    stories.map((_, i) => (i < currentIndex ? 100 : 0))
+/* Highlight small rectangular story card */
+function HighlightSmall({ story, openStory }) {
+  const likes =
+    typeof story.likes === "number"
+      ? story.likes
+      : story.userRating
+        ? Math.round(story.userRating * 20)
+        : Math.floor(Math.random() * 200) + 12;
+
+  const image = story.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
+
+  return (
+    <div className="hl-small-card" onClick={() => openStory(story)}>
+      <div className="hl-small-image" style={{ backgroundImage: `url(${image})` }} />
+      <div className="hl-small-meta">
+        {/* We show destination under the small card as requested */}
+        <div className="hl-small-location">{story.destination || "Unknown"}</div>
+      </div>
+    </div>
   );
-  const [imageLoaded, setImageLoaded] = useState(false);
-  const duration = 15000; // 15s per story
+}
+
+/* Story viewer modal (keeps your behavior) */
+function StoryViewer({ stories, index: startIndex = 0, onClose }) {
+  const [index, setIndex] = useState(startIndex);
+  const [progress, setProgress] = useState(stories.map((_, i) => (i < startIndex ? 100 : 0)));
+  const [loaded, setLoaded] = useState(false);
   const timerRef = useRef(null);
+  const duration = 15000;
 
-  const currentStory = stories[index];
-
-  /* ✅ Preload next and previous story images */
   useEffect(() => {
-    const preloadImage = (url) => {
-      if (!url) return;
-      const img = new Image();
-      img.src = url;
-    };
+    if (!stories || !stories.length) return;
+    setLoaded(false);
+    setProgress((p) => p.map((_, i) => (i < index ? 100 : i === index ? 0 : 0)));
 
-    if (stories[index + 1]) preloadImage(stories[index + 1].image);
-    if (stories[index - 1]) preloadImage(stories[index - 1].image);
-  }, [index, stories]);
-
-  /* ✅ Start progress only after image loads */
-  useEffect(() => {
-    if (!currentStory) return;
-
-    // Reset progress state
-    setProgressList((prev) =>
-      prev.map((_, i) => (i < index ? 100 : i === index ? 0 : 0))
-    );
-
-    // Clear existing timer
     if (timerRef.current) clearInterval(timerRef.current);
 
-    // Wait until image finishes loading
-    setImageLoaded(false);
     const img = new Image();
-    img.src = currentStory.image;
+    img.src = stories[index].image;
     img.onload = () => {
-      setImageLoaded(true);
-
+      setLoaded(true);
       const start = Date.now();
       timerRef.current = setInterval(() => {
         const elapsed = Date.now() - start;
-        const progress = Math.min((elapsed / duration) * 100, 100);
-
-        setProgressList((prev) =>
-          prev.map((p, i) => (i === index ? progress : p))
-        );
-
-        if (progress >= 100) {
+        const pct = Math.min((elapsed / duration) * 100, 100);
+        setProgress((prev) => prev.map((val, i) => (i === index ? pct : val)));
+        if (pct >= 100) {
           clearInterval(timerRef.current);
-          if (index < stories.length - 1) setIndex((prev) => prev + 1);
+          if (index < stories.length - 1) setIndex((i) => i + 1);
           else onClose();
         }
       }, 100);
     };
 
     return () => clearInterval(timerRef.current);
-  }, [index, currentStory]);
+    // eslint-disable-next-line
+  }, [index, stories]);
 
-  /* ✅ Handle tap navigation (left / right) */
-  const handleTap = (e) => {
-    const { clientX } = e;
-    const screenWidth = window.innerWidth;
-
+  function handleTap(e) {
+    const x = e.clientX;
+    const w = window.innerWidth;
     clearInterval(timerRef.current);
+    if (x < w / 3) setIndex((i) => Math.max(0, i - 1));
+    else if (x > (w * 2) / 3) setIndex((i) => Math.min(stories.length - 1, i + 1));
+  }
 
-    if (clientX < screenWidth / 3) {
-      // Left tap → previous story
-      setProgressList((prev) =>
-        prev.map((p, i) => (i < index ? 100 : i === index ? 0 : 0))
-      );
-      setIndex((prev) => (prev > 0 ? prev - 1 : prev));
-    } else if (clientX > (screenWidth * 2) / 3) {
-      // Right tap → next story
-      setProgressList((prev) =>
-        prev.map((p, i) => (i <= index ? 100 : 0))
-      );
-      setIndex((prev) => (prev < stories.length - 1 ? prev + 1 : prev));
-    }
-  };
+  if (!stories || !stories.length) return null;
 
-  if (!currentStory) return null;
+  const current = stories[index];
 
   return (
     <div className="story-viewer-overlay" onClick={onClose}>
-      <div
-        className="story-viewer-card fade-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* ❌ Close Button */}
+      <div className="story-viewer-card" onClick={(e) => e.stopPropagation()}>
         <button className="story-close-btn" onClick={onClose}>
-          <FiX size={22} />
+          <FiX size={18} />
         </button>
 
-        {/* 🕒 Progress Bar */}
         <div className="multi-progress">
           {stories.map((_, i) => (
             <div key={i} className="progress-track">
-              <div
-                className={`progress-filled ${
-                  i < index ? "done" : i === index ? "active" : ""
-                }`}
-                style={{
-                  width: `${progressList[i]}%`,
-                  transition:
-                    i === index ? "width 0.1s linear" : "none",
-                }}
-              ></div>
+              <div className={`progress-filled ${i < index ? "done" : ""}`} style={{ width: `${progress[i] || 0}%` }} />
             </div>
           ))}
         </div>
 
-        {/* 📸 Story Image */}
         <div className="story-image-wrapper" onClick={handleTap}>
-          <img
-            src={currentStory.image}
-            alt={currentStory.location}
-            className={`story-viewer-image ${
-              imageLoaded ? "loaded" : ""
-            }`}
-          />
-
-          {/* 📝 Info Overlay */}
+          <img className={`story-viewer-image ${loaded ? "loaded" : ""}`} src={current.image} alt={current.destination} />
           <div className="story-info-overlay">
-            <h3>📍 {currentStory.location}</h3>
-            {currentStory.comment && (
-              <p className="story-caption">
-                {currentStory.comment.length > 100
-                  ? currentStory.comment.slice(0, 100) + "..."
-                  : currentStory.comment}
-              </p>
-            )}
-            <div className="story-meta">
-              {currentStory.temperature && (
-                <span>🌡️ {currentStory.temperature}°C</span>
-              )}
-              {currentStory.crowd && <span>👥 {currentStory.crowd}</span>}
-              {currentStory.rating > 0 && (
-                <span>⭐ {currentStory.rating}/5</span>
-              )}
-            </div>
+            <h3>📍 {current.destination}</h3>
+            {current.caption && <p className="story-caption">{current.caption}</p>}
           </div>
         </div>
       </div>
@@ -209,66 +173,45 @@ function StoryViewer({ stories, currentIndex, onClose }) {
   );
 }
 
-
-/* 🌍 Main Component */
+/* ----------------- Main HomePage ----------------- */
 export default function HomePage() {
-  const [active, setActive] = useState("home");
-  const [topPlaces, setTopPlaces] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [month, setMonth] = useState("");
-  const [stories, setStories] = useState([]);
-  const [selectedStory, setSelectedStory] = useState(null);
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [location, setLocation] = useState(null);
-  const [locationError, setLocationError] = useState("");
-  const [city, setCity] = useState("");
-  const [showSearchOverlay, setShowSearchOverlay] = useState(false);
   const navigate = useNavigate();
 
-  /* 📅 Detect month */
-  useEffect(() => {
-    const localMonth = new Date().toLocaleString("default", { month: "long" });
-    setMonth(localMonth);
-  }, []);
+  const [active, setActive] = useState("home");
+  const [month, setMonth] = useState("");
+  const [stories, setStories] = useState([]);
+  const [topPlaces, setTopPlaces] = useState([]);
+  const [loadingPlaces, setLoadingPlaces] = useState(true);
 
-  /* 🌍 Fetch user location */
-  const fetchUserLocation = () => {
+  const [location, setLocation] = useState(null);
+  const [city, setCity] = useState("");
+  const [locationError, setLocationError] = useState("");
+
+  const [showAdd, setShowAdd] = useState(false);
+  const [viewStory, setViewStory] = useState(null); // { stories: [...], index: 0 }
+  const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => setMonth(new Date().toLocaleString("default", { month: "long" })), []);
+
+  /* Geolocation and reverse geocode */
+  useEffect(() => {
     if (!navigator.geolocation) {
       setLocationError("Geolocation not supported by your browser.");
       return;
     }
-
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const coords = {
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude,
-        };
+        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         setLocation(coords);
-
-        // Reverse geocode (OpenStreetMap)
         try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`
-          );
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
           const data = await res.json();
-
-          const cityName =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            data.address.suburb;
+          const cityName = data.address.city || data.address.town || data.address.village || data.address.suburb || "";
           const stateName = data.address.state || "";
           const countryName = data.address.country || "";
-
-          setCity(cityName);
-          setLocation((prev) => ({
-            ...prev,
-            state: stateName,
-            country: countryName,
-          }));
+          setCity(cityName ? `${cityName}${stateName ? `, ${stateName}` : ""}${countryName ? `, ${countryName}` : ""}` : "");
         } catch (err) {
-          console.warn("Reverse geocoding failed:", err);
+          console.warn("reverse failed", err);
         }
       },
       (err) => {
@@ -288,212 +231,248 @@ export default function HomePage() {
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
     );
-  };
-
-  useEffect(() => {
-    fetchUserLocation();
   }, []);
 
-  /* 🗺️ Fetch stories and top places */
+  /* Fetch stories -> Today's Highlights */
   useEffect(() => {
-    const fetchUserStories = async () => {
+    async function loadStories() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-
-        if (!res.ok) return console.error("Failed to fetch user stories");
-
+        if (!res.ok) {
+          console.error("failed fetch stories", res.status);
+          return;
+        }
         const data = await res.json();
         if (Array.isArray(data)) {
-          setStories(
-            data.map((story) => ({
-              image: story.image,
-              location: story.destination,
-              temperature: story.temprature,
-              crowd: story.crowdLevel,
-              comment: story.caption,
-              rating: story.userRating,
-            }))
-          );
+          const normalized = data.map((s) => ({
+            image: s.image || s.imageUrl || s.image_url || "",
+            destination: s.destination || s.title || "Unknown",
+            temprature: s.temprature || s.temperature || null,
+            crowdLevel: s.crowdLevel || s.crowd || "low",
+            caption: s.caption || s.description || "",
+            userRating: s.userRating || s.rating || 0,
+            likes: s.likes || s.likeCount || null,
+            userName: s.userName || s.username || s.author || "Traveler",
+            createdAt: s.createdAt || s.createdAtMillis || s.timestamp || null,
+          }));
+          setStories(normalized);
         }
       } catch (err) {
-        console.error("Error fetching stories:", err);
+        console.error("error stories", err);
       }
-    };
-
-    fetchUserStories();
+    }
+    loadStories();
   }, []);
 
+  /* Fetch top places */
   useEffect(() => {
     if (!month) return;
-    const fetchTopPlaces = async () => {
-      setLoading(true);
+    async function loadPlaces() {
+      setLoadingPlaces(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
+        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
+        if (!res.ok) {
+          console.error("failed top places", res.status);
+          setTopPlaces([]);
+          return;
+        }
         const data = await res.json();
         setTopPlaces(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Error fetching:", err);
+        console.error("error top places", err);
       } finally {
-        setLoading(false);
+        setLoadingPlaces(false);
       }
-    };
-
-    fetchTopPlaces();
+    }
+    loadPlaces();
   }, [month]);
 
-  const addStory = (story) => setStories((prev) => [story, ...prev]);
-
-  // ✅ FIXED: Map correct image URLs (image_url1, image_url2)
+  /* map topPlaces -> flattened place list */
   const places = topPlaces
     .flatMap((region) => [
-      region.placeOne && {
-        name: region.placeOne,
-        description: region.placeOneDescription,
-        imageUrl: region.image_url1,
-        lat: region.latitude1,
-        lng: region.longitude1,
-      },
-      region.placeTwo && {
-        name: region.placeTwo,
-        description: region.placeTwoDescription,
-        imageUrl: region.image_url2,
-        lat: region.latitude2,
-        lng: region.longitude2,
-      },
+      region.placeOne && { name: region.placeOne, description: region.placeOneDescription, imageUrl: region.image_url1 },
+      region.placeTwo && { name: region.placeTwo, description: region.placeTwoDescription, imageUrl: region.image_url2 },
     ])
     .filter(Boolean);
 
-  return (
-    <div className="tp">
-      {/* 🌍 Header */}
-      <header className="tp-header">
-        <div className="tp-brand">
-          <img className="brand-logo" src="/logo.jpeg" alt="TripPulse" />
-          <div>
-            <h1>TripEasy4U</h1>
-            <div className="brand-sub">Discover • Plan • Go</div>
-          </div>
+  function openStory(story) {
+    // To reuse viewer which expects array, pass single-story array.
+    setViewStory({ stories: [story], index: 0 });
+  }
 
-        </div>
-      </header>
-      {/* 📍 Location Display */}
-      <div>
-        {locationError ? (
-          <p className="error-text">⚠️ {locationError}</p>
-        ) : city ? (
-          <div className="location-chip fade-in">
-            <i className="fa-solid fa-location-dot location-pin"></i>
-            <span className="location-text">
-              {city}
-              {location?.state ? `, ${location.state}` : ""}
-              {location?.country ? `, ${location.country}` : ""}
-            </span>
+  function openStoryWithList(indexInList = 0) {
+    setViewStory({ stories: stories, index: indexInList });
+  }
+
+  return (
+    <div className="home-root">
+      {/* ---------------- FIGMA HEADER ---------------- */}
+      {/* ---------------- FIGMA HEADER (updated placement) ---------------- */}
+<div className="header-container">
+
+  {/* Top Row */}
+  <div className="header-top">
+    <div className="header-left">
+      <img src="/logo.jpeg" alt="logo" className="header-logo" />
+      <span className="header-title">TRIPEZ</span>
+    </div>
+
+    <div className="header-actions">
+      <button className="add-post-btn" onClick={() => setShowAdd(true)}>
+        <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
+      </button>
+
+      <div className="profile-circle">
+        <i className="fa-solid fa-user"></i>
+      </div>
+    </div>
+  </div>
+
+  {/* Main content: left = title, right = search panel */}
+  <div className="header-main-grid">
+    {/* LEFT: Title / kicker */}
+    <div className="header-left-col">
+      <h1 className="header-heading">
+        Plan Your <span className="escape-text">Escape</span><br />
+        
+      </h1>
+    </div>
+
+    {/* RIGHT: chips + big search button */}
+    <div className="header-right-col">
+      <div className="search-options-row">
+        <div className="search-card small">
+          <i className="fa-solid fa-compass icon-blue"></i>
+          <div className="search-card-text">
+            <div className="search-label">Discover</div>
+            <div className="search-placeholder">Where?</div>
           </div>
+        </div>
+
+        <div className="search-card small">
+          <i className="fa-regular fa-calendar icon-blue"></i>
+          <div className="search-card-text">
+            <div className="search-label">Plan</div>
+            <div className="search-placeholder">When?</div>
+          </div>
+        </div>
+
+        <div className="search-card small">
+          <i className="fa-solid fa-location-arrow icon-blue"></i>
+          <div className="search-card-text">
+            <div className="search-label">Go</div>
+            <div className="search-placeholder">How?</div>
+          </div>
+        </div>
+      </div>
+
+      <button
+        className="header-search-btn large"
+        onClick={() => setShowSearch(true)}
+      >
+        <i className="fa-solid fa-magnifying-glass"></i>
+        <span> Search</span>
+      </button>
+    </div>
+  </div>
+</div>
+{/* ---------------- END FIGMA HEADER ---------------- */}
+
+
+
+      {/* Location chip */}
+      <div className="loc-row">
+        {locationError ? (
+          <div className="loc-error">⚠️ {locationError}</div>
+        ) : city ? (
+          <div className="loc-chip">📍 {city}</div>
         ) : (
-          <div className="location-chip loading">Detecting your location...</div>
+          <div className="loc-chip loading">Detecting your location...</div>
         )}
       </div>
 
-      {/* 🔍 Search Bar */}
-      <div className="tp-search">
-        <div className="search" onClick={() => setShowSearchOverlay(true)}>
-          <FiSearch />
-          <input placeholder="Search destinations..." readOnly />
+      {/* --- TOP PLACES (moved earlier) --- */}
+      <section className="featured">
+        <div className="section-head">
+          <h2>Featured Destinations</h2>
         </div>
-      </div>
+        <p className="featured-sub">
+          Handpicked travel experiences to the most iconic, breathtaking, and exciting places. Discover your next adventure and
+          start making memories today.
+        </p>
 
-      {/* 📸 Stories Section */}
-      <div className="stories-section">
-        <h3>Your Stories</h3>
-        <div className="stories-grid">
-          <div className="story-card your-story" onClick={() => setShowAddModal(true)}>
-            <div className="add-icon">＋</div>
-          </div>
-          {stories.map((s, i) => (
-            <div
-              key={i}
-              className="story-card"
-              onClick={() => setSelectedStory({ index: i, stories })}
-            >
-              <img src={s.image} alt={s.location} />
-              <div className="story-overlay">
-                <p className="story-loc">{s.location}</p>
+        <div className="featured-grid">
+          {loadingPlaces ? Array.from({ length: 6 }).map((_, i) => <SkeletonPlace key={i} />) : places.map((p, i) => <PlaceCard key={i} place={p} />)}
+        </div>
+      </section>
+
+      {/* ---------------------- TODAY'S HIGHLIGHTS (UPDATED UI) ---------------------- */}
+      <section className="highlights-section">
+        <div className="section-header">
+          <h2>Today's Highlights</h2>
+        </div>
+
+        <div className="highlights-scroll">
+          {stories.map((s, idx) => (
+            <div className="highlight-card" key={idx}>
+
+              {/* Image */}
+              <div
+                className="highlight-image"
+                style={{ backgroundImage: `url(${s.image})` }}
+              ></div>
+
+              {/* Text Info */}
+              <div className="highlight-info">
+                <h4>{s.location}</h4>
+
+                <p>{s.caption?.length > 80 ? s.caption.slice(0, 80) + "..." : s.caption}</p>
+
+                <div className="highlight-meta">
+                  {s.temperature && <span>🌡 {s.temperature}°C</span>}
+                  {s.crowd && <span>👥 {s.crowd}</span>}
+                  {s.rating > 0 && <span>⭐ {s.rating}</span>}
+                </div>
               </div>
             </div>
           ))}
         </div>
-      </div>
-
-      {/* 🏞️ Top Places */}
-      <section className="tp-highlights">
-        <div className="section-head">
-          <h2>{month ? `${month}'s Top Places` : "Loading..."}</h2>
-        </div>
-        <div className="place-grid">
-          {loading
-            ? Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)
-            : places.map((place, i) => (
-              <PlaceCard key={i} place={place} userLocation={location} />
-            ))}
-        </div>
       </section>
 
-      <footer className="tp-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
-      <nav className="tp-nav">
-        {[
-          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-          { id: "saved", label: "Saved", icon: <FiBookmark />, path: "/saved" },
-          { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-btn ${active === item.id ? "active" : ""}`}
-            onClick={() => {
-              setActive(item.id);
-              navigate(item.path);
-            }}
-          >
-            <div className="nav-icon">{item.icon}</div>
-            <span className="nav-label">{item.label}</span>
+      <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
+
+      <nav className="bottom-nav">
+        {[{ id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+        { id: "discover", label: "Discover", icon: <FiSearch />, path: "/discover" },
+        { id: "upload", label: "Upload", icon: <FiX />, path: "/upload" },
+        { id: "plan", label: "Plan", icon: <FaUtensils />, path: "/plan" },
+        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" }].map(item => (
+          <button key={item.id} className={`nav-btn ${active === item.id ? "active" : ""}`} onClick={() => { setActive(item.id); navigate(item.path); }}>
+            <div className="nav-ic">{item.icon}</div>
+            <div className="nav-label">{item.label}</div>
           </button>
         ))}
       </nav>
 
-      {showAddModal && (
-        <AddPost onClose={() => setShowAddModal(false)} onAddStory={addStory} />
-      )}
-
-      {selectedStory && (
-        <StoryViewer
-          stories={selectedStory.stories}
-          currentIndex={selectedStory.index}
-          onClose={() => setSelectedStory(null)}
-        />
-      )}
-      {showSearchOverlay && (
-        <SearchOverlay
-          onClose={() => setShowSearchOverlay(false)}
-          userLocation={location}
-        />
-      )}
+      {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
+      {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
+      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} userLocation={location} />}
     </div>
   );
 }
