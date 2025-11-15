@@ -27,6 +27,18 @@ function timeAgo(isoOrMs) {
   if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
   return `${Math.floor(sec / 86400)}d ago`;
 }
+function formatLocationShort(cityName, stateName) {
+  if (!cityName) return "";
+  if (!stateName) return cityName;
+
+  const stateShort = stateName
+    .split(" ")     // Handle names like "Madhya Pradesh"
+    .map(w => w[0]) // Take first letter of each word
+    .join("")       // MP, MH, UP, etc.
+    .toUpperCase();
+
+  return `${cityName}, ${stateShort}`;
+}
 
 /* Avatar initial bubble */
 function Avatar({ name }) {
@@ -206,10 +218,21 @@ export default function HomePage() {
         try {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
           const data = await res.json();
-          const cityName = data.address.city || data.address.town || data.address.village || data.address.suburb || "";
-          const stateName = data.address.state || "";
-          const countryName = data.address.country || "";
-          setCity(cityName ? `${cityName}${stateName ? `, ${stateName}` : ""}${countryName ? `, ${countryName}` : ""}` : "");
+          const cityName =
+  data.address.city ||
+  data.address.town ||
+  data.address.village ||
+  data.address.suburb ||
+  "";
+
+const stateName = data.address.state || "";
+
+// Final format → "Thane, Maharashtra"
+const formattedLocation =
+  cityName && stateName ? `${cityName}, ${stateName}` : cityName || stateName;
+
+setCity(formattedLocation);
+
         } catch (err) {
           console.warn("reverse failed", err);
         }
@@ -239,7 +262,7 @@ export default function HomePage() {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -279,7 +302,7 @@ export default function HomePage() {
       setLoadingPlaces(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -321,76 +344,82 @@ export default function HomePage() {
 
   return (
     <div className="home-root">
-      {/* ---------------- FIGMA HEADER ---------------- */}
-      {/* ---------------- FIGMA HEADER (updated placement) ---------------- */}
 <div className="header-container">
 
-  {/* Top Row */}
+  {/* Top */}
   <div className="header-top">
     <div className="header-left">
-      <img src="/logo.jpeg" alt="logo" className="header-logo" />
-      <span className="header-title">TRIPEZ</span>
+      <img src="/logo.jpeg" className="header-logo-big" alt="logo" />
+      <span className="header-main-brand">tripEZ</span>
     </div>
 
     <div className="header-actions">
       <button className="add-post-btn" onClick={() => setShowAdd(true)}>
         <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
       </button>
-
       <div className="profile-circle">
         <i className="fa-solid fa-user"></i>
       </div>
     </div>
   </div>
 
-  {/* Main content: left = title, right = search panel */}
+  {/* TRIPEZ */}
+  <div className="sub-label-row">
+    <div className="blue-line"></div>
+    <span className="sub-label-text">TRIPEZ</span>
+  </div>
+
+  {/* Grid */}
   <div className="header-main-grid">
-    {/* LEFT: Title / kicker */}
+    
+    {/* Left */}
     <div className="header-left-col">
-      <h1 className="header-heading">
-        Plan Your <span className="escape-text">Escape</span><br />
-        
+      <h1 className="header-heading-large">
+        Plan Your<br />
+        <span className="escape-text-big">Escape</span>
       </h1>
     </div>
 
-    {/* RIGHT: chips + big search button */}
+    {/* Right */}
     <div className="header-right-col">
+
       <div className="search-options-row">
-        <div className="search-card small">
-          <i className="fa-solid fa-compass icon-blue"></i>
-          <div className="search-card-text">
+        <div className="search-card medium">
+          <i className="fa-regular fa-compass icon-blue-outline"></i>
+          <div>
             <div className="search-label">Discover</div>
             <div className="search-placeholder">Where?</div>
           </div>
         </div>
 
-        <div className="search-card small">
-          <i className="fa-regular fa-calendar icon-blue"></i>
-          <div className="search-card-text">
+        <div className="search-card medium">
+          <i className="fa-regular fa-calendar icon-blue-outline"></i>
+          <div>
             <div className="search-label">Plan</div>
             <div className="search-placeholder">When?</div>
           </div>
         </div>
 
-        <div className="search-card small">
-          <i className="fa-solid fa-location-arrow icon-blue"></i>
-          <div className="search-card-text">
+        <div className="search-card medium">
+          <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
+          <div>
             <div className="search-label">Go</div>
             <div className="search-placeholder">How?</div>
           </div>
         </div>
       </div>
 
-      <button
-        className="header-search-btn large"
-        onClick={() => setShowSearch(true)}
-      >
+      <button className="header-search-btn extra-wide">
         <i className="fa-solid fa-magnifying-glass"></i>
-        <span> Search</span>
+        Search
       </button>
+
     </div>
   </div>
 </div>
+
+{/* ---------------- END HEADER ---------------- */}
+
 {/* ---------------- END FIGMA HEADER ---------------- */}
 
 
@@ -400,7 +429,7 @@ export default function HomePage() {
         {locationError ? (
           <div className="loc-error">⚠️ {locationError}</div>
         ) : city ? (
-          <div className="loc-chip">📍 {city}</div>
+          <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{color: "#3b82f6"}}></i> {city}</div>
         ) : (
           <div className="loc-chip loading">Detecting your location...</div>
         )}
@@ -458,17 +487,25 @@ export default function HomePage() {
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
       <nav className="bottom-nav">
-        {[{ id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-        { id: "discover", label: "Discover", icon: <FiSearch />, path: "/discover" },
-        { id: "upload", label: "Upload", icon: <FiX />, path: "/upload" },
-        { id: "plan", label: "Plan", icon: <FaUtensils />, path: "/plan" },
-        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" }].map(item => (
-          <button key={item.id} className={`nav-btn ${active === item.id ? "active" : ""}`} onClick={() => { setActive(item.id); navigate(item.path); }}>
-            <div className="nav-ic">{item.icon}</div>
-            <div className="nav-label">{item.label}</div>
-          </button>
-        ))}
-      </nav>
+  {[
+    { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+    { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+    { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+  ].map((item) => (
+    <button
+      key={item.id}
+      className={`nav-btn ${active === item.id ? "active" : ""}`}
+      onClick={() => {
+        setActive(item.id);
+        navigate(item.path);
+      }}
+    >
+      <div className="nav-ic">{item.icon}</div>
+      <div className="nav-label">{item.label}</div>
+    </button>
+  ))}
+</nav>
+
 
       {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
       {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}

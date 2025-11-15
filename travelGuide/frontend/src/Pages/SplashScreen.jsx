@@ -18,10 +18,10 @@ export default function SplashScreen() {
       <div className="splash-content">
         <img
           src="/logo.jpeg"
-          alt="tripEasy4U Logo"
+          alt="tripEZ Logo"
           className="splash-logo"
         />
-        <h1 className="splash-title">TripEasy4U</h1>
+        <h1 className="splash-title">tripEZ</h1>
         <p className="splash-tagline">Discover • Plan • Go</p>
       </div>
     </div>

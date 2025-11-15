@@ -125,7 +125,7 @@ const showInstallPrompt = async () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/login?email=${encodeURIComponent(
+        `https://travelguide-1-21sw.onrender.com/api/login?email=${encodeURIComponent(
           formData.email
         )}&password=${encodeURIComponent(formData.password)}`,
         {
@@ -162,7 +162,7 @@ const showInstallPrompt = async () => {
     try {
       const googleToken = credentialResponse.credential;
       const res = await fetch(
-        "http://localhost:8080/api/auth/google",
+        "https://travelguide-1-21sw.onrender.com/api/auth/google",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -177,7 +177,7 @@ const showInstallPrompt = async () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.userName);
 
-        await fetch("http://localhost:8080/profile/saveUserDetails", {
+        await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -209,7 +209,7 @@ const showInstallPrompt = async () => {
             <img src="/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
-          <h2 className="auth-heading">Welcome to TripEasy4U</h2>
+          <h2 className="auth-heading">Welcome to tripEZ</h2>
           <p className="auth-subtext">Sign in to explore live travel insights</p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
@@ -271,7 +271,7 @@ const showInstallPrompt = async () => {
           {/* ✅ Install button (only if not installed) */}
           {!isInstalled && (
             <button className="install-btn" onClick={showInstallPrompt}>
-              📲 Install TripEasy4U
+              📲 Install tripEZ
             </button>
           )}
 

@@ -50,7 +50,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const res = await fetch(
-  `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+  `https://travelguide-1-21sw.onrender.com/api/sendOtp?email=${encodeURIComponent(emailId)}`,
   { method: "POST" }
 );
 
@@ -119,7 +119,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/signup?otp=${encodeURIComponent(otp)}`,
+        `https://travelguide-1-21sw.onrender.com/api/signup?otp=${encodeURIComponent(otp)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -142,7 +142,7 @@ export default function SignupPage() {
       Swal.fire({
         icon: "success",
         title: "Signup Successful 🎉",
-        text: "Welcome to TripEasy4U!",
+        text: "Welcome to tripEZ!",
         timer: 2000,
         showConfirmButton: false,
       });
@@ -168,10 +168,10 @@ export default function SignupPage() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/logo.jpeg" alt="TripEasy4U Logo" />
+          <img src="/logo.jpeg" alt="tripEZ Logo" />
         </div>
 
-        <h2 className="auth-heading">Create Your TripEasy4U Account</h2>
+        <h2 className="auth-heading">Create Your tripEZ Account</h2>
         <p className="auth-subtext">Join us to explore and share travel experiences</p>
 
         <form className="auth-form" onSubmit={(e) => e.preventDefault()}>

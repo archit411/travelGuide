@@ -35,7 +35,7 @@ export default function ProfilePage() {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/profile/getUserDetails", {
+        const response = await fetch("https://travelguide-1-21sw.onrender.com/profile/getUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -104,7 +104,7 @@ export default function ProfilePage() {
         return;
       }
 
-      const url = `http://localhost:8080/profile/changePassword?oldPass=${encodeURIComponent(
+      const url = `https://travelguide-1-21sw.onrender.com/profile/changePassword?oldPass=${encodeURIComponent(
         formData.currentPassword
       )}&newPass=${encodeURIComponent(formData.newPassword)}`;
 
@@ -408,7 +408,7 @@ const handleLogout = () => {
   <div className="logout-modal">
     <div className="logout-card">
       <h3>Log Out?</h3>
-      <p>Are you sure you want to log out from TripEasy4U?</p>
+      <p>Are you sure you want to log out from tripEZ?</p>
       <div className="logout-actions">
         <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
           Cancel

@@ -1,15 +1,21 @@
-/* ---------- Header card container ---------- */
+/* --------------------------------------------
+   HEADER CONTAINER
+--------------------------------------------- */
 .header-container {
-  width: 100%;
   background: #ffffff;
   border-radius: 28px;
-  padding: 28px 34px;
-  margin-top: 20px;
-  margin-bottom: 28px;
-  box-shadow: 0px 8px 40px rgba(0, 0, 0, 0.08);
+ padding: 48px 60px;  
+ margin-left: 20px;
+ margin-right: 20px;
+  margin-top: 28px;
+  margin-bottom: 36px;
+ transition: padding 0.2s ease;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
 }
 
-/* ---------- Top row (logo + actions) ---------- */
+/* --------------------------------------------
+   TOP ROW (LOGO + ACTIONS)
+--------------------------------------------- */
 .header-top {
   display: flex;
   justify-content: space-between;
@@ -19,180 +25,187 @@
 .header-left {
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.header-logo {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.header-title {
-  font-size: 20px;
-  font-weight: 700;
-  color: #0a1a2f;
-}
-
-/* Right side actions */
-.header-actions {
-  display: flex;
-  align-items: center;
   gap: 14px;
 }
 
+.header-logo-big {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+}
+
+.header-main-brand {
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* ADD POST BUTTON */
 .add-post-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(90deg, #4f8cff, #2b6ef6);
+  background: linear-gradient(90deg, #2b6ef6, #2b6ef6);
   color: white;
   border: none;
   padding: 9px 16px;
   border-radius: 22px;
   font-size: 14px;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.2);
   cursor: pointer;
-  box-shadow: 0px 4px 18px rgba(30, 96, 255, 0.18);
 }
 
-.add-post-btn:hover { transform: translateY(-2px); }
-
+/* PROFILE ICON */
 .profile-circle {
   width: 40px;
   height: 40px;
   background: #1e60ff;
   color: white;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  border-radius: 50%;
   font-size: 16px;
 }
 
-/* ---------- Main grid: Title (left) and Search (right) ---------- */
+/* --------------------------------------------
+   TRIPEZ SUBTITLE
+--------------------------------------------- */
+.sub-label-row {
+  margin-top: 26px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.blue-line {
+  width: 54px;
+  height: 2px;
+  background: #3b82f6;
+}
+
+.sub-label-text {
+  font-size: 18px;
+  font-weight: 500;
+  color: #3b82f6;
+}
+
+/* --------------------------------------------
+   MAIN GRID (TITLE LEFT — SEARCH RIGHT)
+--------------------------------------------- */
 .header-main-grid {
   display: grid;
-  grid-template-columns: 1fr 420px;
-  gap: 28px;
-  align-items: start;   /* <-- FIX: remove empty gap */
-  margin-top: 18px;
+  grid-template-columns: 1fr auto;
+  column-gap: 60px;
+  margin-top: 35px;
+  align-items: start;
 }
 
-/* Left column - title */
+/* --------------------------------------------
+   LEFT TITLE BLOCK
+--------------------------------------------- */
 .header-left-col {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  padding-top: 5px;
 }
 
-.header-kicker {
-  margin: 0;
-  color: #3b82f6;
-  font-weight: 600;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.header-heading {
-  margin: 0;
-  font-size: 64px; /* large like Figma */
-  line-height: 1.02;
+.header-heading-large {
+  font-size: 70px;
   font-weight: 800;
-  color: #0a1a2f;
+  color: #0f172a;
+  margin: 0;
+  line-height: 1.05;
 }
 
-.escape-text {
-  display: inline-block;
+.escape-text-big {
+  font-size: 72px;
+  font-weight: 600;
   color: #3b82f6;
-  font-weight: 700;
   font-style: italic;
 }
 
-/* Right column - search panel */
+/* --------------------------------------------
+   RIGHT BLOCK (chips + search)
+--------------------------------------------- */
 .header-right-col {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  justify-content: center;
+  align-items: flex-start;
+  gap: 26px;
+  margin-top: 34px;
 }
 
-/* Row of small chips */
+/* --------------------------------------------
+   CHIP ROW
+--------------------------------------------- */
 .search-options-row {
   display: flex;
-  gap: 12px;
+  gap: 20px;
 }
 
-/* small search-card chip (Discover/Plan/Go) */
-.search-card.small {
-  flex: 1;
+/* -------- FIXED CHIP DESIGN -------- */
+.search-card.medium {
+  width: 200px;                         /* wider */
+  min-height: 90px;                    /* taller like reference */
+
   display: flex;
-  align-items: center;
-  gap: 12px;
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 12px;
-  border: 1px solid #eef2f7;
-  min-width: 0; /* allow shrink */
+  align-items: flex-start;
+  flex-direction: row;
+  gap: 16px;
+
+  padding: 22px 26px;                   /* more inside padding */
+  background: #fafbfd;                  /* slightly whiter than before */
+  border-radius: 24px;                  /* smoother rounded corners */
+  border: 1px solid #e6ebf2;            /* lighter border */
+
+  box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.04);
 }
 
-.icon-blue {
+
+.icon-blue-outline {
+  font-size: 26px;
   color: #3b82f6;
-  font-size: 18px;
+  margin-top: 4px;
 }
 
-.search-card-text .search-label {
+/* Text inside chips */
+.search-card-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.search-label {
+  font-size: 17px;
   font-weight: 600;
-  font-size: 14px;
-  margin: 0px;
+  color: #0f172a;
 }
 
-.search-card-text .search-placeholder {
-  font-size: 12px;
+.search-placeholder {
+  font-size: 15px;
   color: #9aa6b6;
-  margin: 0;
 }
 
-/* Large Search Button (right column) */
-.header-search-btn.large {
-  padding: 14px 18px;
-  background: linear-gradient(90deg, #4f8cff, #2b6ef6);
-  color: #fff;
+/* --------------------------------------------
+   SEARCH BUTTON
+--------------------------------------------- */
+.header-search-btn.extra-wide {
+  width: 500px;
+  padding: 20px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
   border: none;
-  border-radius: 14px;
-  font-weight: 700;
-  font-size: 16px;
-  cursor: pointer;
-  box-shadow: 0px 8px 22px rgba(30, 96, 255, 0.18);
-  display: inline-flex;
-  align-items: center;
+  border-radius: 20px;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  display: flex;
   justify-content: center;
-  gap: 8px;
-}
-
-/* ---------- Responsive: stack on small screens ---------- */
-@media (max-width: 960px) {
-  .header-main-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .header-heading {
-    font-size: 42px;
-  }
-
-  .header-right-col {
-    width: 100%;
-  }
-
-  .search-options-row {
-    flex-wrap: wrap;
-  }
-}
-
-/* small tweaks for very small screens */
-@media (max-width: 480px) {
-  .header-container { padding: 18px; border-radius: 18px; }
-  .header-heading { font-size: 34px; }
-  .header-search-btn.large { width: 100%; }
+  gap: 12px;
+  align-items: center;
+  box-shadow: 0 12px 34px rgba(37, 99, 235, 0.25);
 }
