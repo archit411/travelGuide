@@ -1,5 +1,6 @@
 package com.travelGuide.travelGuide.controller;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import com.travelGuide.travelGuide.service.TopVisiitedPlacesByMonthService;
 @RequestMapping("/api")
 @RestController
 @CrossOrigin(origins = "http://localhost:5173")
-public class TopVisitedPlaceByMonthController {
+public class TopVisitedPlaceByMonthController{
 	
 	@Autowired
 	private TopVisiitedPlacesByMonthService topVisiitedPlacesByMonthService;

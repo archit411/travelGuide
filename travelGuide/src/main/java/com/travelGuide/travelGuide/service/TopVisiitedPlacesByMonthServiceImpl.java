@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.travelGuide.travelGuide.Pojo.TopVisitedPlacesByMonthReqBody;
@@ -55,6 +56,7 @@ public class TopVisiitedPlacesByMonthServiceImpl implements TopVisiitedPlacesByM
 	}
 	
 	@Override
+	@Cacheable("month")
 	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth(String month) {
 		TopVisitedPlacesByMonthRespBody response = null;
 		List<TopVisitedPlacesByMonthRespBody> responseList = new ArrayList<>();
