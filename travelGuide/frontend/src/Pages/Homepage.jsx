@@ -435,8 +435,7 @@ export default function HomePage() {
           <h2>Featured Destinations</h2>
         </div>
         <p className="featured-sub">
-          Handpicked travel experiences to the most iconic, breathtaking, and exciting places. Discover your next adventure and
-          start making memories today.
+          Handpicked destinations for your perfect getaway.
         </p>
 
         <div className="featured-grid">
@@ -500,7 +499,7 @@ export default function HomePage() {
 
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
-      <nav className="bottom-nav">
+     
 
         {/* WEB VIEW NAV */}
         {/* <div className="nav-web only-web">
@@ -577,12 +576,6 @@ export default function HomePage() {
             </div>
           )}
         </nav>
-
-
-      </nav>
-
-
-
 
       {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
       {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}

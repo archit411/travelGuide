@@ -2,21 +2,22 @@
    HEADER CONTAINER (Desktop + Mobile)
 ============================================ */
 .header-container {
-    background: white;
-    border-radius: 36px;
-    padding: 28px 32px;
-    margin: 28px 20px 36px 20px;
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-    transition: all 0.25s ease;
+  background: #ffffff;
+  border-radius: 36px;
+  padding: 42px 48px;
+  margin: 28px 20px 36px 20px;
+
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+  transition: all 0.25s ease;
 }
 
 /* Mobile adjustments */
 @media (max-width: 768px) {
-    .header-container {
-        padding: 26px 20px;
-        border-radius: 26px;
-        margin-top: 14px;
-    }
+  .header-container {
+    padding: 26px 20px;
+    border-radius: 26px;
+    margin-top: 14px;
+  }
 }
 
 
@@ -24,96 +25,69 @@
    TOP ROW (Logo - TripEZ - Add Post - Profile)
 ============================================ */
 .header-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .header-left {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
 }
 
-
 .header-logo-big {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
 }
 
 .header-main-brand {
-    font-size: 24px;
-    font-weight: 700;
-    color: #0f172a;
-    line-height: 1;
-    /* keeps text tight with location */
-}
-
-.brand-col {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.loc-row.under-brand {
-    margin-left: 0;
-    /* ensures alignment with TripEZ */
-    margin-top: 2px;
-}
-
-.loc-chip {
-    background: #eef4ff;
-    padding: 6px 12px;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #1e40af;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
+  font-size: 24px;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .header-actions {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 /* Hide in mobile (handled in bottom navigation) */
 @media (max-width: 768px) {
-    .header-actions {
-        display: none !important;
-    }
+  .header-actions {
+    display: none !important;
+  }
 }
 
 
 /* ADD-POST button */
 .add-post-btn {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: linear-gradient(90deg, #2b6ef6, #2b6ef6);
-    color: white;
-    border: none;
-    padding: 9px 16px;
-    border-radius: 22px;
-    font-size: 14px;
-    box-shadow: 0 4px 18px rgba(37, 99, 235, 0.2);
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #2b6ef6, #2b6ef6);
+  color: white;
+  border: none;
+  padding: 9px 16px;
+  border-radius: 22px;
+  font-size: 14px;
+  box-shadow: 0 4px 18px rgba(37, 99, 235, 0.2);
+  cursor: pointer;
 }
 
 /* Profile bubble */
 .profile-circle {
-    width: 40px;
-    height: 40px;
-    background: #1e60ff;
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 16px;
+  width: 40px;
+  height: 40px;
+  background: #1e60ff;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
 }
 
 
@@ -121,22 +95,22 @@
    TRIPEZ SUBTITLE
 ============================================ */
 .sub-label-row {
-    margin-top: 26px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+  margin-top: 26px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .blue-line {
-    width: 54px;
-    height: 2px;
-    background: #3b82f6;
+  width: 54px;
+  height: 2px;
+  background: #3b82f6;
 }
 
 .sub-label-text {
-    font-size: 18px;
-    font-weight: 500;
-    color: #3b82f6;
+  font-size: 18px;
+  font-weight: 500;
+  color: #3b82f6;
 }
 
 
@@ -144,18 +118,18 @@
    GRID: Left (text) — Right (chips + search)
 ============================================ */
 .header-main-grid {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: start;
-    column-gap: 60px;
-    margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  column-gap: 60px;
+  margin-top: 35px;
 }
 
 @media (max-width: 768px) {
-    .header-main-grid {
-        grid-template-columns: 1fr;
-        row-gap: 28px;
-    }
+  .header-main-grid {
+    grid-template-columns: 1fr;
+    row-gap: 28px;
+  }
 }
 
 
@@ -163,32 +137,31 @@
    LEFT TITLE BLOCK
 ============================================ */
 .header-left-col {
-    padding-top: 5px;
+  padding-top: 5px;
 }
 
 .header-heading-large {
-    font-size: 70px;
-    font-weight: 800;
-    margin: 0;
-    color: #0f172a;
-    line-height: 1;
+  font-size: 70px;
+  font-weight: 800;
+  margin: 0;
+  color: #0f172a;
+  line-height: 1.05;
 }
 
 .escape-text-big {
-    font-size: 72px;
-    font-weight: 600;
-    color: #3b82f6;
-    font-style: italic;
+  font-size: 72px;
+  font-weight: 600;
+  color: #3b82f6;
+  font-style: italic;
 }
 
 @media (max-width: 768px) {
-    .header-heading-large {
-        font-size: 44px;
-    }
-
-    .escape-text-big {
-        font-size: 48px;
-    }
+  .header-heading-large {
+    font-size: 44px;
+  }
+  .escape-text-big {
+    font-size: 48px;
+  }
 }
 
 
@@ -196,11 +169,11 @@
    RIGHT SEARCH BLOCK
 ============================================ */
 .header-right-col {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 26px;
+  margin-top: 34px;
 }
 
 
@@ -208,75 +181,74 @@
    SEARCH CHIPS
 ============================================ */
 .search-options-row {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 @media (max-width: 768px) {
-    .search-options-row {
-        flex-direction: column;
-        gap: 14px;
-    }
+  .search-options-row {
+    flex-direction: column;
+    gap: 14px;
+  }
 }
 
 /* --- Chip Card --- */
 .search-card.medium {
-    width: 200px;
-    min-height: 90px;
+  width: 200px;
+  min-height: 90px;
 
-    padding: 22px 26px;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 16px;
+  padding: 22px 26px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 16px;
 
-    background: #fafbfd;
-    border-radius: 24px;
-    border: 1px solid #e6ebf2;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
+  background: #fafbfd;
+  border-radius: 24px;
+  border: 1px solid #e6ebf2;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.04);
 }
 
 @media (max-width: 768px) {
-    .search-card.medium {
-        width: 100%;
-        padding: 20px 24px;
-        border-radius: 20px;
-    }
+  .search-card.medium {
+    width: 100%;
+    padding: 20px 24px;
+    border-radius: 20px;
+  }
 }
 
 /* Icon */
 .icon-blue-outline {
-    font-size: 26px;
-    color: #3b82f6;
-    margin-top: 4px;
+  font-size: 26px;
+  color: #3b82f6;
+  margin-top: 4px;
 }
 
 /* Texts */
 .search-card-text {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .search-label {
-    font-size: 17px;
-    font-weight: 600;
-    color: #0f172a;
+  font-size: 17px;
+  font-weight: 600;
+  color: #0f172a;
 }
 
 .search-placeholder {
-    font-size: 15px;
-    color: #9aa6b6;
+  font-size: 15px;
+  color: #9aa6b6;
 }
 
 @media (max-width: 768px) {
-    .search-label {
-        font-size: 16px;
-    }
-
-    .search-placeholder {
-        font-size: 14px;
-    }
+  .search-label {
+    font-size: 16px;
+  }
+  .search-placeholder {
+    font-size: 14px;
+  }
 }
 
 
@@ -284,28 +256,28 @@
    SEARCH BUTTON
 ============================================ */
 .header-search-btn.extra-wide {
-    width: 100%;
-    padding: 20px;
+  width: 100%;
+  padding: 20px;
 
-    background: linear-gradient(90deg, #3b82f6, #2563eb);
-    border: none;
-    border-radius: 20px;
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border: none;
+  border-radius: 20px;
 
-    color: white;
-    font-size: 18px;
-    font-weight: 600;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
 
-    display: flex;
-    justify-content: center;
-    gap: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
 
-    box-shadow: 0 12px 34px rgba(37, 99, 235, 0.25);
+  box-shadow: 0 12px 34px rgba(37, 99, 235, 0.25);
 }
 
 @media (max-width: 768px) {
-    .header-search-btn.extra-wide {
-        padding: 18px;
-        border-radius: 18px;
-        font-size: 16px;
-    }
+  .header-search-btn.extra-wide {
+    padding: 18px;
+    border-radius: 18px;
+    font-size: 16px;
+  }
 }
