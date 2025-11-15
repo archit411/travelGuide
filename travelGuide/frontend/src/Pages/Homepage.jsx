@@ -257,43 +257,47 @@ export default function HomePage() {
   }, []);
 
   /* Fetch stories -> Today's Highlights */
-  useEffect(() => {
-    async function loadStories() {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) return;
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (!res.ok) {
-          console.error("failed fetch stories", res.status);
-          return;
-        }
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const normalized = data.map((s) => ({
-            image: s.image || s.imageUrl || s.image_url || "",
-            destination: s.destination || s.title || "Unknown",
-            temprature: s.temprature || s.temperature || null,
-            crowdLevel: s.crowdLevel || s.crowd || "low",
-            caption: s.caption || s.description || "",
-            userRating: s.userRating || s.rating || 0,
-            likes: s.likes || s.likeCount || null,
-            userName: s.userName || s.username || s.author || "Traveler",
-            createdAt: s.createdAt || s.createdAtMillis || s.timestamp || null,
-          }));
-          setStories(normalized);
-        }
-      } catch (err) {
-        console.error("error stories", err);
-      }
+ useEffect(() => {
+  async function loadStories() {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.warn("Token missing, skipping story fetch");
+      return;
     }
-    loadStories();
-  }, []);
+
+    try {
+      const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) throw new Error("Failed fetch");
+
+      const data = await res.json();
+
+      setStories(
+        data.map((s) => ({
+          image: s.image || "/noimage.png",
+          destination: s.destination || "Unknown",
+          caption: s.caption || "",
+          userName: s.userName || "Traveler",
+          createdAt: s.createdAt,
+          temprature: s.temprature,
+          crowdLevel: s.crowdLevel,
+          likes: s.likes,
+        }))
+      );
+    } catch (err) {
+      console.error("Error fetching stories:", err);
+    }
+  }
+
+  loadStories();
+}, []); // runs only after refresh
+
 
   /* Fetch top places */
   useEffect(() => {

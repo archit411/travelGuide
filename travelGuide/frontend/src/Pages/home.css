@@ -584,7 +584,7 @@ body {
 }
 
 .upload-btn {
-  flex: 1;
+ 
   background: #111827;
   color: white;
   border: none;
@@ -601,6 +601,18 @@ body {
 
 .upload-btn:hover {
   background: #1f2937;
+}
+.upload-center {
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0.8rem;
+  font-size: 0.9rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+   transition: all 0.25s ease;
 }
 
 /* 🔹 Form Sections */

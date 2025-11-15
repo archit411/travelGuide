@@ -167,20 +167,19 @@ export default function AddPost({ onClose, onAddStory }) {
           )}
 
           <div className="upload-actions">
-            {isMobile && (
-              <button className="upload-btn" onClick={startCamera}>
-                <FiCamera /> Take Photo
-              </button>
-            )}
-            <label className="upload-btn">
-              <FiImage /> Upload Photo
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
-              />
-            </label>
+            
+           <div className="upload-center">
+  <label className="upload-btn1">
+    <FiImage /> Upload Photo
+    <input
+      type="file"
+      accept="image/*"
+      onChange={handleFileChange}
+      style={{ display: "none" }}
+    />
+  </label>
+</div>
+
           </div>
 
           {videoRef.current && (
