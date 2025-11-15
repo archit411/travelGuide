@@ -2,7 +2,7 @@
 
 .home-root {
   font-family: Inter, system-ui, Roboto, Arial, sans-serif;
-  background: transparent;
+  background: white;
   min-height: 100vh;
   color: #0b2339;
   padding-bottom: 120px; 
@@ -196,32 +196,4 @@
   .nav-label {
     font-size: 12px;
   }
-}
-/* =======================================================
-   FIXED FULL-SCREEN BLURRED BACKGROUND (GLOBAL)
-======================================================= */
-
-body::before {
-  content: "";
-  position: fixed;
-  top: 0;
-  left: 0;
-
-  width: 100vw;
-  height: 100vh;
-
-  background-image: url("/public/bgImg.avif");  /* your image */
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-
-  filter: blur(20px) brightness(0.9) saturate(1.1);
-  opacity: 0.5;
-
-  z-index: -1;   /* ensures it stays behind everything */
-}
-
-/* Prevent white background from covering blurred BG */
-body {
-  background: transparent !important;
 }
