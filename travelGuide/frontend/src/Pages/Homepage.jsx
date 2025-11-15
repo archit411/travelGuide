@@ -257,46 +257,46 @@ export default function HomePage() {
   }, []);
 
   /* Fetch stories -> Today's Highlights */
- useEffect(() => {
-  async function loadStories() {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.warn("Token missing, skipping story fetch");
-      return;
+  useEffect(() => {
+    async function loadStories() {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.warn("Token missing, skipping story fetch");
+        return;
+      }
+
+      try {
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Failed fetch");
+
+        const data = await res.json();
+
+        setStories(
+          data.map((s) => ({
+            image: s.image || "/noimage.png",
+            destination: s.destination || "Unknown",
+            caption: s.caption || "",
+            userName: s.userName || "Traveler",
+            createdAt: s.createdAt,
+            temprature: s.temprature,
+            crowdLevel: s.crowdLevel,
+            likes: s.likes,
+          }))
+        );
+      } catch (err) {
+        console.error("Error fetching stories:", err);
+      }
     }
 
-    try {
-      const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!res.ok) throw new Error("Failed fetch");
-
-      const data = await res.json();
-
-      setStories(
-        data.map((s) => ({
-          image: s.image || "/noimage.png",
-          destination: s.destination || "Unknown",
-          caption: s.caption || "",
-          userName: s.userName || "Traveler",
-          createdAt: s.createdAt,
-          temprature: s.temprature,
-          crowdLevel: s.crowdLevel,
-          likes: s.likes,
-        }))
-      );
-    } catch (err) {
-      console.error("Error fetching stories:", err);
-    }
-  }
-
-  loadStories();
-}, []); // runs only after refresh
+    loadStories();
+  }, []); // runs only after refresh
 
 
   /* Fetch top places */
@@ -361,7 +361,14 @@ export default function HomePage() {
             <button className="add-post-btn" onClick={() => setShowAdd(true)}>
               <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
             </button>
-            <div className="profile-circle">
+            <div
+              className="profile-circle"
+              onClick={() => {
+                setActive("profile");
+                navigate("/profile");
+              }}
+              style={{ cursor: "pointer" }}
+            >
               <i className="fa-solid fa-user"></i>
             </div>
           </div>
@@ -433,7 +440,7 @@ export default function HomePage() {
 
 
 
-          {/* --- TOP PLACES (moved earlier) --- */}
+      {/* --- TOP PLACES (moved earlier) --- */}
       <section className="featured">
         <div className="section-head">
           <h2>Featured Destinations</h2>
@@ -503,10 +510,10 @@ export default function HomePage() {
 
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
-     
 
-        {/* WEB VIEW NAV */}
-        {/* <div className="nav-web only-web">
+
+      {/* WEB VIEW NAV */}
+      {/* <div className="nav-web only-web">
     {[
       { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
       { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
@@ -526,60 +533,60 @@ export default function HomePage() {
     ))}
   </div> */}
 
-        {/* MOBILE VIEW NAV */}
-        <nav className="bottom-nav">
-          {/* WEB NAV ONLY */}
-          {window.innerWidth > 768 && (
-            <div className="nav-web">
-              {[
-                { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-                { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-                { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  className={`nav-btn ${active === item.id ? "active" : ""}`}
-                  onClick={() => {
-                    setActive(item.id);
-                    navigate(item.path);
-                  }}
-                >
-                  <div className="nav-ic">{item.icon}</div>
-                  <div className="nav-label">{item.label}</div>
-                </button>
-              ))}
-            </div>
-          )}
+      {/* MOBILE VIEW NAV */}
+      <nav className="bottom-nav">
+        {/* WEB NAV ONLY */}
+        {window.innerWidth > 768 && (
+          <div className="nav-web">
+            {[
+              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+              { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-btn ${active === item.id ? "active" : ""}`}
+                onClick={() => {
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-ic">{item.icon}</div>
+                <div className="nav-label">{item.label}</div>
+              </button>
+            ))}
+          </div>
+        )}
 
-          {/* MOBILE NAV ONLY */}
-          {window.innerWidth <= 768 && (
-            <div className="nav-mobile">
-              {[
-                { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-                { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-                { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-                { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
-                { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
-                  onClick={() => {
-                    if (item.id === "upload") {
-                      setShowAdd(true);
-                      return;
-                    }
-                    setActive(item.id);
-                    navigate(item.path);
-                  }}
-                >
-                  <div className="nav-ic">{item.icon}</div>
-                  <div className="nav-label">{item.label}</div>
-                </button>
-              ))}
-            </div>
-          )}
-        </nav>
+        {/* MOBILE NAV ONLY */}
+        {window.innerWidth <= 768 && (
+          <div className="nav-mobile">
+            {[
+              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+              { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+              { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
+              { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
+                onClick={() => {
+                  if (item.id === "upload") {
+                    setShowAdd(true);
+                    return;
+                  }
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-ic">{item.icon}</div>
+                <div className="nav-label">{item.label}</div>
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
 
       {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
       {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
