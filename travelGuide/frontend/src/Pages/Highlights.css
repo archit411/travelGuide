@@ -1,22 +1,36 @@
-/* ---------------------------
-   TODAY'S HIGHLIGHTS — Updated
----------------------------- */
+/* ------------------------------
+   Today's Highlights Section
+------------------------------ */
 
 .highlights-section {
-  margin-top: 28px;
-  padding: 0 16px;
+  margin-top: 32px;
+  padding: 0 10px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
 .section-header h2 {
-  font-size: 20px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 12px;
+  color: #0f172a;
 }
 
-/* Horizontal Scroll */
+.view-all {
+  font-size: 15px;
+  color: #0f172a;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* Scroll Row */
 .highlights-scroll {
   display: flex;
-  gap: 14px;
+  gap: 20px;
   overflow-x: auto;
   padding-bottom: 8px;
   scroll-behavior: smooth;
@@ -26,51 +40,210 @@
   display: none;
 }
 
-/* Instagram Story Sized Card */
+/* ------------------------------------
+   FULL IMAGE CARD (NO BLACK BLOCK)
+------------------------------------ */
 .highlight-card {
-  width: 160px;
-  min-width: 160px;
-  background: #ffffff;
-  border-radius: 14px;
+  width: 300px;
+  height: 380px;
+  border-radius: 20px;
   overflow: hidden;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  position: relative;
   flex-shrink: 0;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16);
 }
 
-/* Story Image (small, like screenshot) */
+/* Full Image Background */
 .highlight-image {
-  height: 110px;
+  width: 100%;
+  height: 100%;
   background-size: cover;
-  background-position: center;
-  border-bottom: 1px solid #eee;
+  background-position: center top;
+  position: relative;
 }
 
-.highlight-info {
-  padding: 10px;
+/* Gradient Over Image */
+.highlight-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.1),
+    rgba(0,0,0,0.65)
+  );
+}
+
+/* ------------------------------------
+   TOP ROW — Avatar + Name + Crowd
+------------------------------------ */
+.hl-top-row {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  justify-content: space-between;
+  align-items: center;
 }
 
-.highlight-info h4 {
-  margin: 0;
+.hl-user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hl-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.hl-user-text .hl-name {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
+  color: white;
 }
 
-.highlight-info p {
-  margin: 0;
+.hl-user-text .hl-time {
   font-size: 12px;
-  color: #6b7280;
+  color: #d4d4d4;
+}
+
+/* Crowd Badge */
+.hl-crowd {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: 600;
+  color: white;
+}
+
+.hl-crowd.low    { background: #16a34a; }
+.hl-crowd.medium { background: #fbbf24; }
+.hl-crowd.high   { background: #ef4444; }
+
+/* ------------------------------------
+   Middle Row — Temp + Likes
+------------------------------------ */
+.hl-badges-row {
+  position: absolute;
+  bottom: 110px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+}
+
+.hl-badge {
+  background: rgba(255,255,255,0.22);
+  padding: 7px 14px;
+  border-radius: 16px;
+  font-size: 13px;
+  color: white;
+  font-weight: 600;
+  backdrop-filter: blur(6px);
+}
+
+/* ------------------------------------
+   Bottom Text Overlay
+------------------------------------ */
+.hl-text-block {
+  position: absolute;
+  bottom: 14px;
+  left: 14px;
+  right: 14px;
+  z-index: 5;
+}
+
+.hl-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+
+.hl-desc {
+  font-size: 14px;
+  color: #e2e8f0;
   line-height: 1.35;
 }
 
-/* Meta values (temp, crowd, rating) */
-.highlight-meta {
-  display: flex;
-  gap: 8px;
-  font-size: 11px;
-  color: #374151;
-  margin-top: 4px;
+/* ------------------------------
+   MOBILE (≤ 768px)
+------------------------------ */
+@media (max-width: 768px) {
+
+  .highlights-section {
+    margin-top: 20px;
+    padding-left: 8px;
+  }
+
+  .section-header h2 {
+    font-size: 22px;
+  }
+
+  .highlights-scroll {
+    gap: 14px;
+  }
+
+  /* Smaller Card */
+  .highlight-card {
+    width: 240px;
+    height: 310px;
+    border-radius: 18px;
+  }
+
+  /* Adjust avatar */
+  .hl-avatar {
+    width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  .hl-user-text .hl-name {
+    font-size: 13px;
+  }
+
+  .hl-user-text .hl-time {
+    font-size: 11px;
+  }
+
+  .hl-crowd {
+    font-size: 11px;
+    padding: 4px 10px;
+  }
+
+  /* Middle badges */
+  .hl-badges-row {
+    bottom: 90px;
+  }
+
+  .hl-badge {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  /* Bottom Text */
+  .hl-text-block {
+    bottom: 10px;
+  }
+
+  .hl-title {
+    font-size: 16px;
+  }
+
+  .hl-desc {
+    font-size: 13px;
+  }
 }

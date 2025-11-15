@@ -429,8 +429,58 @@ setCity(formattedLocation);
 
 
 
-      {/* Location chip */}
-   
+{/* ---------------------- TODAY'S HIGHLIGHTS (NEW ORDER) ---------------------- */}
+<section className="highlights-section">
+  <div className="section-header">
+    <h2>Today's Highlights</h2>
+    <span className="view-all">View All</span>
+  </div>
+
+  <div className="highlights-scroll">
+    {stories.map((story, idx) => (
+      <div className="highlight-card" key={idx} onClick={() => openStory(story)}>
+        
+        {/* FULL IMAGE */}
+        <div
+          className="highlight-image"
+          style={{ backgroundImage: `url(${story.image})` }}
+        ></div>
+
+        {/* TOP — Avatar + Name + Crowd */}
+        <div className="hl-top-row">
+          <div className="hl-user-info">
+            <div className="hl-avatar">{story.userName?.charAt(0) || "U"}</div>
+            <div className="hl-user-text">
+              <div className="hl-name">{story.userName || "User"}</div>
+              <div className="hl-time">{timeAgo(story.createdAt)}</div>
+            </div>
+          </div>
+
+          <div className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}>
+            {story.crowdLevel}
+          </div>
+        </div>
+
+        {/* MIDDLE BADGES */}
+        <div className="hl-badges-row">
+          <div className="hl-badge">🌡 {story.temprature || "--"}°C</div>
+          <div className="hl-badge">❤️ {story.likes || 0}</div>
+        </div>
+
+        {/* BOTTOM TEXT */}
+        <div className="hl-text-block">
+          <div className="hl-title">{story.destination || "Unknown"}</div>
+          <div className="hl-desc">
+            {story.caption?.length > 70
+              ? story.caption.slice(0, 70) + "..."
+              : story.caption || "No caption"}
+          </div>
+        </div>
+
+      </div>
+    ))}
+  </div>
+</section>
 
       {/* --- TOP PLACES (moved earlier) --- */}
       <section className="featured">
@@ -447,38 +497,7 @@ setCity(formattedLocation);
         </div>
       </section>
 
-      {/* ---------------------- TODAY'S HIGHLIGHTS (UPDATED UI) ---------------------- */}
-      <section className="highlights-section">
-        <div className="section-header">
-          <h2>Today's Highlights</h2>
-        </div>
-
-        <div className="highlights-scroll">
-          {stories.map((s, idx) => (
-            <div className="highlight-card" key={idx}>
-
-              {/* Image */}
-              <div
-                className="highlight-image"
-                style={{ backgroundImage: `url(${s.image})` }}
-              ></div>
-
-              {/* Text Info */}
-              <div className="highlight-info">
-                <h4>{s.location}</h4>
-
-                <p>{s.caption?.length > 80 ? s.caption.slice(0, 80) + "..." : s.caption}</p>
-
-                <div className="highlight-meta">
-                  {s.temperature && <span>🌡 {s.temperature}°C</span>}
-                  {s.crowd && <span>👥 {s.crowd}</span>}
-                  {s.rating > 0 && <span>⭐ {s.rating}</span>}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+     
 
 
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
