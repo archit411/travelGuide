@@ -408,7 +408,7 @@ const handleLogout = () => {
   <div className="logout-modal">
     <div className="logout-card">
       <h3>Log Out?</h3>
-      <p>Are you sure you want to log out from tripEZ?</p>
+      <p>Are you sure you want to log out from TripEZ?</p>
       <div className="logout-actions">
         <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
           Cancel

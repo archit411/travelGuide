@@ -209,7 +209,7 @@ const showInstallPrompt = async () => {
             <img src="/logo.jpeg" alt="TripPulse Logo" />
           </div>
 
-          <h2 className="auth-heading">Welcome to tripEZ</h2>
+          <h2 className="auth-heading">Welcome to TripEZ</h2>
           <p className="auth-subtext">Sign in to explore live travel insights</p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
@@ -271,7 +271,7 @@ const showInstallPrompt = async () => {
           {/* ✅ Install button (only if not installed) */}
           {!isInstalled && (
             <button className="install-btn" onClick={showInstallPrompt}>
-              📲 Install tripEZ
+              📲 Install TripEZ
             </button>
           )}
 

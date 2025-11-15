@@ -142,7 +142,7 @@ export default function SignupPage() {
       Swal.fire({
         icon: "success",
         title: "Signup Successful 🎉",
-        text: "Welcome to tripEZ!",
+        text: "Welcome to TripEZ!",
         timer: 2000,
         showConfirmButton: false,
       });
@@ -168,10 +168,10 @@ export default function SignupPage() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/logo.jpeg" alt="tripEZ Logo" />
+          <img src="/logo.jpeg" alt="TripEZ Logo" />
         </div>
 
-        <h2 className="auth-heading">Create Your tripEZ Account</h2>
+        <h2 className="auth-heading">Create Your TripEZ Account</h2>
         <p className="auth-subtext">Join us to explore and share travel experiences</p>
 
         <form className="auth-form" onSubmit={(e) => e.preventDefault()}>

@@ -345,6 +345,67 @@ export default function HomePage() {
   function openStoryWithList(indexInList = 0) {
     setViewStory({ stories: stories, index: indexInList });
   }
+async function refreshStories() {
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    setStories(
+      data.map((s) => ({
+        image: s.image || "/noimage.png",
+        destination: s.destination || "Unknown",
+        caption: s.caption || "",
+        userName: s.userName || "Traveler",
+        createdAt: s.createdAt,
+        temprature: s.temprature,
+        crowdLevel: s.crowdLevel,
+        likes: s.likes,
+      }))
+    );
+  } catch (err) {
+    console.error("Error refreshing stories:", err);
+  }
+}
+
+async function refreshPlaces() {
+  setLoadingPlaces(true);
+
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json();
+    setTopPlaces(Array.isArray(data) ? data : []);
+
+  } catch (err) {
+    console.error("Error refreshing places:", err);
+  } finally {
+    setLoadingPlaces(false);
+  }
+}
+async function handleRefresh() {
+  await Promise.all([refreshStories(), refreshPlaces()]);
+
+  // optional: vibration feedback on mobile
+  if (navigator.vibrate) navigator.vibrate(10);
+}
+
 
   return (
     <div className="home-root">
@@ -354,7 +415,7 @@ export default function HomePage() {
         <div className="header-top">
           <div className="header-left">
             <img src="/logo.jpeg" className="header-logo-big" alt="logo" />
-            <span className="header-main-brand">tripEZ</span>
+            <span className="header-main-brand">TripEZ</span>
           </div>
 
           <div className="header-actions">
@@ -374,7 +435,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* TRIPEZ */}
+        {/* TripEZ */}
         <div className="loc-row">
           {locationError ? (
             <div className="loc-error">⚠️ {locationError}</div>
@@ -444,6 +505,20 @@ export default function HomePage() {
       <section className="featured">
         <div className="section-head">
           <h2>Featured Destinations</h2>
+          <button 
+      onClick={handleRefresh}
+      style={{
+        background: "#111827",
+        color: "white",
+        padding: "6px 12px",
+        borderRadius: "8px",
+        border: "none",
+        cursor: "pointer",
+        fontSize: "0.85rem"
+      }}
+    >
+      🔄 Refresh
+    </button>
         </div>
         <p className="featured-sub">
           Handpicked destinations for your perfect getaway.
