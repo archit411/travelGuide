@@ -381,8 +381,8 @@ export default function HomePage() {
           <div className="header-left-col">
             <h1 className="header-heading-large">
               Plan Your <span className="escape-text-big"> Escape</span>
-
             </h1>
+            <h3>“The world is big — go explore it.”</h3>
           </div>
 
           {/* Right */}
