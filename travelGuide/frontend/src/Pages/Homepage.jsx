@@ -344,145 +344,92 @@ export default function HomePage() {
 
   return (
     <div className="home-root">
-<div className="header-container">
+      <div className="header-container">
 
-  {/* Top */}
-  <div className="header-top">
-    <div className="header-left">
-      <img src="/logo.jpeg" className="header-logo-big" alt="logo" />
-      <span className="header-main-brand">tripEZ</span>
-    </div>
-
-    <div className="header-actions">
-      <button className="add-post-btn" onClick={() => setShowAdd(true)}>
-        <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
-      </button>
-      <div className="profile-circle">
-        <i className="fa-solid fa-user"></i>
-      </div>
-    </div>
-  </div>
-
-  {/* TRIPEZ */}
-     <div className="loc-row">
-        {locationError ? (
-          <div className="loc-error">⚠️ {locationError}</div>
-        ) : city ? (
-          <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{color: "#3b82f6"}}></i> {city}</div>
-        ) : (
-          <div className="loc-chip loading">Detecting your location...</div>
-        )}
-      </div>
-
-  {/* Grid */}
-  <div className="header-main-grid">
-    
-    {/* Left */}
-    <div className="header-left-col">
-      <h1 className="header-heading-large">
-        Plan Your <span className="escape-text-big"> Escape</span>
-        
-      </h1>
-    </div>
-
-    {/* Right */}
-    <div className="header-right-col">
-
-      <div className="search-options-row">
-        <div className="search-card medium">
-          <i className="fa-regular fa-compass icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Discover</div>
-            <div className="search-placeholder">Where?</div>
+        {/* Top */}
+        <div className="header-top">
+          <div className="header-left">
+            <img src="/logo.jpeg" className="header-logo-big" alt="logo" />
+            <span className="header-main-brand">tripEZ</span>
           </div>
-        </div>
 
-        <div className="search-card medium">
-          <i className="fa-regular fa-calendar icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Plan</div>
-            <div className="search-placeholder">When?</div>
-          </div>
-        </div>
-
-        <div className="search-card medium">
-          <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Go</div>
-            <div className="search-placeholder">How?</div>
-          </div>
-        </div>
-      </div>
-
-      <button className="header-search-btn extra-wide">
-        <i className="fa-solid fa-magnifying-glass"></i>
-        Search
-      </button>
-
-    </div>
-  </div>
-</div>
-
-{/* ---------------- END HEADER ---------------- */}
-
-{/* ---------------- END FIGMA HEADER ---------------- */}
-
-
-
-{/* ---------------------- TODAY'S HIGHLIGHTS (NEW ORDER) ---------------------- */}
-<section className="highlights-section">
-  <div className="section-header">
-    <h2>Today's Highlights</h2>
-    <span className="view-all">View All</span>
-  </div>
-
-  <div className="highlights-scroll">
-    {stories.map((story, idx) => (
-      <div className="highlight-card" key={idx} onClick={() => openStory(story)}>
-        
-        {/* FULL IMAGE */}
-        <div
-          className="highlight-image"
-          style={{ backgroundImage: `url(${story.image})` }}
-        ></div>
-
-        {/* TOP — Avatar + Name + Crowd */}
-        <div className="hl-top-row">
-          <div className="hl-user-info">
-            <div className="hl-avatar">{story.userName?.charAt(0) || "U"}</div>
-            <div className="hl-user-text">
-              <div className="hl-name">{story.userName || "User"}</div>
-              <div className="hl-time">{timeAgo(story.createdAt)}</div>
+          <div className="header-actions">
+            <button className="add-post-btn" onClick={() => setShowAdd(true)}>
+              <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
+            </button>
+            <div className="profile-circle">
+              <i className="fa-solid fa-user"></i>
             </div>
           </div>
+        </div>
 
-          <div className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}>
-            {story.crowdLevel}
+        {/* TRIPEZ */}
+        <div className="loc-row">
+          {locationError ? (
+            <div className="loc-error">⚠️ {locationError}</div>
+          ) : city ? (
+            <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{ color: "#3b82f6" }}></i> {city}</div>
+          ) : (
+            <div className="loc-chip loading">Detecting your location...</div>
+          )}
+        </div>
+
+        {/* Grid */}
+        <div className="header-main-grid">
+
+          {/* Left */}
+          <div className="header-left-col">
+            <h1 className="header-heading-large">
+              Plan Your <span className="escape-text-big"> Escape</span>
+
+            </h1>
+          </div>
+
+          {/* Right */}
+          <div className="header-right-col">
+
+            <div className="search-options-row">
+              <div className="search-card medium">
+                <i className="fa-regular fa-compass icon-blue-outline"></i>
+                <div>
+                  <div className="search-label">Discover</div>
+                  <div className="search-placeholder">Where?</div>
+                </div>
+              </div>
+
+              <div className="search-card medium">
+                <i className="fa-regular fa-calendar icon-blue-outline"></i>
+                <div>
+                  <div className="search-label">Plan</div>
+                  <div className="search-placeholder">When?</div>
+                </div>
+              </div>
+
+              <div className="search-card medium">
+                <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
+                <div>
+                  <div className="search-label">Go</div>
+                  <div className="search-placeholder">How?</div>
+                </div>
+              </div>
+            </div>
+
+            <button className="header-search-btn extra-wide">
+              <i className="fa-solid fa-magnifying-glass"></i>
+              Search
+            </button>
+
           </div>
         </div>
-
-        {/* MIDDLE BADGES */}
-        <div className="hl-badges-row">
-          <div className="hl-badge">🌡 {story.temprature || "--"}°C</div>
-          <div className="hl-badge">❤️ {story.likes || 0}</div>
-        </div>
-
-        {/* BOTTOM TEXT */}
-        <div className="hl-text-block">
-          <div className="hl-title">{story.destination || "Unknown"}</div>
-          <div className="hl-desc">
-            {story.caption?.length > 70
-              ? story.caption.slice(0, 70) + "..."
-              : story.caption || "No caption"}
-          </div>
-        </div>
-
       </div>
-    ))}
-  </div>
-</section>
 
-      {/* --- TOP PLACES (moved earlier) --- */}
+      {/* ---------------- END HEADER ---------------- */}
+
+      {/* ---------------- END FIGMA HEADER ---------------- */}
+
+
+
+          {/* --- TOP PLACES (moved earlier) --- */}
       <section className="featured">
         <div className="section-head">
           <h2>Featured Destinations</h2>
@@ -497,15 +444,66 @@ export default function HomePage() {
         </div>
       </section>
 
-     
 
+      {/* ---------------------- TODAY'S HIGHLIGHTS (NEW ORDER) ---------------------- */}
+      <section className="highlights-section">
+        <div className="section-header">
+          <h2>Today's Highlights</h2>
+          <span className="view-all">View All</span>
+        </div>
+
+        <div className="highlights-scroll">
+          {stories.map((story, idx) => (
+            <div className="highlight-card" key={idx} onClick={() => openStory(story)}>
+
+              {/* FULL IMAGE */}
+              <div
+                className="highlight-image"
+                style={{ backgroundImage: `url(${story.image})` }}
+              ></div>
+
+              {/* TOP — Avatar + Name + Crowd */}
+              <div className="hl-top-row">
+                <div className="hl-user-info">
+                  <div className="hl-avatar">{story.userName?.charAt(0) || "U"}</div>
+                  <div className="hl-user-text">
+                    <div className="hl-name">{story.userName || "User"}</div>
+                    <div className="hl-time">{timeAgo(story.createdAt)}</div>
+                  </div>
+                </div>
+
+                <div className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}>
+                  {story.crowdLevel}
+                </div>
+              </div>
+
+              {/* MIDDLE BADGES */}
+              <div className="hl-badges-row">
+                <div className="hl-badge">🌡 {story.temprature || "--"}°C</div>
+                <div className="hl-badge">❤️ {story.likes || 0}</div>
+              </div>
+
+              {/* BOTTOM TEXT */}
+              <div className="hl-text-block">
+                <div className="hl-title">{story.destination || "Unknown"}</div>
+                <div className="hl-desc">
+                  {story.caption?.length > 70
+                    ? story.caption.slice(0, 70) + "..."
+                    : story.caption || "No caption"}
+                </div>
+              </div>
+
+            </div>
+          ))}
+        </div>
+      </section>
 
       <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
 
       <nav className="bottom-nav">
 
-  {/* WEB VIEW NAV */}
-  {/* <div className="nav-web only-web">
+        {/* WEB VIEW NAV */}
+        {/* <div className="nav-web only-web">
     {[
       { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
       { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
@@ -525,63 +523,63 @@ export default function HomePage() {
     ))}
   </div> */}
 
-  {/* MOBILE VIEW NAV */}
-  <nav className="bottom-nav">
-  {/* WEB NAV ONLY */}
-  {window.innerWidth > 768 && (
-    <div className="nav-web">
-      {[
-        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-        { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-      ].map((item) => (
-        <button
-          key={item.id}
-          className={`nav-btn ${active === item.id ? "active" : ""}`}
-          onClick={() => {
-            setActive(item.id);
-            navigate(item.path);
-          }}
-        >
-          <div className="nav-ic">{item.icon}</div>
-          <div className="nav-label">{item.label}</div>
-        </button>
-      ))}
-    </div>
-  )}
+        {/* MOBILE VIEW NAV */}
+        <nav className="bottom-nav">
+          {/* WEB NAV ONLY */}
+          {window.innerWidth > 768 && (
+            <div className="nav-web">
+              {[
+                { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+                { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+                { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-btn ${active === item.id ? "active" : ""}`}
+                  onClick={() => {
+                    setActive(item.id);
+                    navigate(item.path);
+                  }}
+                >
+                  <div className="nav-ic">{item.icon}</div>
+                  <div className="nav-label">{item.label}</div>
+                </button>
+              ))}
+            </div>
+          )}
 
-  {/* MOBILE NAV ONLY */}
-  {window.innerWidth <= 768 && (
-    <div className="nav-mobile">
-      {[
-        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-        { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-        { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
-        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-      ].map((item) => (
-        <button
-          key={item.id}
-          className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
-          onClick={() => {
-            if (item.id === "upload") {
-              setShowAdd(true);
-              return;
-            }
-            setActive(item.id);
-            navigate(item.path);
-          }}
-        >
-          <div className="nav-ic">{item.icon}</div>
-          <div className="nav-label">{item.label}</div>
-        </button>
-      ))}
-    </div>
-  )}
-</nav>
+          {/* MOBILE NAV ONLY */}
+          {window.innerWidth <= 768 && (
+            <div className="nav-mobile">
+              {[
+                { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+                { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+                { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+                { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
+                { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
+                  onClick={() => {
+                    if (item.id === "upload") {
+                      setShowAdd(true);
+                      return;
+                    }
+                    setActive(item.id);
+                    navigate(item.path);
+                  }}
+                >
+                  <div className="nav-ic">{item.icon}</div>
+                  <div className="nav-label">{item.label}</div>
+                </button>
+              ))}
+            </div>
+          )}
+        </nav>
 
 
-</nav>
+      </nav>
 
 
 

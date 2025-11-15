@@ -121,7 +121,8 @@ body {
   gap: 1rem;
   overflow-x: auto;
   padding-bottom: 0.5rem;
-  scrollbar-width: none; /* hide scrollbar in Firefox */
+  scrollbar-width: none;
+  /* hide scrollbar in Firefox */
 }
 
 .stories-grid::-webkit-scrollbar {
@@ -205,8 +206,10 @@ body {
 /* 🏞️ Places grid layout */
 .place-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ✅ Responsive columns */
-  gap: 1.5rem; /* space between cards */
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  /* ✅ Responsive columns */
+  gap: 1.5rem;
+  /* space between cards */
   justify-items: center;
   padding: 1rem;
 }
@@ -258,6 +261,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -355,6 +359,7 @@ body {
   border-radius: 10px;
   transition: width 0.1s linear;
 }
+
 .progress-filled.done {
   width: 100% !important;
 }
@@ -367,6 +372,7 @@ body {
   from {
     width: 0%;
   }
+
   to {
     width: 100%;
   }
@@ -443,7 +449,8 @@ body {
   color: #6b7280;
   padding: 16px 0;
   background: #f9fafb;
-  margin-bottom: 70px; /* space above bottom nav */
+  margin-bottom: 70px;
+  /* space above bottom nav */
   letter-spacing: 0.3px;
   border-top: 1px solid #e5e7eb;
 }
@@ -469,6 +476,7 @@ body {
     font-size: 12px;
   }
 }
+
 /* 🔹 Popup Overlay */
 .popup-overlay {
   position: fixed;
@@ -500,6 +508,7 @@ body {
 .popup-card::-webkit-scrollbar {
   display: none;
 }
+
 .popup-card {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -538,6 +547,7 @@ body {
   font-size: 1.3rem;
   transition: transform 0.2s ease;
 }
+
 .popup-close:hover {
   transform: scale(1.2);
 }
@@ -559,6 +569,7 @@ body {
   color: #6b7280;
   transition: all 0.2s ease;
 }
+
 .upload-placeholder:hover {
   background: #f3f4f6;
   border-color: #94a3b8;
@@ -571,6 +582,7 @@ body {
   gap: 10px;
   margin-bottom: 1.4rem;
 }
+
 .upload-btn {
   flex: 1;
   background: #111827;
@@ -586,6 +598,7 @@ body {
   cursor: pointer;
   transition: all 0.25s ease;
 }
+
 .upload-btn:hover {
   background: #1f2937;
 }
@@ -594,12 +607,14 @@ body {
 .form-section {
   margin-bottom: 1.1rem;
 }
+
 .form-section label {
   display: block;
   font-weight: 600;
   color: #111827;
   margin-bottom: 0.4rem;
 }
+
 .form-section input,
 .form-section textarea {
   width: 100%;
@@ -611,11 +626,13 @@ body {
   background: #fff;
   transition: border-color 0.2s ease;
 }
+
 .form-section input:focus,
 .form-section textarea:focus {
   border-color: #111827;
   outline: none;
 }
+
 .form-section small {
   color: #9ca3af;
   font-size: 0.8rem;
@@ -627,6 +644,7 @@ body {
   gap: 8px;
   margin-top: 4px;
 }
+
 .crowd-chip {
   flex: 1;
   text-align: center;
@@ -639,11 +657,13 @@ body {
   font-weight: 500;
   transition: all 0.25s ease;
 }
+
 .crowd-chip.active {
   background: #111827;
   color: #fff;
   border-color: #111827;
 }
+
 .crowd-chip:hover {
   background: #1f2937;
   color: #fff;
@@ -663,6 +683,7 @@ body {
   gap: 10px;
   margin-top: 1.2rem;
 }
+
 .btn {
   border: none;
   border-radius: 10px;
@@ -672,17 +693,21 @@ body {
   cursor: pointer;
   transition: all 0.25s ease;
 }
+
 .btn--primary {
   background: #111827;
   color: white;
 }
+
 .btn--primary:hover {
   background: #1f2937;
 }
+
 .btn--cancel {
   background: #f3f4f6;
   color: #374151;
 }
+
 .btn--cancel:hover {
   background: #e5e7eb;
 }
@@ -698,15 +723,18 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
 }
+
 @keyframes slideUp {
   from {
     transform: translateY(60px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
@@ -720,11 +748,13 @@ body {
   flex-direction: column;
   align-items: center;
 }
+
 .camera-feed {
   width: 100%;
   border-radius: 10px;
   margin-bottom: 10px;
 }
+
 .camera-controls {
   display: flex;
   justify-content: space-between;
@@ -769,6 +799,7 @@ body {
   color: #e63946;
   font-size: 1rem;
 }
+
 .place-title {
   color: #0b2b4a;
   font-size: 1.2rem;
@@ -797,6 +828,7 @@ body {
   line-height: 1.4;
   margin-top: 2px;
 }
+
 .place-title {
   color: #0b2b4a;
   font-size: 1.1rem;
@@ -826,6 +858,7 @@ body {
   color: #444;
   line-height: 1.4;
 }
+
 /* 🌍 Header improvements */
 .tp-header {
   display: flex;
@@ -892,7 +925,8 @@ body {
 }
 
 .stories-grid::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for clean look */
+  display: none;
+  /* Hide scrollbar for clean look */
 }
 
 /* ✅ Add Story Button */
@@ -988,7 +1022,8 @@ body {
   }
 
   .place-card-new {
-    flex: 0 0 250px; /* Fixed width cards while scrolling */
+    flex: 0 0 250px;
+    /* Fixed width cards while scrolling */
   }
 }
 
@@ -1035,12 +1070,14 @@ body {
   color: #6b7280;
   line-height: 1.4;
 }
+
 .story-viewer-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100dvh; /* ✅ dynamically accounts for visible viewport */
+  height: 100dvh;
+  /* ✅ dynamically accounts for visible viewport */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1055,9 +1092,11 @@ body {
   position: relative;
   width: 100%;
   max-width: 420px;
-  height: 100vh; /* full height on mobile */
+  height: 100vh;
+  /* full height on mobile */
   background: #000;
-  border-radius: 0; /* full bleed look like Instagram */
+  border-radius: 0;
+  /* full bleed look like Instagram */
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -1068,7 +1107,8 @@ body {
 .story-viewer-image {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* show full image without cutting */
+  object-fit: contain;
+  /* show full image without cutting */
   background-color: black;
 }
 
@@ -1100,3 +1140,4 @@ body {
   cursor: pointer;
   z-index: 20;
 }
+
