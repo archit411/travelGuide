@@ -1,0 +1,47 @@
+/* PlaceCard.css */
+.place-card {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    min-height: 180px;
+    cursor: pointer
+}
+
+.place-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.6)
+}
+
+.place-overlay {
+    position: relative;
+    z-index: 2;
+    padding: 14px;
+    height: 100%
+}
+
+.place-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    height: 100%
+}
+
+.place-title {
+    font-size: 20px;
+    color: #fff;
+    font-weight: 800
+}
+
+.place-sub {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 6px
+}
+
+.featured-card {
+    border-radius: 16px;
+    box-shadow: 0 12px 30px rgba(2, 6, 23, 0.06)
+}

@@ -1,0 +1,42 @@
+/* Featured.css */
+.featured {
+    padding: 14px 18px
+}
+
+.featured-sub {
+    color: #6b7280;
+    max-width: 900px;
+    margin-top: 6px
+}
+
+.featured-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 18px
+}
+
+@media(max-width:1100px) {
+    .featured-grid {
+        grid-template-columns: repeat(2, 1fr)
+    }
+}
+
+@media(max-width:700px) {
+    .featured-grid {
+        grid-template-columns: 1fr;
+        overflow-x: auto;
+        padding-bottom: 10px
+    }
+}
+
+.empty {
+    color: #6b7280;
+    padding: 18px
+}
+
+.skeleton-place {
+    height: 200px;
+    background: linear-gradient(90deg, #f3f6ff, #f8fbff);
+    border-radius: 12px
+}

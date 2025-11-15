@@ -1,0 +1,120 @@
+/* Hero.css */
+.hero-section {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    margin: 18px
+}
+
+.hero-left {
+    flex: 1
+}
+
+.kicker {
+    display: inline-block;
+    padding-left: 8px;
+    border-left: 6px solid rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: rgba(255, 255, 255, 0.95);
+    font-weight: 700
+}
+
+.hero-title {
+    font-size: 68px;
+    margin: 10px 0;
+    color: #031026;
+    line-height: 0.95
+}
+
+.hero-escape {
+    font-style: italic;
+    color: #2f7bff
+}
+
+.hero-right {
+    width: 520px;
+    flex-shrink: 0
+}
+
+.search-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(8, 21, 45, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 12px
+}
+
+.chips {
+    display: flex;
+    gap: 12px
+}
+
+.chip {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    border-radius: 12px;
+    background: #f7f9fc;
+    border: 1px solid #eef3ff;
+    flex: 1
+}
+
+.chip-ic {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #4f72ff, #0061ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff
+}
+
+.chip-label {
+    font-weight: 700
+}
+
+.chip-sub {
+    font-size: 13px;
+    color: #9aa8c6
+}
+
+.search-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 12px;
+    background: linear-gradient(90deg, rgba(79, 114, 255, 0.06), rgba(0, 97, 255, 0.03));
+    border: 1px solid rgba(15, 23, 42, 0.06)
+}
+
+.search-input input {
+    border: none;
+    background: transparent;
+    outline: none;
+    flex: 1
+}
+
+.btn-search {
+    background: linear-gradient(90deg, #4f72ff, #0061ff);
+    border: none;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer
+}
+
+@media(max-width:1000px) {
+    .hero-right {
+        width: 100%
+    }
+
+    .hero-title {
+        font-size: 42px
+    }
+}

@@ -1,0 +1,76 @@
+/* ---------------------------
+   TODAY'S HIGHLIGHTS — Updated
+---------------------------- */
+
+.highlights-section {
+  margin-top: 28px;
+  padding: 0 16px;
+}
+
+.section-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+/* Horizontal Scroll */
+.highlights-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scroll-behavior: smooth;
+}
+
+.highlights-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Instagram Story Sized Card */
+.highlight-card {
+  width: 160px;
+  min-width: 160px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+  flex-shrink: 0;
+}
+
+/* Story Image (small, like screenshot) */
+.highlight-image {
+  height: 110px;
+  background-size: cover;
+  background-position: center;
+  border-bottom: 1px solid #eee;
+}
+
+.highlight-info {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.highlight-info h4 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.highlight-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.35;
+}
+
+/* Meta values (temp, crowd, rating) */
+.highlight-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 11px;
+  color: #374151;
+  margin-top: 4px;
+}

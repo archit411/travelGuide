@@ -1,0 +1,44 @@
+/* HomeLayout.css - helpers and layout adjustments */
+
+.home-root {
+  font-family: Inter, system-ui, Roboto, Arial, sans-serif;
+  background: #f7fbff;
+  min-height: 100vh;
+  color: #0b2339;
+  padding-bottom: 120px; /* space for bottom nav */
+}
+
+/* location row */
+.loc-row {
+  padding: 8px 22px;
+}
+
+.loc-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  padding: 8px 12px;
+  border-radius: 999px;
+  box-shadow: 0 8px 20px rgba(2, 6, 23, 0.06);
+}
+
+/* header and hero remain in their own css files */
+
+/* featured + highlights spacing tweaks */
+.featured {
+  padding: 14px 18px;
+}
+
+.featured-sub {
+  color: #6b7280;
+  max-width: 900px;
+  margin-top: 6px;
+}
+
+.home-footer {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  margin-top: 24px;
+}
