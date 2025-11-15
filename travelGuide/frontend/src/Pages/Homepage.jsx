@@ -219,19 +219,19 @@ export default function HomePage() {
           const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
           const data = await res.json();
           const cityName =
-  data.address.city ||
-  data.address.town ||
-  data.address.village ||
-  data.address.suburb ||
-  "";
+            data.address.city ||
+            data.address.town ||
+            data.address.village ||
+            data.address.suburb ||
+            "";
 
-const stateName = data.address.state || "";
+          const stateName = data.address.state || "";
 
-// Final format → "Thane, Maharashtra"
-const formattedLocation =
-  cityName && stateName ? `${cityName}, ${stateName}` : cityName || stateName;
+          // Final format → "Thane, Maharashtra"
+          const formattedLocation =
+            cityName && stateName ? `${cityName}, ${stateName}` : cityName || stateName;
 
-setCity(formattedLocation);
+          setCity(formattedLocation);
 
         } catch (err) {
           console.warn("reverse failed", err);
@@ -262,7 +262,7 @@ setCity(formattedLocation);
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -302,7 +302,7 @@ setCity(formattedLocation);
       setLoadingPlaces(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
+        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -380,8 +380,8 @@ setCity(formattedLocation);
     {/* Left */}
     <div className="header-left-col">
       <h1 className="header-heading-large">
-        Plan Your<br />
-        <span className="escape-text-big">Escape</span>
+        Plan Your <span className="escape-text-big"> Escape</span>
+        
       </h1>
     </div>
 

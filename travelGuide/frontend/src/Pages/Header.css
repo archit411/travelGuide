@@ -4,7 +4,7 @@
 .header-container {
   background: #ffffff;
   border-radius: 36px;
-  padding: 42px 48px;
+  padding: 28px 32px;
   margin: 28px 20px 36px 20px;
 
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
@@ -36,6 +36,7 @@
   gap: 14px;
 }
 
+
 .header-logo-big {
   width: 48px;
   height: 48px;
@@ -44,8 +45,31 @@
 
 .header-main-brand {
   font-size: 24px;
-  font-weight: 600;
+  font-weight: 700;
   color: #0f172a;
+  line-height: 1; /* keeps text tight with location */
+}
+
+.brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.loc-row.under-brand {
+  margin-left: 0;   /* ensures alignment with TripEZ */
+  margin-top: 2px;
+}
+.loc-chip {
+  background: #eef4ff;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #1e40af;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .header-actions {
@@ -122,7 +146,7 @@
   grid-template-columns: 1fr auto;
   align-items: start;
   column-gap: 60px;
-  margin-top: 35px;
+  margin-top: 18px;
 }
 
 @media (max-width: 768px) {
@@ -145,7 +169,7 @@
   font-weight: 800;
   margin: 0;
   color: #0f172a;
-  line-height: 1.05;
+  line-height: 1;
 }
 
 .escape-text-big {
@@ -172,8 +196,8 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 26px;
-  margin-top: 34px;
+  gap: 18px;
+  margin-top: 20px;
 }
 
 
