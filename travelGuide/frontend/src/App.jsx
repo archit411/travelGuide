@@ -9,6 +9,7 @@ import LiveStories from "./Pages/LiveStories";
 import FoodPage from "./Pages/FoodPage";
 import SavedStories from "./Pages/SavedStories";
 import Layout from "../src/Pages/Layout";
+import FeedPage from "./Pages/FeedPage";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Route path="/homepage" element={<TripPulseHome />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/food" element={<FoodPage />} />
+          <Route path="/feed" element={<FeedPage/>}/>
           <Route path="/saved" element={<SavedStories />} />
         </Route>
 
