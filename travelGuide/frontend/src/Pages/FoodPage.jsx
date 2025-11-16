@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FiSearch, FiClock, FiMapPin } from "react-icons/fi";
 import { FaStar, FaFilter } from "react-icons/fa";
 import "./FoodPage.css";
+import Navbar from "./Navbar";
 
 export default function FoodPage() {
   const [city, setCity] = useState("Mumbai");
@@ -234,11 +235,14 @@ export default function FoodPage() {
       </main>
 
       {/* Footer (simple) */}
-      <footer className="fp-footer">
+     <footer className="fp-footer">
         <div className="fp-footer-inner">
           <div>© {new Date().getFullYear()} TripEZ. All Rights Reserved.</div>
         </div>
       </footer>
+
+     
+      <Navbar active="food" />
     </div>
   );
 }

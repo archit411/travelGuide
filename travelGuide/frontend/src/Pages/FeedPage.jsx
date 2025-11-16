@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FiSearch, FiMapPin, FiBookmark, FiPlus } from "react-icons/fi";
 import { FaHeart, FaRegComment } from "react-icons/fa";
 import "./FeedPage.css";
+import Navbar from "./Navbar";
 
 export default function FeedPage() {
   const [city, setCity] = useState("Mumbai");
@@ -219,9 +220,14 @@ const [posts] = useState([
       </section>
 
       {/* Footer */}
-      <footer className="feed-footer">
-        <div>© {new Date().getFullYear()} TripEZ • Made with ❤️ in India</div>
-      </footer>
+      <footer className="fp-footer">
+              <div className="fp-footer-inner">
+                <div>© {new Date().getFullYear()} TripEZ. All Rights Reserved.</div>
+              </div>
+            </footer>
+      
+           
+            <Navbar active="feed" />
     </div>
   );
 }
