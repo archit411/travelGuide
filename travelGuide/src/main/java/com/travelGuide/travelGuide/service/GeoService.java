@@ -19,7 +19,7 @@ public class GeoService {
     public NominatimResponse getLatLonFromPlace(String place) {
 
         // Nominatim requires custom User-Agent (important!)
-        String userAgent = "travelGuide-app/1.0 (your-email@example.com)";
+        String userAgent = "travelGuide-app/1.0 (example@gmail.com)";
 
         List<NominatimResponse> response = webClient.get()
                 .uri(uriBuilder -> uriBuilder
