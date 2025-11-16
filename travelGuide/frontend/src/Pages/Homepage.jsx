@@ -460,54 +460,55 @@ async function handleRefresh() {
   </div>
 
   {/* PLAN YOUR ESCAPE CARD */}
-  <div className="header-card">
+<div className="header-card glass-card">
 
-    <div className="header-main-grid">
+  <div className="header-main-grid">
 
-      <div className="header-left-col">
-        <h1 className="header-heading-large">
-          Plan Your <span className="escape-text-big">Escape</span>
-        </h1>
-        <div>“The world is big — go explore it.”</div>
-      </div>
+    <div className="header-left-col">
+      <h1 className="header-heading-large">
+        Plan Your <span className="escape-text-big">Escape</span>
+      </h1>
+      <div>“The world is big — go explore it.”</div>
+    </div>
 
-      <div className="header-right-col">
+    <div className="header-right-col">
 
-        <div className="search-options-row">
-          <div className="search-card medium">
-            <i className="fa-regular fa-compass icon-blue-outline"></i>
-            <div>
-              <div className="search-label">Discover</div>
-              <div className="search-placeholder">Where?</div>
-            </div>
-          </div>
-
-          <div className="search-card medium">
-            <i className="fa-regular fa-calendar icon-blue-outline"></i>
-            <div>
-              <div className="search-label">Plan</div>
-              <div className="search-placeholder">When?</div>
-            </div>
-          </div>
-
-          <div className="search-card medium">
-            <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
-            <div>
-              <div className="search-label">Go</div>
-              <div className="search-placeholder">How?</div>
-            </div>
+      <div className="search-options-row">
+        <div className="search-card medium">
+          <i className="fa-regular fa-compass icon-blue-outline"></i>
+          <div>
+            <div className="search-label">Discover</div>
+            <div className="search-placeholder">Where?</div>
           </div>
         </div>
 
-        <button className="header-search-btn extra-wide">
-          <i className="fa-solid fa-magnifying-glass"></i>
-          Search
-        </button>
+        <div className="search-card medium">
+          <i className="fa-regular fa-calendar icon-blue-outline"></i>
+          <div>
+            <div className="search-label">Plan</div>
+            <div className="search-placeholder">When?</div>
+          </div>
+        </div>
 
+        <div className="search-card medium">
+          <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
+          <div>
+            <div className="search-label">Go</div>
+            <div className="search-placeholder">How?</div>
+          </div>
+        </div>
       </div>
-    </div>
 
+      <button className="header-search-btn extra-wide">
+        <i className="fa-solid fa-magnifying-glass"></i>
+        Search
+      </button>
+
+    </div>
   </div>
+
+</div>
+
 
 </div>
 
