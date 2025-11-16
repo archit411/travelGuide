@@ -17,7 +17,7 @@ export default function SplashScreen() {
     <div className="splash-container">
       <div className="splash-content">
         <img
-          src="/logo.jpeg"
+          src="/logo.png"
           alt="TripEZ Logo"
           className="splash-logo"
         />

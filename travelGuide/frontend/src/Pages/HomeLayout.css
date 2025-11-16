@@ -51,7 +51,7 @@
 
   /* HEADER CONTAINER */
   .header-container {
-    padding: 24px 20px;
+    
     border-radius: 0 0 26px 26px;
   }
 
@@ -66,15 +66,91 @@
     width: 38px;
     height: 38px;
   }
+/* ——— TOP SECTION ——— */
+.top-header-bar {
+  /* padding: 20px 24px; */
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ROW: Logo left + buttons right */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* BIGGER LOGO */
+.big-logo {
+  width: 160px;   /* increase / decrease as needed */
+  height: auto;
+  object-fit: contain;
+}
+
+/* Buttons on right */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Add post button */
+.add-post-btn {
+  background: #2563ff;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Profile circle */
+.profile-circle {
+  width: 38px;
+  height: 38px;
+  background: #2563ff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+}
+
+/* LOCATION under logo */
+.under-logo {
+  /* margin-top: -4px; */
+  margin-left: 4px;
+}
+
+.loc-chip {
+  background: #ffffff;
+  border-radius: 25px;
+  padding: 6px 12px;
+  font-size: 14px;
+  color: #111;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Blue card */
+.header-card {
+  background: #a7d3e4;
+  padding: 26px 24px;
+  border-radius: 32px;
+  margin-top: 10px;
+}
 
   .header-main-brand {
     font-size: 20px;
   }
 
-  /* LOCATION CHIP INSIDE HEADER */
-  .loc-row {
-    margin-top: 16px;
-  }
+
 
   .loc-chip {
     width: fit-content;

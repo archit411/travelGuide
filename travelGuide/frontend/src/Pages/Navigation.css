@@ -6,13 +6,10 @@
   bottom: 22px;
   left: 50%;
   transform: translateX(-50%);
-  width: auto;
-
-  z-index: 99999;
-  pointer-events: auto;
+  z-index: 9999;
 }
 
-/* Remove button outline */
+/* Button reset */
 .nav-btn {
   border: none;
   background: transparent;
@@ -21,7 +18,6 @@
   flex-direction: column;
   align-items: center;
   gap: 6px;
-
   color: #9aa8c6;
   font-size: 13px;
 }
@@ -34,20 +30,17 @@
   color: #ffffff;
 }
 
-
 /* ============================================
-   WEB NAV (Desktop / Laptop)
+   DESKTOP NAV
 ============================================ */
 @media (min-width: 769px) {
   .nav-web {
     display: flex;
     background: rgba(15, 23, 42, 0.82);
     backdrop-filter: blur(20px);
-
     padding: 14px 34px;
     border-radius: 40px;
     gap: 40px;
-
     box-shadow: 0px 12px 35px rgba(0, 0, 0, 0.35);
   }
 
@@ -56,78 +49,90 @@
   }
 }
 
-
 /* ============================================
-   MOBILE NAV (Premium Bottom Bar)
+   MOBILE PREMIUM NAV
+============================================ */
+/* ============================================
+   MOBILE PREMIUM NAV  (FIXED OVERLAP)
 ============================================ */
 @media (max-width: 768px) {
-  /* Hide desktop nav */
+
   .nav-web {
     display: none !important;
   }
 
-  /* Mobile pill container */
+  /* Pill bar */
   .nav-mobile {
     width: 92vw;
     background: rgba(6, 12, 36, 0.85);
-    backdrop-filter: blur(22px);
-    padding:  16px;
-
+    backdrop-filter: blur(20px);
+    padding: 22px 26px 18px;   /* ⬅ added more top padding */
     border-radius: 44px;
 
     display: flex;
     justify-content: space-between;
     align-items: center;
-
     position: relative;
+
+    box-shadow: 0px 8px 28px rgba(0,0,0,0.45);
   }
 
-  /* Center Upload Button (Floating) */
+  /* Buttons inside bar */
+  .nav-btn {
+    flex: 1;
+    color: #c9d1e3;
+    font-size: 12px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 4px;
+
+    padding: 10px 6px;  /* ⬅ adds spacing so upload doesn't overlap */
+  }
+
+  /* Reduce icon overlap */
+  .nav-btn .nav-ic {
+    font-size: 20px;
+    opacity: 0.85;
+    margin-top: 4px;  /* pushes icons slightly down */
+  }
+
+  /* Active state */
+  .nav-btn.active {
+    background: rgba(255,255,255,0.12);
+    border-radius: 40px;
+    color: white;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.18);
+  }
+
   .upload-btn {
-    position: absolute;
-    top: -50px;
+    position: absolute !important;
+    top: -40px;   /* ⬅ moved slightly UP so overlap lowers */
     left: 50%;
     transform: translateX(-50%);
-    padding: 20px;
-    width: 74px;
-    height: 74px;
+
+    width: 70px !important;
+    height: 70px !important;
 
     background: linear-gradient(145deg, #4f8cff, #2563eb);
     border-radius: 50%;
+    border: 4px solid #1d2a44;
 
     display: flex;
     justify-content: center;
     align-items: center;
 
-    font-size: 28px;
-    color: #fff;
+    color: white !important;
+    font-size: 32px !important;
 
-    box-shadow: 0px 10px 28px rgba(37, 99, 235, 0.45);
+    box-shadow: 
+      0px 10px 25px rgba(0,0,0,0.35),
+      0 0 10px rgba(41,116,255,0.35);
   }
 
   .upload-btn .nav-label {
     display: none;
   }
 }
-
-
-/* ============================================
-   UTILITY VISIBILITY CLASSES
-============================================ */
-.only-web {
-  display: flex;
-}
-
-.only-mobile {
-  display: none;
-}
-
-@media (max-width: 768px) {
-  .only-web {
-    display: none !important;
-  }
-  .only-mobile {
-    display: flex !important;
-  }
-}
-    

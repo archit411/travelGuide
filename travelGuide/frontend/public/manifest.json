@@ -11,17 +11,17 @@
   "categories": ["travel", "maps", "lifestyle"],
   "icons": [
     {
-      "src": "/logo.jpeg",
+      "src": "/logo.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/logo.jpeg",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png"
     },
     {
-      "src": "/logo.jpeg",
+      "src": "/logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

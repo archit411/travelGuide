@@ -202,7 +202,17 @@ export default function HomePage() {
   const [showAdd, setShowAdd] = useState(false);
   const [viewStory, setViewStory] = useState(null); // { stories: [...], index: 0 }
   const [showSearch, setShowSearch] = useState(false);
+const [isMobile, setIsMobile] = useState(
+  window.matchMedia("(max-width: 768px)").matches
+);
 
+useEffect(() => {
+  const handler = () => {
+    setIsMobile(window.matchMedia("(max-width: 768px)").matches);
+  };
+  window.addEventListener("resize", handler);
+  return () => window.removeEventListener("resize", handler);
+}, []);
   useEffect(() => setMonth(new Date().toLocaleString("default", { month: "long" })), []);
 
   /* Geolocation and reverse geocode */
@@ -409,91 +419,99 @@ async function handleRefresh() {
 
   return (
     <div className="home-root">
-      <div className="header-container">
+    <div className="top-header-bar">
 
-        {/* Top */}
-        <div className="header-top">
-          <div className="header-left">
-            <img src="/logo.jpeg" className="header-logo-big" alt="logo" />
-            <span className="header-main-brand">TripEZ</span>
-          </div>
+  {/* TOP ROW: Logo Left — Buttons Right */}
+  <div className="header-top">
+    
+    {/* BIG LOGO */}
+    <div className="header-left">
+      <img src="/logo.png" className="big-logo" alt="TripEZ" />
+    </div>
 
-          <div className="header-actions">
-            <button className="add-post-btn" onClick={() => setShowAdd(true)}>
-              <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
-            </button>
-            <div
-              className="profile-circle"
-              onClick={() => {
-                setActive("profile");
-                navigate("/profile");
-              }}
-              style={{ cursor: "pointer" }}
-            >
-              <i className="fa-solid fa-user"></i>
-            </div>
-          </div>
-        </div>
+    {/* RIGHT SIDE BUTTONS */}
+    <div className="header-actions">
+      <button className="add-post-btn" onClick={() => setShowAdd(true)}>
+        <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
+      </button>
 
-        {/* TripEZ */}
-        <div className="loc-row">
-          {locationError ? (
-            <div className="loc-error">⚠️ {locationError}</div>
-          ) : city ? (
-            <div className="loc-chip"><i className="fa-solid fa-location-arrow fa-bounce" style={{ color: "#3b82f6" }}></i> {city}</div>
-          ) : (
-            <div className="loc-chip loading">Detecting your location...</div>
-          )}
-        </div>
-
-        {/* Grid */}
-        <div className="header-main-grid">
-
-          {/* Left */}
-          <div className="header-left-col">
-            <h1 className="header-heading-large">
-              Plan Your <span className="escape-text-big"> Escape</span>
-            </h1>
-            <h3>“The world is big — go explore it.”</h3>
-          </div>
-
-          {/* Right */}
-          <div className="header-right-col">
-
-            <div className="search-options-row">
-              <div className="search-card medium">
-                <i className="fa-regular fa-compass icon-blue-outline"></i>
-                <div>
-                  <div className="search-label">Discover</div>
-                  <div className="search-placeholder">Where?</div>
-                </div>
-              </div>
-
-              <div className="search-card medium">
-                <i className="fa-regular fa-calendar icon-blue-outline"></i>
-                <div>
-                  <div className="search-label">Plan</div>
-                  <div className="search-placeholder">When?</div>
-                </div>
-              </div>
-
-              <div className="search-card medium">
-                <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
-                <div>
-                  <div className="search-label">Go</div>
-                  <div className="search-placeholder">How?</div>
-                </div>
-              </div>
-            </div>
-
-            <button className="header-search-btn extra-wide">
-              <i className="fa-solid fa-magnifying-glass"></i>
-              Search
-            </button>
-
-          </div>
-        </div>
+      <div
+        className="profile-circle"
+        onClick={() => navigate("/profile")}
+      >
+        <i className="fa-solid fa-user"></i>
       </div>
+    </div>
+
+  </div>
+
+  {/* LOCATION CHIP BELOW THE LOGO */}
+  <div className="loc-row under-logo">
+    {locationError ? (
+      <div className="loc-error">⚠️ {locationError}</div>
+    ) : city ? (
+      <div className="loc-chip">
+        <i className="fa-solid fa-location-arrow" style={{ color: "#3b82f6" }}></i>
+        {city}
+      </div>
+    ) : (
+      <div className="loc-chip loading">Detecting your location...</div>
+    )}
+  </div>
+
+  {/* PLAN YOUR ESCAPE CARD */}
+  <div className="header-card">
+
+    <div className="header-main-grid">
+
+      <div className="header-left-col">
+        <h1 className="header-heading-large">
+          Plan Your <span className="escape-text-big">Escape</span>
+        </h1>
+        <div>“The world is big — go explore it.”</div>
+      </div>
+
+      <div className="header-right-col">
+
+        <div className="search-options-row">
+          <div className="search-card medium">
+            <i className="fa-regular fa-compass icon-blue-outline"></i>
+            <div>
+              <div className="search-label">Discover</div>
+              <div className="search-placeholder">Where?</div>
+            </div>
+          </div>
+
+          <div className="search-card medium">
+            <i className="fa-regular fa-calendar icon-blue-outline"></i>
+            <div>
+              <div className="search-label">Plan</div>
+              <div className="search-placeholder">When?</div>
+            </div>
+          </div>
+
+          <div className="search-card medium">
+            <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
+            <div>
+              <div className="search-label">Go</div>
+              <div className="search-placeholder">How?</div>
+            </div>
+          </div>
+        </div>
+
+        <button className="header-search-btn extra-wide">
+          <i className="fa-solid fa-magnifying-glass"></i>
+          Search
+        </button>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
 
       {/* ---------------- END HEADER ---------------- */}
 
@@ -609,59 +627,62 @@ async function handleRefresh() {
   </div> */}
 
       {/* MOBILE VIEW NAV */}
-      <nav className="bottom-nav">
-        {/* WEB NAV ONLY */}
-        {window.innerWidth > 768 && (
-          <div className="nav-web">
-            {[
-              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-              { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-btn ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-ic">{item.icon}</div>
-                <div className="nav-label">{item.label}</div>
-              </button>
-            ))}
-          </div>
-        )}
+    <nav className="bottom-nav">
 
-        {/* MOBILE NAV ONLY */}
-        {window.innerWidth <= 768 && (
-          <div className="nav-mobile">
-            {[
-              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-              { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-              { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
-              { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                  if (item.id === "upload") {
-                    setShowAdd(true);
-                    return;
-                  }
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-ic">{item.icon}</div>
-                <div className="nav-label">{item.label}</div>
-              </button>
-            ))}
-          </div>
-        )}
-      </nav>
+    {/* DESKTOP NAV */}
+    {!isMobile && (
+      <div className="nav-web">
+        {[
+          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+          { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            className={`nav-btn ${active === item.id ? "active" : ""}`}
+            onClick={() => {
+              setActive(item.id);
+              navigate(item.path);
+            }}
+          >
+            <div className="nav-ic">{item.icon}</div>
+            <div className="nav-label">{item.label}</div>
+          </button>
+        ))}
+      </div>
+    )}
+
+    {/* MOBILE NAV */}
+    {isMobile && (
+      <div className="nav-mobile">
+        {[
+          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+          { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+          { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
+          { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${
+              active === item.id ? "active" : ""
+            }`}
+            onClick={() => {
+              if (item.id === "upload") {
+                setShowAdd(true);
+                return;
+              }
+              setActive(item.id);
+              navigate(item.path);
+            }}
+          >
+            <div className="nav-ic">{item.icon}</div>
+            <div className="nav-label">{item.label}</div>
+          </button>
+        ))}
+      </div>
+    )}
+  </nav>
 
       {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
       {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}

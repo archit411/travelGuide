@@ -168,7 +168,7 @@ export default function SignupPage() {
 
       <div className="auth-card">
         <div className="auth-logo">
-          <img src="/logo.jpeg" alt="TripEZ Logo" />
+          <img src="/logo.png" alt="TripEZ Logo" />
         </div>
 
         <h2 className="auth-heading">Create Your TripEZ Account</h2>
