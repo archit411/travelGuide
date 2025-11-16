@@ -602,7 +602,7 @@ async function handleRefresh() {
         </div>
       </section>
 
-      <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
+
 
 
 
@@ -746,7 +746,7 @@ async function handleRefresh() {
   </div>
 
 </footer>
-
+      <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
     </div>
   );
 }

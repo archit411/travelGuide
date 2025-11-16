@@ -102,11 +102,12 @@ export default function DestinationPage() {
   // LOADING VIEW
   // ---------------------------------------------
   if (loading)
-    return (
-      <div className="dest-loading">
-        <p>Loading destination details...</p>
-      </div>
-    );
+  return (
+    <div className="dest-loading">
+      <div className="dest-loader"></div>
+      <p>Loading destination...</p>
+    </div>
+  );
 
   // ---------------------------------------------
   // ERROR VIEW

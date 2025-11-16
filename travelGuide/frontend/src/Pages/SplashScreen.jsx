@@ -6,23 +6,21 @@ export default function SplashScreen() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      navigate("/login");
-    }, 2500);
-
+    const timer = setTimeout(() => navigate("/login"), 2200);
     return () => clearTimeout(timer);
   }, [navigate]);
 
   return (
-    <div className="splash-container">
+    <div className="splash-wrapper">
+      <div className="splash-glow"></div>
+
       <div className="splash-content">
-        <img
-          src="/logo.png"
-          alt="TripEZ Logo"
-          className="splash-logo"
-        />
+        <img src="/logo.png" alt="TripEZ" className="splash-logo" />
+
         <h1 className="splash-title">TripEZ</h1>
         <p className="splash-tagline">Discover • Plan • Go</p>
+
+       
       </div>
     </div>
   );

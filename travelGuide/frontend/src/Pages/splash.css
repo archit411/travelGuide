@@ -1,55 +1,114 @@
-.splash-container {
+/* ------------------------- MAIN WRAPPER ------------------------- */
+.splash-wrapper {
+  height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  background: linear-gradient(180deg, #ffffff 0%, #f7f9fc 100%);
+
+  background: radial-gradient(circle at top, #dbeafe, #eff6ff, #ffffff);
+  position: relative;
+  overflow: hidden;
+
   animation: fadeIn 0.8s ease forwards;
 }
 
-.splash-content {
-  text-align: center;
-  animation: scaleIn 1s ease forwards;
+/* Soft glowing gradient blob */
+.splash-glow {
+  position: absolute;
+  width: 480px;
+  height: 480px;
+  background: radial-gradient(circle, rgba(59,130,246,0.28), rgba(37,99,235,0.18), transparent);
+  filter: blur(80px);
+  top: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: glowFloat 4s ease-in-out infinite alternate;
 }
 
+/* ------------------------- CONTENT ------------------------- */
+.splash-content {
+  text-align: center;
+  position: relative;
+  z-index: 2;
+  animation: scaleIn 1.1s ease forwards;
+}
+
+/* Logo styling */
 .splash-logo {
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
   margin-bottom: 1rem;
   opacity: 0;
   animation: fadeUp 1s ease forwards;
 }
 
+/* Title */
 .splash-title {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.3rem;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.5px;
   opacity: 0;
   animation: fadeUp 1.2s ease forwards;
 }
 
+/* Tagline */
 .splash-tagline {
-  font-size: 0.95rem;
-  color: #6b7280;
+  font-size: 1rem;
   font-weight: 500;
+  color: #475569;
+  margin-top: 4px;
   opacity: 0;
   animation: fadeUp 1.4s ease forwards;
 }
 
-/* Animations */
+/* ------------------------- Loader ------------------------- */
+
+
+/* ------------------------- ANIMATIONS ------------------------- */
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
 }
 
 @keyframes fadeUp {
-  from { transform: translateY(10px); opacity: 0; }
+  from { transform: translateY(14px); opacity: 0; }
   to { transform: translateY(0); opacity: 1; }
 }
 
 @keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
+  from { transform: scale(0.94); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg);}
+}
+
+@keyframes glowFloat {
+  from { transform: translateX(-50%) translateY(0) scale(1); }
+  to   { transform: translateX(-50%) translateY(20px) scale(1.05); }
+}
+
+/* ------------------------- RESPONSIVE ------------------------- */
+@media (max-width: 600px) {
+  .splash-logo {
+    width: 110px;
+    height: 110px;
+  }
+
+  .splash-title {
+    font-size: 1.8rem;
+  }
+
+  .splash-tagline {
+    font-size: 0.9rem;
+  }
+
+  .splash-loader {
+    width: 32px;
+    height: 32px;
+  }
 }
