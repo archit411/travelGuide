@@ -2,7 +2,7 @@
    HEADER CONTAINER (Desktop + Mobile)
 ============================================ */
 .header-container {
-  background: lightgray;
+  background: rgb(153, 200, 218);
   border-radius: 36px;
   padding: 42px 48px;
   margin: 28px 20px 36px 20px;

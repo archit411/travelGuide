@@ -56,31 +56,30 @@ public class TopVisiitedPlacesByMonthServiceImpl implements TopVisiitedPlacesByM
 	}
 	
 	@Override
-	@Cacheable("month")
+	@Cacheable(value="month" , key="#month")
 	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth(String month) {
 		TopVisitedPlacesByMonthRespBody response = null;
 		List<TopVisitedPlacesByMonthRespBody> responseList = new ArrayList<>();
+		System.out.println("----------------------------------------db hit");
 		try {
-			if(month!=null) {
-				List<TopVisitedByMonth> findByMonth = repository.findByMonth(month);
-				for(TopVisitedByMonth entry : findByMonth) {
-					response = new TopVisitedPlacesByMonthRespBody();
-					
-					response.setMonth(entry.getMonth());
-					response.setPlaceOne(entry.getPlaceOne());
-					response.setPlaceOneDescription(entry.getPlaceOneDescription());
-					response.setPlaceTwo(entry.getPlaceTwo());
-					response.setPlaceTwoDescription(entry.getPlaceTwoDescription());
-					response.setRegion(entry.getRegion());
-					response.setWeather(entry.getWeather());
-					response.setImage_url1(entry.getImageUrl1());
-					response.setImage_url2(entry.getImage_url2());
-					
-					responseList.add(response);
-				}
-			}else {
+
+			List<TopVisitedByMonth> findByMonth = repository.findByMonth(month);
+			for(TopVisitedByMonth entry : findByMonth) {
+				response = new TopVisitedPlacesByMonthRespBody();
+				
+				response.setMonth(entry.getMonth());
+				response.setPlaceOne(entry.getPlaceOne());
+				response.setPlaceOneDescription(entry.getPlaceOneDescription());
+				response.setPlaceTwo(entry.getPlaceTwo());
+				response.setPlaceTwoDescription(entry.getPlaceTwoDescription());
+				response.setRegion(entry.getRegion());
+				response.setWeather(entry.getWeather());
+				response.setImage_url1(entry.getImageUrl1());
+				response.setImage_url2(entry.getImage_url2());
+				
 				responseList.add(response);
 			}
+		
 			return responseList;
 		}catch(Exception e) {
 			e.printStackTrace();
