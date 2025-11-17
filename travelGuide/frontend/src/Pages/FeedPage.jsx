@@ -139,7 +139,7 @@ const [posts] = useState([
       {/* Topbar */}
       <header className="feed-topbar">
         <div className="feed-left">
-          <img src="/logo.png" alt="TripEZ" className="feed-logo" />
+          <img src="/logo.jpg" alt="TripEZ" className="feed-logo" />
           <div className="feed-location">
             <FiMapPin className="icon" />
             <select className="feed-city" value={city} onChange={(e) => setCity(e.target.value)}>

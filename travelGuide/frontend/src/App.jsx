@@ -10,6 +10,7 @@ import FoodPage from "./Pages/FoodPage";
 import SavedStories from "./Pages/SavedStories";
 import Layout from "../src/Pages/Layout";
 import FeedPage from "./Pages/FeedPage";
+import Onboarding from "./Pages/onBoarding";
 
 function App() {
   return (
@@ -17,7 +18,7 @@ function App() {
       <Routes>
         {/* Splash screen */}
         <Route path="/" element={<SplashScreen />} />
-
+ <Route path="/onboarding" element={<Onboarding />} />
         {/* Auth routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />

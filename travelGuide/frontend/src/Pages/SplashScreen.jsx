@@ -1,27 +1,40 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import useIsMobile from "../isMobile";
 import "./splash.css";
 
 export default function SplashScreen() {
   const navigate = useNavigate();
+  const isMobile = useIsMobile(768);
 
   useEffect(() => {
-    const timer = setTimeout(() => navigate("/login"), 2200);
+    if (!isMobile) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    const timer = setTimeout(() => navigate("/onboarding"), 2200);
     return () => clearTimeout(timer);
-  }, [navigate]);
+  }, [isMobile, navigate]);
 
   return (
     <div className="splash-wrapper">
-      <div className="splash-glow"></div>
+      {/* Aesthetic travel background */}
+      <img
+        src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=80"
+        className="splash-bg"
+        alt="aesthetic background"
+      />
 
-      <div className="splash-content">
-        <img src="/logo.png" alt="TripEZ" className="splash-logo" />
+      {/* light blur for premium feel */}
+      <div className="bg-blur"></div>
 
-        <h1 className="splash-title">TripEZ</h1>
-        <p className="splash-tagline">Discover • Plan • Go</p>
-
-       
-      </div>
+      {/* Centered logo */}
+      <img
+        src="/logo2.png"
+        className="splash-logo"
+        alt="Tripez logo"
+      />
     </div>
   );
 }

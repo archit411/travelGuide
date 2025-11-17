@@ -102,7 +102,7 @@ const showInstallPrompt = async () => {
       <img src="${
         source === "google"
           ? "/google.svg"
-          : "/logo.png"
+          : "/logo.jpg"
       }" alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
     `;
@@ -206,7 +206,7 @@ const showInstallPrompt = async () => {
       <div className="auth-wrapper">
         <div className="auth-card">
           <div className="auth-logo">
-            <img src="/logo.png" alt="TripPulse Logo" />
+            <img src="/logo.jpg" alt="TripPulse Logo" />
           </div>
 
           <h2 className="auth-heading">Welcome to TripEZ</h2>

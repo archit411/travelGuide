@@ -122,7 +122,7 @@ export default function FoodPage() {
       <header className="fp-topbar">
         <div className="fp-topbar-left">
           <div className="fp-logo-wrap">
-            <img src="/logo.png" alt="TripEZ" className="fp-logo" />
+            <img src="/logo.jpg" alt="TripEZ" className="fp-logo" />
           </div>
 
           <div className="fp-location">

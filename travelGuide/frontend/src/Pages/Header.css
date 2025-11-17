@@ -34,32 +34,76 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
 }
 
+/* --------------- LOGO TEXT ---------------- */
 .header-left {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
-.big-logo {
-  width: 160px;
-  height: auto;
-  object-fit: contain;
+.logo-text {
+  font-size: 32px;
+  font-weight: 800;
+  color: #1482ffe2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
 }
 
+.logo-text .ez-blue {
+  color: #3b82f6;
+  font-style: italic;
+}
+
+/* ============================================================
+   ACTIONS (Location + Add + Profile)
+============================================================ */
 .header-actions {
   display: flex;
   align-items: center;
   gap: 14px;
 }
 
+/* SHOW ACTIONS ON MOBILE (FIXED) */
 @media (max-width: 768px) {
   .header-actions {
-    display: none !important;
+    display: flex !important;
+    gap: 10px;
   }
 }
 
+/* --------------- LOCATION CHIP ---------------- */
+.header-loc-chip {
+  background: none !important;
+  backdrop-filter: none !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+
+  color: #2483ff;
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* MOBILE ORDERING FIX — makes location always visible */
+@media (max-width: 768px) {
+  .header-loc-chip { order: 1; }
+  .add-post-btn { order: 2; }
+  .profile-circle { order: 3; }
+}
+
+/* ============================================================
+   ADD POST BUTTON & PROFILE
+============================================================ */
 .add-post-btn {
   display: flex;
   align-items: center;
@@ -88,13 +132,14 @@
 }
 
 /* ============================================================
-   LOCATION CHIP
+   LOCATION CHIP LEGACY (UNDER LOGO) — NOT USED ANYMORE
 ============================================================ */
 .under-logo {
   margin-top: -40px;
   margin-left: 4px;
 }
 
+/* Keep it in case other parts use it */
 .loc-chip {
   background: #ffffff;
   border-radius: 25px;
@@ -107,6 +152,7 @@
   box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
 }
 
+
 /* ============================================================
    CARD CONTAINER — Glass + BG IMAGE
 ============================================================ */
@@ -115,8 +161,6 @@
   padding: 26px 24px;
   border-radius: 32px;
   margin-top: 10px;
-
-  /* Background Image */
   background: url("/snowback.avif") center/cover no-repeat;
   overflow: hidden;
 }
@@ -126,22 +170,18 @@
   content: "";
   position: absolute;
   inset: 0;
-
   background: rgba(255, 255, 255, 0.22);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-
   border-radius: inherit;
   z-index: 1;
 }
 
-/* All content above blur layer */
 .header-card > * {
   position: relative;
   z-index: 2;
 }
 
-/* MOBILE — stronger frost */
 @media (max-width: 768px) {
   .header-card {
     padding: 20px 16px;
@@ -243,7 +283,6 @@
    MOBILE — Equal Small Cards
 ============================================================ */
 @media (max-width: 768px) {
-
   .search-options-row {
     display: flex;
     flex-direction: row !important;
@@ -258,16 +297,13 @@
     flex: 1;
     max-width: 33%;
     min-width: 0;
-
     padding: 10px 6px;
     border-radius: 14px;
     min-height: 72px;
-
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-
     gap: 4px;
     text-align: center;
     box-sizing: border-box;
@@ -303,4 +339,62 @@
   justify-content: center;
   gap: 12px;
   box-shadow: 0 12px 34px rgba(37, 99, 235, 0.25);
+}
+
+/* ============================================================
+   MOBILE TEXT SIZING
+============================================================ */
+@media (max-width: 600px) {
+  .logo-text { font-size: 26px; }
+  .header-loc-chip {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    margin-right: 6px;
+    color: #1e60ff;
+  }
+}
+/* ================= WEB BEHAVIOR (SHOW EVERYTHING) ================= */
+@media (min-width: 769px) {
+  .header-actions {
+    display: flex !important;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-loc-chip {
+    order: 0;
+    margin-right: 10px; /* spacing before Add Post button */
+  }
+
+  .add-post-btn {
+    display: flex !important;
+  }
+
+  .profile-circle {
+    display: flex !important;
+  }
+}
+
+/* ================= MOBILE BEHAVIOR (HIDE ADD + PROFILE, SHOW ONLY LOCATION) ================= */
+@media (max-width: 768px) {
+
+  .header-actions {
+    display: flex !important;
+    gap: 0;
+    align-items: center;
+  }
+
+  /* ONLY show location on mobile */
+  .header-loc-chip {
+    font-size: 0.80rem !important;
+    margin-left: auto;
+  }
+
+  .add-post-btn {
+    display: none !important;
+  }
+
+  .profile-circle {
+    display: none !important;
+  }
 }

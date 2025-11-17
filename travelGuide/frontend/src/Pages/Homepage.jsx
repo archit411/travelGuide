@@ -355,66 +355,8 @@ useEffect(() => {
   function openStoryWithList(indexInList = 0) {
     setViewStory({ stories: stories, index: indexInList });
   }
-async function refreshStories() {
-  const token = localStorage.getItem("token");
-  if (!token) return;
 
-  try {
-    const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
 
-    const data = await res.json();
-    setStories(
-      data.map((s) => ({
-        image: s.image || "/noimage.png",
-        destination: s.destination || "Unknown",
-        caption: s.caption || "",
-        userName: s.userName || "Traveler",
-        createdAt: s.createdAt,
-        temprature: s.temprature,
-        crowdLevel: s.crowdLevel,
-        likes: s.likes,
-      }))
-    );
-  } catch (err) {
-    console.error("Error refreshing stories:", err);
-  }
-}
-
-async function refreshPlaces() {
-  setLoadingPlaces(true);
-
-  try {
-    const token = localStorage.getItem("token");
-
-    const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-    });
-
-    const data = await res.json();
-    setTopPlaces(Array.isArray(data) ? data : []);
-
-  } catch (err) {
-    console.error("Error refreshing places:", err);
-  } finally {
-    setLoadingPlaces(false);
-  }
-}
-async function handleRefresh() {
-  await Promise.all([refreshStories(), refreshPlaces()]);
-
-  // optional: vibration feedback on mobile
-  if (navigator.vibrate) navigator.vibrate(10);
-}
 
 
   return (
@@ -425,28 +367,37 @@ async function handleRefresh() {
   <div className="header-top">
     
     {/* BIG LOGO */}
-    <div className="header-left">
-      <img src="/logo.png" className="big-logo" alt="TripEZ" />
-    </div>
+   <div className="header-left logo-text">
+  Trip<span className="ez-blue">EZ</span>
+</div>
+
 
     {/* RIGHT SIDE BUTTONS */}
     <div className="header-actions">
-      <button className="add-post-btn" onClick={() => setShowAdd(true)}>
-        <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
-      </button>
 
-      <div
-        className="profile-circle"
-        onClick={() => navigate("/profile")}
-      >
-        <i className="fa-solid fa-user"></i>
-      </div>
-    </div>
+  {/* LOCATION CHIP */}
+  <div className="loc-chip header-loc-chip">
+    <i className="fa-solid fa-location-arrow" style={{ color: "#3b82f6" }}></i>
+    {locationError ? "Unknown" : city || "Locating..."}
+  </div>
+
+  <button className="add-post-btn" onClick={() => setShowAdd(true)}>
+    <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
+  </button>
+
+  <div
+    className="profile-circle"
+    onClick={() => navigate("/profile")}
+  >
+    <i className="fa-solid fa-user"></i>
+  </div>
+</div>
+
 
   </div>
 
   {/* LOCATION CHIP BELOW THE LOGO */}
-  <div className="loc-row under-logo">
+  {/* <div className="loc-row under-logo">
     {locationError ? (
       <div className="loc-error">⚠️ {locationError}</div>
     ) : city ? (
@@ -457,7 +408,7 @@ async function handleRefresh() {
     ) : (
       <div className="loc-chip loading">Detecting your location...</div>
     )}
-  </div>
+  </div> */}
 
   {/* PLAN YOUR ESCAPE CARD */}
 <div className="header-card glass-card">
@@ -524,20 +475,7 @@ async function handleRefresh() {
       <section className="featured">
         <div className="section-head">
           <h2>Featured Destinations</h2>
-          <button 
-      onClick={handleRefresh}
-      style={{
-        background: "#111827",
-        color: "white",
-        padding: "6px 12px",
-        borderRadius: "8px",
-        border: "none",
-        cursor: "pointer",
-        fontSize: "0.85rem"
-      }}
-    >
-      🔄 Refresh
-    </button>
+         
         </div>
         <p className="featured-sub">
           Handpicked destinations for your perfect getaway.
@@ -696,7 +634,7 @@ async function handleRefresh() {
 
     {/* LOGO + ABOUT */}
     <div className="te-footer-col">
-      <img src="/logo.png" className="te-footer-logo" alt="TripEZ" />
+      <img src="/logo.jpg" className="te-footer-logo" alt="TripEZ" />
       <p className="te-footer-text">
         Discover destinations, plan your trips, and explore the world with TripEZ.
       </p>
