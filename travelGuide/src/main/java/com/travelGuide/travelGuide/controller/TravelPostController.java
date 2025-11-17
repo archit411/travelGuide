@@ -12,6 +12,8 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -47,7 +49,8 @@ public class TravelPostController {
 	private JwtUtil jwtUtil;
 	
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public TravelPostRespBody uploadTravelPost(@RequestParam("caption") String caption,
+	@CachePut(value="story" , key="'user_stories'")
+	public List<TravelPostRespBody> uploadTravelPost(@RequestParam("caption") String caption,
 	        @RequestParam("crowdLevel") String crowdLevel,
 	        @RequestParam("destination") String destination,
 	        @RequestParam("temprature") String temprature,
@@ -57,6 +60,7 @@ public class TravelPostController {
 	        @RequestHeader("Authorization") String authHeader) {
 		
 		TravelPostRespBody postResponse = null;
+		List<TravelPostRespBody> list = new ArrayList<>();
 		
 		try {
 			
@@ -86,7 +90,8 @@ public class TravelPostController {
             if (response.statusCode() != 200 && response.statusCode() != 201) {
             	postResponse = new TravelPostRespBody();
             	postResponse.setStatus("image upload failed");
-            	return postResponse;
+            	list.add(postResponse);
+            	return list;
             }
             
             //get the image url from supabase to save in db and access it by public url 
@@ -117,16 +122,22 @@ public class TravelPostController {
             postResponse.setUserRating(updatedRow.getUserRating());
             postResponse.setUsername(updatedRow.getUsername());
             
-			return postResponse;
+            list.add(postResponse);
+        	return list;
 		}catch(Exception e) {
 			e.printStackTrace();
 			postResponse = new TravelPostRespBody();
-			return postResponse;
+			list.add(postResponse);
+        	return list;
 		}
 	}
 	@PostMapping("/getUserPosts")
+	@Cacheable(value="story" , key="'user_stories'")
 	public List<TravelPostRespBody> getUserPosts() {
 	    List<TravelPostRespBody> responseList = new ArrayList<>();
+	    
+	    System.out.println("------------------------db hit");
+	    
 	    try {
 	    	
 	        List<TravelPost> posts = travelPostRepository.findAll();
