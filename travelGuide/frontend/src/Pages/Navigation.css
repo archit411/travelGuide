@@ -136,3 +136,44 @@
     display: none;
   }
 }
+/* =========================================
+   MOBILE "MADE IN INDIA" FOOTER
+========================================= */
+.mobile-made-india {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-made-india {
+    display: block;
+    text-align: center;
+    width: 100%;
+    padding: 24px 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+
+    color: #263a69; /* very light dark → aesthetic */
+    text-transform: uppercase;
+    user-select: none;
+  }
+
+  /* Hide web footer on mobile */
+  .te-footer {
+    display: none !important;
+  }
+
+  /* Hide your old small footer too */
+  .home-footer {
+    display: none !important;
+  }
+}
+
+/* =========================================
+   WEB VIEW — keep footer visible
+========================================= */
+@media (min-width: 769px) {
+  .mobile-made-india {
+    display: none;
+  }
+}

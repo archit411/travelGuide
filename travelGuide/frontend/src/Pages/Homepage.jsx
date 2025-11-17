@@ -628,63 +628,71 @@ useEffect(() => {
       {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} userLocation={location} />}
 
 
-        <footer className="te-footer">
+      {/* WEB FOOTER (desktop only) */}
+{!isMobile && (
+  <footer className="te-footer">
 
-  <div className="te-footer-section">
+    <div className="te-footer-section">
 
-    {/* LOGO + ABOUT */}
-    <div className="te-footer-col">
-      <img src="/logo.jpg" className="te-footer-logo" alt="TripEZ" />
-      <p className="te-footer-text">
-        Discover destinations, plan your trips, and explore the world with TripEZ.
-      </p>
-    </div>
-
-    {/* COMPANY */}
-    <div className="te-footer-col">
-      <h3 className="te-footer-title">Company</h3>
-      <p>About</p>
-      <p>Features</p>
-      <p>Works</p>
-      <p>Career</p>
-    </div>
-
-    {/* RESOURCES */}
-    <div className="te-footer-col">
-      <h3 className="te-footer-title">Resources</h3>
-      <p>Free Guides</p>
-      <p>Travel Tips</p>
-      <p>How-to Blog</p>
-      <p>Community</p>
-    </div>
-
-    {/* NEWSLETTER */}
-    <div className="te-footer-col">
-      <h3 className="te-footer-title">Newsletter</h3>
-
-      <div className="te-footer-input-box">
-        <input type="email" placeholder="Enter your email" />
+      {/* LOGO + ABOUT */}
+      <div className="te-footer-col">
+        <img src="/logo.jpg" className="te-footer-logo" alt="TripEZ" />
+        <p className="te-footer-text">
+          Discover destinations, plan your trips, and explore the world with TripEZ.
+        </p>
       </div>
 
-      <button className="te-footer-btn">Subscribe</button>
-
-      {/* Social Icons */}
-      <div className="te-footer-socials">
-        <i className="fa-brands fa-twitter"></i>
-        <i className="fa-brands fa-instagram"></i>
-        <i className="fa-brands fa-facebook"></i>
-        <i className="fa-brands fa-github"></i>
+      {/* COMPANY */}
+      <div className="te-footer-col">
+        <h3 className="te-footer-title">Company</h3>
+        <p>About</p>
+        <p>Features</p>
+        <p>Works</p>
+        <p>Career</p>
       </div>
+
+      {/* RESOURCES */}
+      <div className="te-footer-col">
+        <h3 className="te-footer-title">Resources</h3>
+        <p>Free Guides</p>
+        <p>Travel Tips</p>
+        <p>How-to Blog</p>
+        <p>Community</p>
+      </div>
+
+      {/* NEWSLETTER */}
+      <div className="te-footer-col">
+        <h3 className="te-footer-title">Newsletter</h3>
+
+        <div className="te-footer-input-box">
+          <input type="email" placeholder="Enter your email" />
+        </div>
+
+        <button className="te-footer-btn">Subscribe</button>
+
+        {/* Social Icons */}
+        <div className="te-footer-socials">
+          <i className="fa-brands fa-twitter"></i>
+          <i className="fa-brands fa-instagram"></i>
+          <i className="fa-brands fa-facebook"></i>
+          <i className="fa-brands fa-github"></i>
+        </div>
+      </div>
+
     </div>
 
-  </div>
+    <div className="te-footer-bottom">
+      © 2025 TripEZ. All Rights Reserved.
+    </div>
 
-  <div className="te-footer-bottom">
-    © 2025 TripEZ. All Rights Reserved.
-  </div>
+  </footer>
+)}
 
-</footer>
-      <footer className="home-footer">🇮🇳 Made in India • ❤️ Crafted in Mumbai</footer>
+{/* MOBILE FOOTER (big stylish text only on mobile) */}
+{isMobile && (
+  <div className="mobile-made-india">♥️ Crafted in Mumbai</div>
+)}
+
     </div>
   );
 }
