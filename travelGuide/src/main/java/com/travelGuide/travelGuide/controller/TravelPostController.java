@@ -49,7 +49,7 @@ public class TravelPostController {
 	private JwtUtil jwtUtil;
 	
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@CachePut(value="story" , key="'user_stories'")
+	//@CachePut(value="story" , key="'user_stories'")
 	public List<TravelPostRespBody> uploadTravelPost(@RequestParam("caption") String caption,
 	        @RequestParam("crowdLevel") String crowdLevel,
 	        @RequestParam("destination") String destination,
@@ -132,7 +132,7 @@ public class TravelPostController {
 		}
 	}
 	@PostMapping("/getUserPosts")
-	@Cacheable(value="story" , key="'user_stories'")
+	//@Cacheable(value="story" , key="'user_stories'")
 	public List<TravelPostRespBody> getUserPosts() {
 	    List<TravelPostRespBody> responseList = new ArrayList<>();
 	    
