@@ -1,281 +1,127 @@
-import React, { useEffect, useRef, useState } from "react";
-import { FiSearch, FiHome, FiUser, FiX } from "react-icons/fi";
+import React, { useEffect, useState, useRef } from "react";
+import "./HomePage.css";
+import './Highlights.css'
+import {
+  FiPlus,
+  FiUser,
+  FiCompass,
+  FiCalendar,
+  FiNavigation,
+  FiX,
+  FiSearch,
+  FiHome,
+} from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
-
-// styles (ensure these files exist in src/Pages/styles/)
-import "./Header.css";
-import "./Hero.css";
-import "./Highlights.css";
-import "./Featured.css";
-import "./PlaceCard.css";
-import "./StoryCard.css";
-import "./StoryViewer.css";
-import "./Navigation.css";
-import "./HomeLayout.css";
+import Navbar from "./Navbar";
 
 /* ----------------- Helpers ----------------- */
-function timeAgo(isoOrMs) {
-  if (!isoOrMs) return "Just now";
-  const t = typeof isoOrMs === "number" ? isoOrMs : Date.parse(isoOrMs);
-  if (Number.isNaN(t)) return "Just now";
-  const sec = Math.floor((Date.now() - t) / 1000);
+function timeAgo(t) {
+  if (!t) return "Just now";
+  const sec = Math.floor((Date.now() - Date.parse(t)) / 1000);
   if (sec < 60) return `${sec}s ago`;
   if (sec < 3600) return `${Math.floor(sec / 60)}m ago`;
   if (sec < 86400) return `${Math.floor(sec / 3600)}h ago`;
   return `${Math.floor(sec / 86400)}d ago`;
 }
-function formatLocationShort(cityName, stateName) {
-  if (!cityName) return "";
-  if (!stateName) return cityName;
 
-  const stateShort = stateName
-    .split(" ")     // Handle names like "Madhya Pradesh"
-    .map(w => w[0]) // Take first letter of each word
-    .join("")       // MP, MH, UP, etc.
-    .toUpperCase();
-
-  return `${cityName}, ${stateShort}`;
-}
-
-/* Avatar initial bubble */
-function Avatar({ name }) {
-  const initial = name ? name.trim()[0].toUpperCase() : "T";
-  return <div className="hl-avatar">{initial}</div>;
-}
-
-/* Crowd badge */
-function CrowdBadge({ level }) {
-  const text = (level || "").toString().toLowerCase();
-  if (["high", "h"].includes(text)) return <span className="crowd high">High</span>;
-  if (["medium", "med", "m"].includes(text)) return <span className="crowd medium">Medium</span>;
-  return <span className="crowd low">Low</span>;
-}
-
-/* Small skeleton used while loading */
-function SkeletonPlace({ style }) {
-  return <div className="skeleton-place" style={style}></div>;
-}
-
-/* Place card for Featured section */
-function PlaceCard({ place }) {
-  const navigate = useNavigate();
-  const image =
-    place.imageUrl ||
-    place.image_url1 ||
-    place.image_url2 ||
-    "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
-
-  return (
-    <div
-      className="place-card featured-card"
-      onClick={() =>
-        navigate(`/destination/${encodeURIComponent(place.name || "place")}`, {
-          state: { place },
-        })
-      }
-    >
-      <div className="place-bg" style={{ backgroundImage: `url(${image})` }} />
-      <div className="place-overlay">
-        <div className="place-inner">
-          <div className="place-title">{place.name}</div>
-          {place.description && <div className="place-sub">{place.description}</div>}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* Highlight small rectangular story card */
-function HighlightSmall({ story, openStory }) {
-  const likes =
-    typeof story.likes === "number"
-      ? story.likes
-      : story.userRating
-        ? Math.round(story.userRating * 20)
-        : Math.floor(Math.random() * 200) + 12;
-
-  const image = story.image || "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200";
-
-  return (
-    <div className="hl-small-card" onClick={() => openStory(story)}>
-      <div className="hl-small-image" style={{ backgroundImage: `url(${image})` }} />
-      <div className="hl-small-meta">
-        {/* We show destination under the small card as requested */}
-        <div className="hl-small-location">{story.destination || "Unknown"}</div>
-      </div>
-    </div>
-  );
-}
-
-/* Story viewer modal (keeps your behavior) */
+/* ----------------- Story Viewer ----------------- */
 function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   const [index, setIndex] = useState(startIndex);
-  const [progress, setProgress] = useState(stories.map((_, i) => (i < startIndex ? 100 : 0)));
-  const [loaded, setLoaded] = useState(false);
   const timerRef = useRef(null);
-  const duration = 15000;
 
   useEffect(() => {
-    if (!stories || !stories.length) return;
-    setLoaded(false);
-    setProgress((p) => p.map((_, i) => (i < index ? 100 : i === index ? 0 : 0)));
-
-    if (timerRef.current) clearInterval(timerRef.current);
-
     const img = new Image();
     img.src = stories[index].image;
-    img.onload = () => {
-      setLoaded(true);
-      const start = Date.now();
-      timerRef.current = setInterval(() => {
-        const elapsed = Date.now() - start;
-        const pct = Math.min((elapsed / duration) * 100, 100);
-        setProgress((prev) => prev.map((val, i) => (i === index ? pct : val)));
-        if (pct >= 100) {
-          clearInterval(timerRef.current);
-          if (index < stories.length - 1) setIndex((i) => i + 1);
-          else onClose();
-        }
-      }, 100);
-    };
+    img.onload = startTimer;
 
     return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line
-  }, [index, stories]);
+  }, [index]);
 
-  function handleTap(e) {
-    const x = e.clientX;
-    const w = window.innerWidth;
-    clearInterval(timerRef.current);
-    if (x < w / 3) setIndex((i) => Math.max(0, i - 1));
-    else if (x > (w * 2) / 3) setIndex((i) => Math.min(stories.length - 1, i + 1));
+  function startTimer() {
+    const start = Date.now();
+    const duration = 15000;
+
+    timerRef.current = setInterval(() => {
+      const pct = (Date.now() - start) / duration;
+      if (pct >= 1) {
+        clearInterval(timerRef.current);
+        if (index < stories.length - 1) setIndex((i) => i + 1);
+        else onClose();
+      }
+    }, 100);
   }
 
-  if (!stories || !stories.length) return null;
-
   const current = stories[index];
-
   return (
-    <div className="story-viewer-overlay" onClick={onClose}>
-      <div className="story-viewer-card" onClick={(e) => e.stopPropagation()}>
-        <button className="story-close-btn" onClick={onClose}>
-          <FiX size={18} />
+    <div className="story-overlay" onClick={onClose}>
+      <div className="story-box" onClick={(e) => e.stopPropagation()}>
+        <button className="story-close" onClick={onClose}>
+          <FiX />
         </button>
 
-        <div className="multi-progress">
-          {stories.map((_, i) => (
-            <div key={i} className="progress-track">
-              <div className={`progress-filled ${i < index ? "done" : ""}`} style={{ width: `${progress[i] || 0}%` }} />
-            </div>
-          ))}
-        </div>
-
-        <div className="story-image-wrapper" onClick={handleTap}>
-          <img className={`story-viewer-image ${loaded ? "loaded" : ""}`} src={current.image} alt={current.destination} />
-          <div className="story-info-overlay">
-            <h3>📍 {current.destination}</h3>
-            {current.caption && <p className="story-caption">{current.caption}</p>}
-          </div>
+        <img src={current.image} alt="" className="story-img" />
+        <div className="story-caption-area">
+          <h3>📍 {current.destination}</h3>
+          <p>{current.caption}</p>
         </div>
       </div>
     </div>
   );
 }
 
-/* ----------------- Main HomePage ----------------- */
+/* ----------------- Main Home Page ----------------- */
 export default function HomePage() {
   const navigate = useNavigate();
 
-  const [active, setActive] = useState("home");
-  const [month, setMonth] = useState("");
   const [stories, setStories] = useState([]);
   const [topPlaces, setTopPlaces] = useState([]);
   const [loadingPlaces, setLoadingPlaces] = useState(true);
 
-  const [location, setLocation] = useState(null);
-  const [city, setCity] = useState("");
-  const [locationError, setLocationError] = useState("");
-
+  const [viewStory, setViewStory] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [viewStory, setViewStory] = useState(null); // { stories: [...], index: 0 }
   const [showSearch, setShowSearch] = useState(false);
-const [isMobile, setIsMobile] = useState(
-  window.matchMedia("(max-width: 768px)").matches
-);
 
-useEffect(() => {
-  const handler = () => {
-    setIsMobile(window.matchMedia("(max-width: 768px)").matches);
-  };
-  window.addEventListener("resize", handler);
-  return () => window.removeEventListener("resize", handler);
-}, []);
-  useEffect(() => setMonth(new Date().toLocaleString("default", { month: "long" })), []);
+  const [city, setCity] = useState("Locating...");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [active, setActive] = useState("home");
 
-  /* Geolocation and reverse geocode */
+  /* ----------------- Resize Listener ----------------- */
   useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocationError("Geolocation not supported by your browser.");
-      return;
-    }
+    const onResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  /* ----------------- Location Fetch ----------------- */
+  useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
-        const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
-        setLocation(coords);
         try {
-          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lng}&format=json`);
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+          );
           const data = await res.json();
-          const cityName =
-            data.address.city ||
-            data.address.town ||
-            data.address.village ||
-            data.address.suburb ||
-            "";
 
-          const stateName = data.address.state || "";
-
-          // Final format → "Thane, Maharashtra"
-          const formattedLocation =
-            cityName && stateName ? `${cityName}, ${stateName}` : cityName || stateName;
-
-          setCity(formattedLocation);
-
-        } catch (err) {
-          console.warn("reverse failed", err);
+          setCity(data.address.city || data.address.state || "Unknown");
+        } catch {
+          setCity("Unknown");
         }
       },
-      (err) => {
-        switch (err.code) {
-          case err.PERMISSION_DENIED:
-            setLocationError("Location permission denied.");
-            break;
-          case err.POSITION_UNAVAILABLE:
-            setLocationError("Location unavailable.");
-            break;
-          case err.TIMEOUT:
-            setLocationError("Location request timed out.");
-            break;
-          default:
-            setLocationError("An unknown location error occurred.");
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
+      () => setCity("Unknown")
     );
   }, []);
 
-  /* Fetch stories -> Today's Highlights */
+  /* ----------------- Fetch Stories ----------------- */
   useEffect(() => {
     async function loadStories() {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        console.warn("Token missing, skipping story fetch");
-        return;
-      }
-
       try {
+        const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
           method: "POST",
           headers: {
@@ -284,34 +130,29 @@ useEffect(() => {
           },
         });
 
-        if (!res.ok) throw new Error("Failed fetch");
-
         const data = await res.json();
 
         setStories(
           data.map((s) => ({
-            image: s.image || "/noimage.png",
-            destination: s.destination || "Unknown",
-            caption: s.caption || "",
-            userName: s.userName || "Traveler",
+            image: s.image,
+            destination: s.destination,
+            caption: s.caption,
+            userName: s.userName,
             createdAt: s.createdAt,
             temprature: s.temprature,
             crowdLevel: s.crowdLevel,
             likes: s.likes,
           }))
         );
-      } catch (err) {
-        console.error("Error fetching stories:", err);
+      } catch (e) {
+        console.log("Error loading stories", e);
       }
     }
-
     loadStories();
-  }, []); // runs only after refresh
+  }, []);
 
-
-  /* Fetch top places */
+  /* ----------------- Fetch Places ----------------- */
   useEffect(() => {
-    if (!month) return;
     async function loadPlaces() {
       setLoadingPlaces(true);
       try {
@@ -323,172 +164,112 @@ useEffect(() => {
             Authorization: `Bearer ${token}`,
           },
         });
-        if (!res.ok) {
-          console.error("failed top places", res.status);
-          setTopPlaces([]);
-          return;
-        }
+
         const data = await res.json();
-        setTopPlaces(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("error top places", err);
-      } finally {
-        setLoadingPlaces(false);
-      }
+        setTopPlaces(data);
+      } catch {}
+      setLoadingPlaces(false);
     }
     loadPlaces();
-  }, [month]);
+  }, []);
 
-  /* map topPlaces -> flattened place list */
   const places = topPlaces
-    .flatMap((region) => [
-      region.placeOne && { name: region.placeOne, description: region.placeOneDescription, imageUrl: region.image_url1 },
-      region.placeTwo && { name: region.placeTwo, description: region.placeTwoDescription, imageUrl: region.image_url2 },
+    .flatMap((p) => [
+      p.placeOne && { name: p.placeOne, desc: p.placeOneDescription, img: p.image_url1 },
+      p.placeTwo && { name: p.placeTwo, desc: p.placeTwoDescription, img: p.image_url2 },
     ])
     .filter(Boolean);
 
-  function openStory(story) {
-    // To reuse viewer which expects array, pass single-story array.
-    setViewStory({ stories: [story], index: 0 });
-  }
-
-  function openStoryWithList(indexInList = 0) {
-    setViewStory({ stories: stories, index: indexInList });
-  }
-
-
-
-
   return (
-    <div className="home-root">
-    <div className="top-header-bar">
+    <div className="homepage-light">
 
-  {/* TOP ROW: Logo Left — Buttons Right */}
-  <div className="header-top">
-    
-    {/* BIG LOGO */}
-   <div className="header-left logo-text">
-  Trip<span className="ez-blue">EZ</span>
-</div>
+      {/* ---------- HEADER ---------- */}
+      <header className="header-main">
+        <div className="trip-header-inner">
 
+          {/* LEFT - LOGO */}
+          <div className="trip-logo">
+            <div className="logo-circle">
+              <i className="fa-solid fa-location-dot"></i>
+            </div>
+            <span className="logo-text">TripEZ<span>.in</span></span>
+          </div>
 
-    {/* RIGHT SIDE BUTTONS */}
-    <div className="header-actions">
+          {/* RIGHT ACTIONS */}
+          <div className="trip-header-right">
+            <div className="trip-loc-pill">
+              <i className="fa-solid fa-location-arrow"></i>
+              {city}
+            </div>
 
-  {/* LOCATION CHIP */}
-  <div className="loc-chip header-loc-chip">
-    <i className="fa-solid fa-location-arrow" style={{ color: "#3b82f6" }}></i>
-    {locationError ? "Unknown" : city || "Locating..."}
-  </div>
+            <button className="trip-add-btn" onClick={() => setShowAdd(true)}>
+              <FiPlus /> Add Post
+            </button>
 
-  <button className="add-post-btn" onClick={() => setShowAdd(true)}>
-    <FiX style={{ transform: "rotate(45deg)" }} size={16} /> Add Post
-  </button>
+            <button className="trip-profile-btn" onClick={() => navigate("/profile")}>
+              <FiUser />
+            </button>
+          </div>
+        </div>
+      </header>
 
-  <div
-    className="profile-circle"
-    onClick={() => navigate("/profile")}
-  >
-    <i className="fa-solid fa-user"></i>
-  </div>
-</div>
-
-
-  </div>
-
-  {/* LOCATION CHIP BELOW THE LOGO */}
-  {/* <div className="loc-row under-logo">
-    {locationError ? (
-      <div className="loc-error">⚠️ {locationError}</div>
-    ) : city ? (
-      <div className="loc-chip">
-        <i className="fa-solid fa-location-arrow" style={{ color: "#3b82f6" }}></i>
-        {city}
-      </div>
-    ) : (
-      <div className="loc-chip loading">Detecting your location...</div>
-    )}
-  </div> */}
-
-  {/* PLAN YOUR ESCAPE CARD */}
-<div className="header-card glass-card">
-
-  <div className="header-main-grid">
-
-    <div className="header-left-col">
-      <h1 className="header-heading-large">
-        Plan Your <span className="escape-text-big">Escape</span>
-      </h1>
-      <div>“The world is big — go explore it.”</div>
-    </div>
-
-    <div className="header-right-col">
-
-      <div className="search-options-row">
-        <div className="search-card medium">
-          <i className="fa-regular fa-compass icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Discover</div>
-            <div className="search-placeholder">Where?</div>
+      {/* ---------- SEARCH BAR (Discover Plan Go) ---------- */}
+      <div className="dpg-wrapper">
+        <div className="dpg-bar">
+          <div className="dpg-item">
+            <FiCompass className="dpg-icon" />
+            <div>
+              <div className="dpg-title">Discover</div>
+              <div className="dpg-sub">Where?</div>
+            </div>
+          </div>
+          <div className="dpg-divider"></div>
+          <div className="dpg-item">
+            <FiCalendar className="dpg-icon" />
+            <div>
+              <div className="dpg-title">Plan</div>
+              <div className="dpg-sub">When?</div>
+            </div>
+          </div>
+          <div className="dpg-divider"></div>
+          <div className="dpg-item">
+            <FiNavigation className="dpg-icon" />
+            <div>
+              <div className="dpg-title">Go</div>
+              <div className="dpg-sub">How?</div>
+            </div>
           </div>
         </div>
 
-        <div className="search-card medium">
-          <i className="fa-regular fa-calendar icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Plan</div>
-            <div className="search-placeholder">When?</div>
-          </div>
-        </div>
-
-        <div className="search-card medium">
-          <i className="fa-solid fa-location-arrow icon-blue-outline"></i>
-          <div>
-            <div className="search-label">Go</div>
-            <div className="search-placeholder">How?</div>
-          </div>
-        </div>
+        <button className="create-trip-btn">
+          <FiCompass /> Create a Trip
+        </button>
       </div>
 
-      <button className="header-search-btn extra-wide">
-        <i className="fa-solid fa-magnifying-glass"></i>
-        Search
-      </button>
-
-    </div>
-  </div>
-
-</div>
-
-
-</div>
-
-
-
-      {/* ---------------- END HEADER ---------------- */}
-
-      {/* ---------------- END FIGMA HEADER ---------------- */}
-
-
-
-      {/* --- TOP PLACES (moved earlier) --- */}
-      <section className="featured">
+      {/* ---------- FEATURED DESTINATIONS ---------- */}
+      <section className="section">
         <div className="section-head">
           <h2>Featured Destinations</h2>
-         
+          <span className="view-all">View All</span>
         </div>
-        <p className="featured-sub">
-          Handpicked destinations for your perfect getaway.
-        </p>
 
         <div className="featured-grid">
-          {loadingPlaces ? Array.from({ length: 6 }).map((_, i) => <SkeletonPlace key={i} />) : places.map((p, i) => <PlaceCard key={i} place={p} />)}
+          {places.map((p, i) => (
+            <div className="place-card" key={i}>
+              <div className="place-img" style={{ backgroundImage: `url(${p.img})` }}></div>
+              <div className="place-overlay">
+                <h3>{p.name}</h3>
+                <p>{p.desc}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
-
-      {/* ---------------------- TODAY'S HIGHLIGHTS (NEW ORDER) ---------------------- */}
-      <section className="highlights-section">
+  
+   {/* ---------------------- TODAY'S HIGHLIGHTS (FIGMA STYLE) ---------------------- */}
+{/* ---------------------- TODAY'S HIGHLIGHTS (IMPROVED UI) ---------------------- */}
+ <section className="highlights-section">
         <div className="section-header">
           <h2>Today's Highlights</h2>
           <span className="view-all">View All</span>
@@ -543,30 +324,8 @@ useEffect(() => {
 
 
 
-
-      {/* WEB VIEW NAV */}
-      {/* <div className="nav-web only-web">
-    {[
-      { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-      { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-      { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-    ].map((item) => (
-      <button
-        key={item.id}
-        className={`nav-btn ${active === item.id ? "active" : ""}`}
-        onClick={() => {
-          setActive(item.id);
-          navigate(item.path);
-        }}
-      >
-        <div className="nav-ic">{item.icon}</div>
-        <div className="nav-label">{item.label}</div>
-      </button>
-    ))}
-  </div> */}
-
-      {/* MOBILE VIEW NAV */}
-    <nav className="bottom-nav">
+      {/* ---------- NAVIGATION ---------- */}
+     <nav className="bottom-nav">
 
     {/* DESKTOP NAV */}
     {!isMobile && (
@@ -623,76 +382,78 @@ useEffect(() => {
     )}
   </nav>
 
-      {showAdd && <AddPost onClose={() => setShowAdd(false)} onAddStory={(st) => setStories((p) => [st, ...p])} />}
-      {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
-      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} userLocation={location} />}
 
+      {/* ---------- FOOTER ---------- */}
+      {!isMobile && (
+        <footer className="footer">
+          <div className="footer-content">
+            <div className="footer-left">
+             
+              <div>
+                <h2>TripEZ</h2>
+                <p>Discover destinations, plan your trips & explore the world.</p>
+              </div>
+            </div>
 
-      {/* WEB FOOTER (desktop only) */}
-{!isMobile && (
-  <footer className="te-footer">
+            <div>
+              <h3>Company</h3>
+              <p>About</p>
+              <p>Features</p>
+              <p>Works</p>
+              <p>Career</p>
+            </div>
 
-    <div className="te-footer-section">
+            <div>
+              <h3>Resources</h3>
+              <p>Free Guides</p>
+              <p>Travel Tips</p>
+              <p>Blog</p>
+              <p>Community</p>
+            </div>
 
-      {/* LOGO + ABOUT */}
-      <div className="te-footer-col">
-        <img src="/logo.jpg" className="te-footer-logo" alt="TripEZ" />
-        <p className="te-footer-text">
-          Discover destinations, plan your trips, and explore the world with TripEZ.
-        </p>
-      </div>
+            <div>
+              <h3>Newsletter</h3>
+              <div className="footer-input">
+                <input placeholder="Enter your email" />
+                <button>Subscribe</button>
+              </div>
+            </div>
+          </div>
 
-      {/* COMPANY */}
-      <div className="te-footer-col">
-        <h3 className="te-footer-title">Company</h3>
-        <p>About</p>
-        <p>Features</p>
-        <p>Works</p>
-        <p>Career</p>
-      </div>
-
-      {/* RESOURCES */}
-      <div className="te-footer-col">
-        <h3 className="te-footer-title">Resources</h3>
-        <p>Free Guides</p>
-        <p>Travel Tips</p>
-        <p>How-to Blog</p>
-        <p>Community</p>
-      </div>
-
-      {/* NEWSLETTER */}
-      <div className="te-footer-col">
-        <h3 className="te-footer-title">Newsletter</h3>
-
-        <div className="te-footer-input-box">
-          <input type="email" placeholder="Enter your email" />
-        </div>
-
-        <button className="te-footer-btn">Subscribe</button>
-
-        {/* Social Icons */}
-        <div className="te-footer-socials">
-          <i className="fa-brands fa-twitter"></i>
-          <i className="fa-brands fa-instagram"></i>
-          <i className="fa-brands fa-facebook"></i>
-          <i className="fa-brands fa-github"></i>
-        </div>
-      </div>
-
-    </div>
-
-    <div className="te-footer-bottom">
-      © 2025 TripEZ. All Rights Reserved.
-    </div>
-
-  </footer>
-)}
-
-{/* MOBILE FOOTER (big stylish text only on mobile) */}
+          <p className="footer-bottom">© 2025 TripEZ. All Rights Reserved.</p>
+        </footer>
+      )}
 {isMobile && (
-  <div className="mobile-made-india">♥️ Crafted in Mumbai</div>
+  <div className="travel-hero-footer">
+    <h1>
+      India’s most loved <br />
+      travel companion <span>❤️</span>
+    </h1>
+
+    <div className="thf-line"></div>
+
+    <p className="thf-brand">TripEZ</p>
+  </div>
 )}
 
+      {viewStory && (
+        <StoryViewer
+          stories={viewStory.stories}
+          index={viewStory.index}
+          onClose={() => setViewStory(null)}
+        />
+      )}
+
+      {showAdd && (
+        <AddPost
+          onClose={() => setShowAdd(false)}
+          onAddStory={(s) => setStories((prev) => [s, ...prev])}
+        />
+      )}
+
+      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
     </div>
   );
 }
+
+
