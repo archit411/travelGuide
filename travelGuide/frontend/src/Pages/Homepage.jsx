@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./HomePage.css";
-import './Highlights.css'
+import "./Highlights.css";
 import {
   FiPlus,
   FiUser,
@@ -15,8 +15,8 @@ import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
-import Navbar from "./Navbar";
-
+import "./StoryCard.css";
+import "./StoryViewer.css";
 /* ----------------- Helpers ----------------- */
 function timeAgo(t) {
   if (!t) return "Just now";
@@ -27,52 +27,82 @@ function timeAgo(t) {
   return `${Math.floor(sec / 86400)}d ago`;
 }
 
-/* ----------------- Story Viewer ----------------- */
 function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   const [index, setIndex] = useState(startIndex);
+  const [progress, setProgress] = useState(stories.map((_, i) => (i < startIndex ? 100 : 0)));
+  const [loaded, setLoaded] = useState(false);
   const timerRef = useRef(null);
+  const duration = 15000;
 
   useEffect(() => {
+    if (!stories || !stories.length) return;
+    setLoaded(false);
+    setProgress((p) => p.map((_, i) => (i < index ? 100 : i === index ? 0 : 0)));
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
     const img = new Image();
     img.src = stories[index].image;
-    img.onload = startTimer;
+    img.onload = () => {
+      setLoaded(true);
+      const start = Date.now();
+      timerRef.current = setInterval(() => {
+        const elapsed = Date.now() - start;
+        const pct = Math.min((elapsed / duration) * 100, 100);
+        setProgress((prev) => prev.map((val, i) => (i === index ? pct : val)));
+        if (pct >= 100) {
+          clearInterval(timerRef.current);
+          if (index < stories.length - 1) setIndex((i) => i + 1);
+          else onClose();
+        }
+      }, 100);
+    };
 
     return () => clearInterval(timerRef.current);
-  }, [index]);
+    // eslint-disable-next-line
+  }, [index, stories]);
 
-  function startTimer() {
-    const start = Date.now();
-    const duration = 15000;
-
-    timerRef.current = setInterval(() => {
-      const pct = (Date.now() - start) / duration;
-      if (pct >= 1) {
-        clearInterval(timerRef.current);
-        if (index < stories.length - 1) setIndex((i) => i + 1);
-        else onClose();
-      }
-    }, 100);
+  function handleTap(e) {
+    const x = e.clientX;
+    const w = window.innerWidth;
+    clearInterval(timerRef.current);
+    if (x < w / 3) setIndex((i) => Math.max(0, i - 1));
+    else if (x > (w * 2) / 3) setIndex((i) => Math.min(stories.length - 1, i + 1));
   }
 
+  if (!stories || !stories.length) return null;
+
   const current = stories[index];
+
   return (
-    <div className="story-overlay" onClick={onClose}>
-      <div className="story-box" onClick={(e) => e.stopPropagation()}>
-        <button className="story-close" onClick={onClose}>
-          <FiX />
+    <div className="story-viewer-overlay" onClick={onClose}>
+      <div className="story-viewer-card" onClick={(e) => e.stopPropagation()}>
+        <button className="story-close-btn" onClick={onClose}>
+          <FiX size={18} />
         </button>
 
-        <img src={current.image} alt="" className="story-img" />
-        <div className="story-caption-area">
-          <h3>📍 {current.destination}</h3>
-          <p>{current.caption}</p>
+        <div className="multi-progress">
+          {stories.map((_, i) => (
+            <div key={i} className="progress-track">
+              <div className={`progress-filled ${i < index ? "done" : ""}`} style={{ width: `${progress[i] || 0}%` }} />
+            </div>
+          ))}
+        </div>
+
+        <div className="story-image-wrapper" onClick={handleTap}>
+          <img className={`story-viewer-image ${loaded ? "loaded" : ""}`} src={current.image} alt={current.destination} />
+          <div className="story-info-overlay">
+            <h3>📍 {current.destination}</h3>
+            {current.caption && <p className="story-caption">{current.caption}</p>}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-/* ----------------- Main Home Page ----------------- */
+
+/* ----------------- Home Page ----------------- */
 export default function HomePage() {
   const navigate = useNavigate();
 
@@ -82,32 +112,28 @@ export default function HomePage() {
 
   const [viewStory, setViewStory] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [showSearch, setShowSearch] = useState(false);
+  const [showSearch] = useState(false);
 
   const [city, setCity] = useState("Locating...");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [active, setActive] = useState("home");
 
-  /* ----------------- Resize Listener ----------------- */
+  /* Responsive listener */
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  /* ----------------- Location Fetch ----------------- */
+  /* Location */
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
-          const lat = pos.coords.latitude;
-          const lon = pos.coords.longitude;
-
           const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`
+            `https://nominatim.openstreetmap.org/reverse?lat=${pos.coords.latitude}&lon=${pos.coords.longitude}&format=json`
           );
           const data = await res.json();
-
           setCity(data.address.city || data.address.state || "Unknown");
         } catch {
           setCity("Unknown");
@@ -117,18 +143,21 @@ export default function HomePage() {
     );
   }, []);
 
-  /* ----------------- Fetch Stories ----------------- */
+  /* Fetch stories */
   useEffect(() => {
     async function loadStories() {
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await fetch(
+          "http://localhost:8080/api/travel/getUserPosts",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await res.json();
 
@@ -151,43 +180,71 @@ export default function HomePage() {
     loadStories();
   }, []);
 
-  /* ----------------- Fetch Places ----------------- */
+  /* Fetch top places */
   useEffect(() => {
     async function loadPlaces() {
       setLoadingPlaces(true);
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
+
+        const res = await fetch(
+          "http://localhost:8080/api/getTopPlacesByMonth",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         const data = await res.json();
         setTopPlaces(data);
       } catch {}
       setLoadingPlaces(false);
     }
+
     loadPlaces();
   }, []);
 
   const places = topPlaces
     .flatMap((p) => [
-      p.placeOne && { name: p.placeOne, desc: p.placeOneDescription, img: p.image_url1 },
-      p.placeTwo && { name: p.placeTwo, desc: p.placeTwoDescription, img: p.image_url2 },
+      p.placeOne && {
+        name: p.placeOne,
+        desc: p.placeOneDescription,
+        img: p.image_url1,
+      },
+      p.placeTwo && {
+        name: p.placeTwo,
+        desc: p.placeTwoDescription,
+        img: p.image_url2,
+      },
     ])
     .filter(Boolean);
 
+  /* Story viewer handlers */
+  function openStoryWithList(indexInList) {
+setViewStory({
+  stories: [{
+  image: stories[indexInList]?.image || "/noimage.png",
+  destination: stories[indexInList]?.destination || "Unknown",
+  caption: stories[indexInList]?.caption || "",
+}], // fresh copy
+  index: 0,
+  key: Date.now()                           // force React to remake component
+});
+
+}
+function openStory(story) {
+    // To reuse viewer which expects array, pass single-story array.
+    setViewStory({ stories: [story], index: 0 });
+  }
   return (
     <div className="homepage-light">
 
       {/* ---------- HEADER ---------- */}
       <header className="header-main">
         <div className="trip-header-inner">
-
-          {/* LEFT - LOGO */}
           <div className="trip-logo">
             <div className="logo-circle">
               <i className="fa-solid fa-location-dot"></i>
@@ -195,7 +252,6 @@ export default function HomePage() {
             <span className="logo-text">TripEZ<span>.in</span></span>
           </div>
 
-          {/* RIGHT ACTIONS */}
           <div className="trip-header-right">
             <div className="trip-loc-pill">
               <i className="fa-solid fa-location-arrow"></i>
@@ -206,14 +262,17 @@ export default function HomePage() {
               <FiPlus /> Add Post
             </button>
 
-            <button className="trip-profile-btn" onClick={() => navigate("/profile")}>
+            <button
+              className="trip-profile-btn"
+              onClick={() => navigate("/profile")}
+            >
               <FiUser />
             </button>
           </div>
         </div>
       </header>
 
-      {/* ---------- SEARCH BAR (Discover Plan Go) ---------- */}
+      {/* ---------- SEARCH BAR ---------- */}
       <div className="dpg-wrapper">
         <div className="dpg-bar">
           <div className="dpg-item">
@@ -224,6 +283,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="dpg-divider"></div>
+
           <div className="dpg-item">
             <FiCalendar className="dpg-icon" />
             <div>
@@ -231,6 +291,7 @@ export default function HomePage() {
               <div className="dpg-sub">When?</div>
             </div>
           </div>
+
           <div className="dpg-divider"></div>
           <div className="dpg-item">
             <FiNavigation className="dpg-icon" />
@@ -255,8 +316,19 @@ export default function HomePage() {
 
         <div className="featured-grid">
           {places.map((p, i) => (
-            <div className="place-card" key={i}>
-              <div className="place-img" style={{ backgroundImage: `url(${p.img})` }}></div>
+            <div
+              className="place-card"
+              key={i}
+              onClick={() =>
+                navigate(`/destination/${encodeURIComponent(p.name)}`, {
+                  state: { place: p },
+                })
+              }
+            >
+              <div
+                className="place-img"
+                style={{ backgroundImage: `url(${p.img})` }}
+              />
               <div className="place-overlay">
                 <h3>{p.name}</h3>
                 <p>{p.desc}</p>
@@ -266,10 +338,8 @@ export default function HomePage() {
         </div>
       </section>
 
-  
-   {/* ---------------------- TODAY'S HIGHLIGHTS (FIGMA STYLE) ---------------------- */}
-{/* ---------------------- TODAY'S HIGHLIGHTS (IMPROVED UI) ---------------------- */}
- <section className="highlights-section">
+      {/* ---------- HIGHLIGHTS ---------- */}
+       <section className="highlights-section">
         <div className="section-header">
           <h2>Today's Highlights</h2>
           <span className="view-all">View All</span>
@@ -321,139 +391,111 @@ export default function HomePage() {
         </div>
       </section>
 
-
-
-
-      {/* ---------- NAVIGATION ---------- */}
-     <nav className="bottom-nav">
-
-    {/* DESKTOP NAV */}
-    {!isMobile && (
-      <div className="nav-web">
-        {[
-          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-          { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-btn ${active === item.id ? "active" : ""}`}
-            onClick={() => {
-              setActive(item.id);
-              navigate(item.path);
-            }}
-          >
-            <div className="nav-ic">{item.icon}</div>
-            <div className="nav-label">{item.label}</div>
-          </button>
-        ))}
-      </div>
-    )}
-
-    {/* MOBILE NAV */}
-    {isMobile && (
-      <div className="nav-mobile">
-        {[
-          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-          { id: "upload", label: "Upload", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-          { id: "story", label: "Story", icon: <FiSearch />, path: "/feed" },
-          { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-btn ${item.id === "upload" ? "upload-btn" : ""} ${
-              active === item.id ? "active" : ""
-            }`}
-            onClick={() => {
-              if (item.id === "upload") {
-                setShowAdd(true);
-                return;
-              }
-              setActive(item.id);
-              navigate(item.path);
-            }}
-          >
-            <div className="nav-ic">{item.icon}</div>
-            <div className="nav-label">{item.label}</div>
-          </button>
-        ))}
-      </div>
-    )}
-  </nav>
-
-
-      {/* ---------- FOOTER ---------- */}
-      {!isMobile && (
-        <footer className="footer">
-          <div className="footer-content">
-            <div className="footer-left">
-             
-              <div>
-                <h2>TripEZ</h2>
-                <p>Discover destinations, plan your trips & explore the world.</p>
-              </div>
-            </div>
-
-            <div>
-              <h3>Company</h3>
-              <p>About</p>
-              <p>Features</p>
-              <p>Works</p>
-              <p>Career</p>
-            </div>
-
-            <div>
-              <h3>Resources</h3>
-              <p>Free Guides</p>
-              <p>Travel Tips</p>
-              <p>Blog</p>
-              <p>Community</p>
-            </div>
-
-            <div>
-              <h3>Newsletter</h3>
-              <div className="footer-input">
-                <input placeholder="Enter your email" />
-                <button>Subscribe</button>
-              </div>
-            </div>
+      {/* ---------- NAV ---------- */}
+      <nav className="bottom-nav">
+        {!isMobile && (
+          <div className="nav-web">
+            {[
+              {
+                id: "home",
+                label: "Home",
+                icon: <FiHome />,
+                path: "/homepage",
+              },
+              {
+                id: "food",
+                label: "Food",
+                icon: <FaUtensils />,
+                path: "/food",
+              },
+              {
+                id: "feed",
+                label: "Feed",
+                icon: <FiSearch />,
+                path: "/feed",
+              },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-btn ${active === item.id ? "active" : ""}`}
+                onClick={() => {
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-ic">{item.icon}</div>
+                <div className="nav-label">{item.label}</div>
+              </button>
+            ))}
           </div>
+        )}
 
-          <p className="footer-bottom">© 2025 TripEZ. All Rights Reserved.</p>
-        </footer>
-      )}
-{isMobile && (
-  <div className="travel-hero-footer">
-    <h1>
-      India’s most loved <br />
-      travel companion <span>❤️</span>
-    </h1>
+        {isMobile && (
+          <div className="nav-mobile">
+            {[
+              {
+                id: "home",
+                label: "Home",
+                icon: <FiHome />,
+                path: "/homepage",
+              },
+              {
+                id: "food",
+                label: "Food",
+                icon: <FaUtensils />,
+                path: "/food",
+              },
+              {
+                id: "upload",
+                label: "Upload",
+                icon: <FiX style={{ transform: "rotate(45deg)" }} />,
+              },
+              {
+                id: "story",
+                label: "Story",
+                icon: <FiSearch />,
+                path: "/feed",
+              },
+              {
+                id: "profile",
+                label: "Profile",
+                icon: <FiUser />,
+                path: "/profile",
+              },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-btn ${
+                  item.id === "upload" ? "upload-btn" : ""
+                } ${active === item.id ? "active" : ""}`}
+                onClick={() => {
+                  if (item.id === "upload") {
+                    setShowAdd(true);
+                    return;
+                  }
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-ic">{item.icon}</div>
+                <div className="nav-label">{item.label}</div>
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
 
-    <div className="thf-line"></div>
+      {/* ---------- STORY VIEWER ---------- */}
+      {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
 
-    <p className="thf-brand">TripEZ</p>
-  </div>
-)}
 
-      {viewStory && (
-        <StoryViewer
-          stories={viewStory.stories}
-          index={viewStory.index}
-          onClose={() => setViewStory(null)}
-        />
-      )}
-
+      {/* ---------- ADD POST ---------- */}
       {showAdd && (
         <AddPost
           onClose={() => setShowAdd(false)}
           onAddStory={(s) => setStories((prev) => [s, ...prev])}
         />
       )}
-
-      {showSearch && <SearchOverlay onClose={() => setShowSearch(false)} />}
     </div>
   );
 }
-
-
