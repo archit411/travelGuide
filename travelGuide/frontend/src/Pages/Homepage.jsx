@@ -310,7 +310,7 @@ function openStory(story) {
       {/* ---------- FEATURED DESTINATIONS ---------- */}
       <section className="section">
         <div className="section-head">
-          <h2>Featured Destinations</h2>
+          <div>Featured Destinations</div>
           <span className="view-all">View All</span>
         </div>
 
@@ -341,7 +341,7 @@ function openStory(story) {
       {/* ---------- HIGHLIGHTS ---------- */}
        <section className="highlights-section">
         <div className="section-header">
-          <h3>Today's Highlights</h3>
+          <div>Today's Highlights</div>
           <span className="view-all">View All</span>
         </div>
 
@@ -484,7 +484,57 @@ function openStory(story) {
           </div>
         )}
       </nav>
+{!isMobile && (
+        <footer className="footer">
+          <div className="footer-content">
+            <div className="footer-left">
+             
+              <div>
+                <h2>TripEZ</h2>
+                <p>Discover destinations, plan your trips & explore the world.</p>
+              </div>
+            </div>
 
+            <div>
+              <h3>Company</h3>
+              <p>About</p>
+              <p>Features</p>
+              <p>Works</p>
+              <p>Career</p>
+            </div>
+
+            <div>
+              <h3>Resources</h3>
+              <p>Free Guides</p>
+              <p>Travel Tips</p>
+              <p>Blog</p>
+              <p>Community</p>
+            </div>
+
+            <div>
+              <h3>Newsletter</h3>
+              <div className="footer-input">
+                <input placeholder="Enter your email" />
+                <button>Subscribe</button>
+              </div>
+            </div>
+          </div>
+
+          <p className="footer-bottom">© 2025 TripEZ. All Rights Reserved.</p>
+        </footer>
+      )}
+{isMobile && (
+  <div className="travel-hero-footer">
+    <h1>
+      India’s most loved <br />
+      travel companion <span>❤️</span>
+    </h1>
+
+    <div className="thf-line"></div>
+
+    <p className="thf-brand">TripEZ</p>
+  </div>
+)}
       {/* ---------- STORY VIEWER ---------- */}
       {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
 

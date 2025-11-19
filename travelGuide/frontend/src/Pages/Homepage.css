@@ -180,19 +180,21 @@ body {
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
 }
-
 /* --------------------------------------------------
    FEATURED DESTINATIONS
 -------------------------------------------------- */
 .section {
-  width: 100%;
-  max-width: 1300px;
- 
-      padding: 0px 10px;
+  width: 97%;
+  padding: 10px 10px;
     margin: 20px;
 }
-
+.section-header{
+  font-size: 20px;
+  font-weight: 500;
+}
 .section-head {
+  font-size: 20px;
+  font-weight: 500;
   display: flex;
   justify-content: space-between;
   margin-bottom: 16px;
