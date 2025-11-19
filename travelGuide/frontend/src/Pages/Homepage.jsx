@@ -15,7 +15,7 @@ import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
-import "./StoryCard.css";
+// import "./StoryCard.css";
 import "./StoryViewer.css";
 /* ----------------- Helpers ----------------- */
 function timeAgo(t) {
@@ -341,7 +341,7 @@ function openStory(story) {
       {/* ---------- HIGHLIGHTS ---------- */}
        <section className="highlights-section">
         <div className="section-header">
-          <h2>Today's Highlights</h2>
+          <h3>Today's Highlights</h3>
           <span className="view-all">View All</span>
         </div>
 
