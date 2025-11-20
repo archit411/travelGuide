@@ -10,6 +10,14 @@ export default function ProfilePage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
 
+  /* ---------------- Avatar Picker ---------------- */
+  const [avatarModal, setAvatarModal] = useState(false);
+  const [avatarList] = useState([
+    "/p1.png",
+    "/p2.png"
+  ]);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -24,8 +32,15 @@ export default function ProfilePage() {
     newPassword: "",
     confirmPassword: "",
   });
+// Load avatar from localStorage on mount
+useEffect(() => {
+  const savedAvatar = localStorage.getItem("userAvatar");
+  if (savedAvatar) {
+    setSelectedAvatar(savedAvatar);
+  }
+}, []);
 
-  // 🔹 Fetch user details on mount
+  /* ---------------- Fetch User Details ---------------- */
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -70,23 +85,22 @@ export default function ProfilePage() {
     fetchUserDetails();
   }, []);
 
-  // 🔹 Handle input change
+  /* ---------------- Handle Input ---------------- */
   const handleChange = (e) => {
     const { name, value } = e.target;
     const updatedForm = { ...formData, [name]: value };
     setFormData(updatedForm);
 
-    // Enable button only when all fields filled and passwords match
     const allFilled =
       updatedForm.currentPassword.trim() !== "" &&
       updatedForm.newPassword.trim() !== "" &&
       updatedForm.confirmPassword.trim() !== "";
+
     const passwordsMatch = updatedForm.newPassword === updatedForm.confirmPassword;
 
     setIsPasswordValid(allFilled && passwordsMatch);
   };
 
-  // 🔹 Save Personal Info (for future backend API)
   const handleSaveInfo = () => {
     toast.success("Personal information updated successfully ✅", {
       position: "top-center",
@@ -95,7 +109,7 @@ export default function ProfilePage() {
     });
   };
 
-  // 🔹 Change Password API call
+  /* ---------------- Password Change ---------------- */
   const handlePasswordChange = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -110,35 +124,34 @@ export default function ProfilePage() {
 
       const response = await fetch(url, {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       const result = await response.json();
 
       if (result.status === "SUCCESS") {
-        toast.success(result.description || "Password changed successfully 🔒", {
+        toast.success("Password changed successfully 🔒", {
           position: "top-center",
           autoClose: 1500,
           transition: Slide,
         });
+
         setFormData({
           ...formData,
           currentPassword: "",
           newPassword: "",
           confirmPassword: "",
         });
+
         setIsPasswordValid(false);
       } else {
-        toast.error(result.description || "Password change failed ❌", {
+        toast.error("Password change failed ❌", {
           position: "top-center",
           autoClose: 2000,
           transition: Slide,
         });
       }
-    } catch (error) {
-      console.error("Error while changing password:", error);
+    } catch {
       toast.error("Something went wrong ❌", {
         position: "top-center",
         autoClose: 2000,
@@ -146,59 +159,56 @@ export default function ProfilePage() {
       });
     }
   };
-// 🔹 Logout
-const handleLogout = () => {
-  localStorage.clear();
-  setLogoutConfirm(false);
 
-  toast.info("You’ve been logged out 👋", {
-    position: "bottom-center",
-    autoClose: 1800,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: true,
-    transition: Slide,
-    style: {
-      backgroundColor: "#333",
-      color: "#fff",
-      borderRadius: "8px",
-      fontSize: "15px",
-      textAlign: "center",
-      padding: "12px 18px",
-    },
-  });
+  /* ---------------- Logout ---------------- */
+  const handleLogout = () => {
+    localStorage.clear();
+    setLogoutConfirm(false);
 
-  // Redirect after toast disappears
-  setTimeout(() => {
-    window.location.href = "/login";
-  }, 1800);
-};
+    toast.info("You’ve been logged out 👋", {
+      position: "bottom-center",
+      autoClose: 1800,
+      hideProgressBar: true,
+      transition: Slide,
+    });
+
+    setTimeout(() => {
+      window.location.href = "/login";
+    }, 1800);
+  };
 
   const toggleSection = (section) => {
     setActiveSection(activeSection === section ? null : section);
   };
 
+  /* ============================================================
+                      RENDER UI
+  ============================================================ */
   return (
     <div className="profile-page">
+
       {errorMessage && <div className="error-banner">{errorMessage}</div>}
 
       <div className="profile-content">
         <h2 className="profile-title">Profile</h2>
 
+        {/* ---------------- Profile Card ---------------- */}
         <div className="profile-info-card">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/847/847969.png"
-            alt="Default Profile"
+            src={selectedAvatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+            alt="Profile"
             className="profile-img"
+            onClick={() => setAvatarModal(true)}
+            style={{ cursor: "pointer" }}
           />
+
           <div className="profile-text">
             <h3>Hello, {formData.firstName || "Guest"}</h3>
             <p>{formData.city || "No city info"}</p>
           </div>
         </div>
 
-        {/* Tabs Section */}
+        {/* ---------------- Options Section ---------------- */}
         <div className="profile-options">
           {/* PERSONAL INFO */}
           <div className="option" onClick={() => toggleSection("personal-info")}>
@@ -208,41 +218,48 @@ const handleLogout = () => {
             </div>
             <span className="arrow">{activeSection === "personal-info" ? "▼" : "›"}</span>
           </div>
+
           {activeSection === "personal-info" && (
             <div className="expandable-section">
               <h3 className="info-heading">Your Details</h3>
+
               <div className="form-row">
                 <div className="form-group">
                   <label>First Name</label>
-                  <input type="text" name="firstName" value={formData.firstName} readOnly />
+                  <input type="text" value={formData.firstName} readOnly />
                 </div>
+
                 <div className="form-group">
                   <label>Last Name</label>
-                  <input type="text" name="lastName" value={formData.lastName} readOnly />
+                  <input type="text" value={formData.lastName} readOnly />
                 </div>
               </div>
+
               <div className="form-group">
                 <label>Email</label>
-                <input type="email" name="email" value={formData.email} readOnly />
+                <input type="email" value={formData.email} readOnly />
               </div>
+
               <div className="form-row">
                 <div className="form-group">
                   <label>City</label>
-                  <input type="text" name="city" value={formData.city} readOnly />
+                  <input type="text" value={formData.city} readOnly />
                 </div>
+
                 <div className="form-group">
                   <label>State</label>
-                  <input type="text" name="state" value={formData.state} readOnly />
+                  <input type="text" value={formData.state} readOnly />
                 </div>
+
                 <div className="form-group">
                   <label>Country</label>
-                  <input type="text" name="country" value={formData.country} readOnly />
+                  <input type="text" value={formData.country} readOnly />
                 </div>
               </div>
             </div>
           )}
 
-          {/* CHANGE PERSONAL INFO */}
+          {/* EDIT PERSONAL INFO */}
           <div className="option" onClick={() => toggleSection("edit-personal-info")}>
             <div className="left">
               <FiUser className="icon" />
@@ -258,41 +275,29 @@ const handleLogout = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>First Name</label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
+                  <input name="firstName" value={formData.firstName} onChange={handleChange} />
                 </div>
+
                 <div className="form-group">
                   <label>Last Name</label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
+                  <input name="lastName" value={formData.lastName} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="form-row">
                 <div className="form-group">
                   <label>City</label>
-                  <input type="text" name="city" value={formData.city} onChange={handleChange} />
+                  <input name="city" value={formData.city} onChange={handleChange} />
                 </div>
+
                 <div className="form-group">
                   <label>State</label>
-                  <input type="text" name="state" value={formData.state} onChange={handleChange} />
+                  <input name="state" value={formData.state} onChange={handleChange} />
                 </div>
+
                 <div className="form-group">
                   <label>Country</label>
-                  <input
-                    type="text"
-                    name="country"
-                    value={formData.country}
-                    onChange={handleChange}
-                  />
+                  <input name="country" value={formData.country} onChange={handleChange} />
                 </div>
               </div>
 
@@ -350,8 +355,8 @@ const handleLogout = () => {
               <div className="button-group">
                 <button
                   className={`save-btn ${!isPasswordValid ? "disabled-btn" : ""}`}
-                  onClick={handlePasswordChange}
                   disabled={!isPasswordValid}
+                  onClick={handlePasswordChange}
                 >
                   Update Password
                 </button>
@@ -367,13 +372,14 @@ const handleLogout = () => {
             </div>
             <span className="arrow">{activeSection === "notifications" ? "▼" : "›"}</span>
           </div>
+
           {activeSection === "notifications" && (
             <div className="expandable-section">
               <p>Notification preferences coming soon 🔔</p>
             </div>
           )}
 
-          {/* ABOUT ME / TERMS */}
+          {/* TERMS */}
           <div className="option" onClick={() => toggleSection("terms")}>
             <div className="left">
               <FiFileText className="icon" />
@@ -381,45 +387,83 @@ const handleLogout = () => {
             </div>
             <span className="arrow">{activeSection === "terms" ? "▼" : "›"}</span>
           </div>
+
           {activeSection === "terms" && (
             <div className="expandable-section">
               <p>
-                At TripEasy, travel planning is simple, smart, and fun! 🌍
-                Discover breathtaking destinations, plan your perfect getaway, and go explore — all in one place.
-                No more endless tabs or confusing maps — just Discover • Plan • Go ✈️💼🌄
-                From hidden gems to iconic spots, TripEasy makes every trip smoother and more memorable.
-                So pack light, dream big, and let TripEasy handle the rest! 💫
+                TripEZ makes travel easier.
+Discover great places, plan smarter, and explore with real insights from real travelers.
+Fast, simple, and reliable — everything you need for your next trip in one clean app.
+
+TripEZ — Discover. Plan. Go.
               </p>
             </div>
           )}
         </div>
 
-     <div className="logout-option" onClick={() => setLogoutConfirm(true)}>
-  <div className="logout-left">
-    <i className="fa-solid fa-right-from-bracket logout-icon"></i>
-    <span>Log Out</span>
-  </div>
-   <span className="arrow">{activeSection === "terms" ? "▼" : "›"}</span>
-</div>
-
+        {/* LOGOUT */}
+        <div className="logout-option" onClick={() => setLogoutConfirm(true)}>
+          <div className="logout-left">
+            <i className="fa-solid fa-right-from-bracket logout-icon"></i>
+            <span>Log Out</span>
+          </div>
+        </div>
       </div>
 
+      {/* ---------------- Logout Modal ---------------- */}
       {logoutConfirm && (
-  <div className="logout-modal">
-    <div className="logout-card">
-      <h3>Log Out?</h3>
-      <p>Are you sure you want to log out from TripEZ?</p>
-      <div className="logout-actions">
-        <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
-          Cancel
-        </button>
-        <button className="confirm-btn" onClick={handleLogout}>
-          Yes, Log Out
-        </button>
-      </div>
-    </div>
-  </div>
-)}
+        <div className="logout-modal">
+          <div className="logout-card">
+            <h3>Log Out?</h3>
+            <p>Are you sure you want to log out from TripEZ?</p>
+
+            <div className="logout-actions">
+              <button className="cancel-btn" onClick={() => setLogoutConfirm(false)}>
+                Cancel
+              </button>
+              <button className="confirm-btn" onClick={handleLogout}>
+                Yes, Log Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ---------------- Avatar Picker Modal (Proper Position) ---------------- */}
+      {avatarModal && (
+        <div className="avatar-modal-overlay" onClick={() => setAvatarModal(false)}>
+          <div className="avatar-modal" onClick={(e) => e.stopPropagation()}>
+            <h3>Select Your Avatar</h3>
+
+            <div className="avatar-grid">
+              {avatarList.map((av, i) => (
+                <div
+                  key={i}
+                  className={`avatar-option ${selectedAvatar === av ? "selected" : ""}`}
+                  onClick={() => setSelectedAvatar(av)}
+                >
+                  <img src={av} alt="avatar" />
+                </div>
+              ))}
+            </div>
+
+          <button
+  className="avatar-save-btn"
+  onClick={() => {
+    if (selectedAvatar) {
+      localStorage.setItem("userAvatar", selectedAvatar); 
+      toast.success("Avatar updated!");
+    }
+    setAvatarModal(false);
+  }}
+>
+  Save
+</button>
+
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );

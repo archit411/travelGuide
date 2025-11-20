@@ -29,27 +29,66 @@ function timeAgo(t) {
 
 function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   const [index, setIndex] = useState(startIndex);
-  const [progress, setProgress] = useState(stories.map((_, i) => (i < startIndex ? 100 : 0)));
+  const [progress, setProgress] = useState(
+    stories.map((_, i) => (i < startIndex ? 100 : 0))
+  );
   const [loaded, setLoaded] = useState(false);
   const timerRef = useRef(null);
   const duration = 15000;
 
+  /* -------------------------------------------------
+      🔥 FULL SCROLL LOCK (Desktop + Mobile + iOS)
+  --------------------------------------------------- */
+  useEffect(() => {
+    const preventScroll = (e) => e.preventDefault();
+
+    // Lock screen (desktop + android)
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.width = "100%";
+
+    // Lock touch scroll (iOS + Android)
+    document.addEventListener("touchmove", preventScroll, {
+      passive: false,
+    });
+
+    return () => {
+      // Reset scroll behavior
+      document.body.style.overflow = "auto";
+      document.body.style.position = "static";
+      document.body.style.width = "auto";
+
+      // Re-enable touch scroll
+      document.removeEventListener("touchmove", preventScroll);
+    };
+  }, []);
+
+  /* ------------------------------------------------- */
+
   useEffect(() => {
     if (!stories || !stories.length) return;
     setLoaded(false);
-    setProgress((p) => p.map((_, i) => (i < index ? 100 : i === index ? 0 : 0)));
+    setProgress((p) =>
+      p.map((_, i) => (i < index ? 100 : i === index ? 0 : 0))
+    );
 
     if (timerRef.current) clearInterval(timerRef.current);
 
     const img = new Image();
     img.src = stories[index].image;
+
     img.onload = () => {
       setLoaded(true);
       const start = Date.now();
+
       timerRef.current = setInterval(() => {
         const elapsed = Date.now() - start;
         const pct = Math.min((elapsed / duration) * 100, 100);
-        setProgress((prev) => prev.map((val, i) => (i === index ? pct : val)));
+
+        setProgress((prev) =>
+          prev.map((val, i) => (i === index ? pct : val))
+        );
+
         if (pct >= 100) {
           clearInterval(timerRef.current);
           if (index < stories.length - 1) setIndex((i) => i + 1);
@@ -59,13 +98,14 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
     };
 
     return () => clearInterval(timerRef.current);
-    // eslint-disable-next-line
   }, [index, stories]);
 
   function handleTap(e) {
     const x = e.clientX;
     const w = window.innerWidth;
+
     clearInterval(timerRef.current);
+
     if (x < w / 3) setIndex((i) => Math.max(0, i - 1));
     else if (x > (w * 2) / 3) setIndex((i) => Math.min(stories.length - 1, i + 1));
   }
@@ -76,7 +116,10 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
 
   return (
     <div className="story-viewer-overlay" onClick={onClose}>
-      <div className="story-viewer-card" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="story-viewer-card"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button className="story-close-btn" onClick={onClose}>
           <FiX size={18} />
         </button>
@@ -84,16 +127,26 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
         <div className="multi-progress">
           {stories.map((_, i) => (
             <div key={i} className="progress-track">
-              <div className={`progress-filled ${i < index ? "done" : ""}`} style={{ width: `${progress[i] || 0}%` }} />
+              <div
+                className={`progress-filled ${i < index ? "done" : ""}`}
+                style={{ width: `${progress[i] || 0}%` }}
+              />
             </div>
           ))}
         </div>
 
         <div className="story-image-wrapper" onClick={handleTap}>
-          <img className={`story-viewer-image ${loaded ? "loaded" : ""}`} src={current.image} alt={current.destination} />
+          <img
+            className={`story-viewer-image ${loaded ? "loaded" : ""}`}
+            src={current.image}
+            alt={current.destination}
+          />
+
           <div className="story-info-overlay">
             <h3>📍 {current.destination}</h3>
-            {current.caption && <p className="story-caption">{current.caption}</p>}
+            {current.caption && (
+              <p className="story-caption">{current.caption}</p>
+            )}
           </div>
         </div>
       </div>
@@ -144,68 +197,87 @@ export default function HomePage() {
   }, []);
 
   /* Fetch stories */
-  useEffect(() => {
-    async function loadStories() {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          "http://localhost:8080/api/travel/getUserPosts",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await res.json();
-
-        setStories(
-          data.map((s) => ({
-            image: s.image,
-            destination: s.destination,
-            caption: s.caption,
-            userName: s.userName,
-            createdAt: s.createdAt,
-            temprature: s.temprature,
-            crowdLevel: s.crowdLevel,
-            likes: s.likes,
-          }))
-        );
-      } catch (e) {
-        console.log("Error loading stories", e);
-      }
+  /* Fetch stories only first time using sessionStorage */
+useEffect(() => {
+  async function loadStories() {
+    const cached = sessionStorage.getItem("stories");
+    if (cached) {
+      setStories(JSON.parse(cached));
+      return;
     }
-    loadStories();
-  }, []);
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      const formatted = data.map((s) => ({
+        image: s.image,
+        destination: s.destination,
+        caption: s.caption,
+        userName: s.userName,
+        createdAt: s.createdAt,
+        temprature: s.temprature,
+        crowdLevel: s.crowdLevel,
+        likes: s.likes,
+      }));
+
+      setStories(formatted);
+      sessionStorage.setItem("stories", JSON.stringify(formatted));
+    } catch (e) {
+      console.log("Error loading stories", e);
+    }
+  }
+
+  loadStories();
+}, []);
+
 
   /* Fetch top places */
-  useEffect(() => {
-    async function loadPlaces() {
-      setLoadingPlaces(true);
-      try {
-        const token = localStorage.getItem("token");
-
-        const res = await fetch(
-          "http://localhost:8080/api/getTopPlacesByMonth",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const data = await res.json();
-        setTopPlaces(data);
-      } catch {}
+/* Fetch top places only first time using sessionStorage */
+useEffect(() => {
+  async function loadPlaces() {
+    const cached = sessionStorage.getItem("topPlaces");
+    if (cached) {
+      setTopPlaces(JSON.parse(cached));
       setLoadingPlaces(false);
+      return;
     }
 
-    loadPlaces();
-  }, []);
+    setLoadingPlaces(true);
+
+    try {
+      const token = localStorage.getItem("token");
+
+      const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      setTopPlaces(data);
+      sessionStorage.setItem("topPlaces", JSON.stringify(data));
+    } catch (e) {
+      console.log("Failed loading places", e);
+    }
+
+    setLoadingPlaces(false);
+  }
+
+  loadPlaces();
+}, []);
+
 
   const places = topPlaces
     .flatMap((p) => [
