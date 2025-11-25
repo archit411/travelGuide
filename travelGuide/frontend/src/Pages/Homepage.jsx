@@ -380,35 +380,44 @@ function openStory(story) {
       </div>
 
       {/* ---------- FEATURED DESTINATIONS ---------- */}
-      <section className="section">
-        <div className="section-head">
-          <div>Featured Destinations</div>
-          <span className="view-all">View All</span>
-        </div>
+      {/* ---------- FEATURED DESTINATIONS ---------- */}
+<section className="section">
+  <div className="section-head">
+    <div>Featured Destinations</div>
+    <span className="view-all">View All</span>
+  </div>
 
-        <div className="featured-grid">
-          {places.map((p, i) => (
-            <div
-              className="place-card"
-              key={i}
-              onClick={() =>
-                navigate(`/destination/${encodeURIComponent(p.name)}`, {
-                  state: { place: p },
-                })
-              }
-            >
-              <div
-                className="place-img"
-                style={{ backgroundImage: `url(${p.img})` }}
-              />
-              <div className="place-overlay">
-                <h3>{p.name}</h3>
-                <p>{p.desc}</p>
-              </div>
-            </div>
-          ))}
+  <div className="featured-grid">
+    {loadingPlaces ? (
+      <p>Loading destinations...</p>
+    ) : places.length === 0 ? (
+      <p>No destinations available</p>
+    ) : (
+      places.map((p, i) => (
+        <div
+          className="place-card"
+          key={i}
+          onClick={() => {
+            console.log("Clicked place:", p); // Debug log
+            navigate(`/destination/${encodeURIComponent(p.name)}`, {
+              state: { place: p },
+            });
+          }}
+          style={{ cursor: "pointer" }}
+        >
+          <div
+            className="place-img"
+            style={{ backgroundImage: `url(${p.img})` }}
+          />
+          <div className="place-overlay">
+            <h3>{p.name}</h3>
+            <p>{p.desc}</p>
+          </div>
         </div>
-      </section>
+      ))
+    )}
+  </div>
+</section>
 
       {/* ---------- HIGHLIGHTS ---------- */}
        <section className="highlights-section">

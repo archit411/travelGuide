@@ -74,16 +74,22 @@ export default function DestinationPage() {
           name: placeName,
           state: placeData?.state || "India",
           imageUrl:
+            placeData?.img ||
             placeData?.imageUrl ||
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200",
           about:
+            placeData?.desc ||
             placeData?.description ||
             "Discover breathtaking views, vibrant culture, and unforgettable experiences.",
           temperature: weatherData.current_weather.temperature,
           weather: weatherData.current_weather.description,
           crowdLevel: "Medium",
           bestMonths: "October - March",
-          gallery: [placeData?.imageUrl],
+          gallery: [
+            placeData?.img ||
+            placeData?.imageUrl ||
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=1200",
+          ],
           featured: [],
         });
 
@@ -102,12 +108,12 @@ export default function DestinationPage() {
   // LOADING VIEW
   // ---------------------------------------------
   if (loading)
-  return (
-    <div className="dest-loading">
-      <div className="dest-loader"></div>
-      <p>Loading destination...</p>
-    </div>
-  );
+    return (
+      <div className="dest-loading">
+        <div className="dest-loader"></div>
+        <p>Loading destination...</p>
+      </div>
+    );
 
   // ---------------------------------------------
   // ERROR VIEW
@@ -116,6 +122,14 @@ export default function DestinationPage() {
     return (
       <div className="dest-error">
         <p>{error}</p>
+      </div>
+    );
+
+  // Check if destination data exists before rendering
+  if (!destination)
+    return (
+      <div className="dest-error">
+        <p>No destination data available</p>
       </div>
     );
 
