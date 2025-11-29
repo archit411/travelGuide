@@ -56,11 +56,9 @@ public class TopVisiitedPlacesByMonthServiceImpl implements TopVisiitedPlacesByM
 	}
 	
 	@Override
-	@Cacheable(value="month" , key="#month")
 	public List<TopVisitedPlacesByMonthRespBody> getTopVisitedPlaceByMonth(String month) {
 		TopVisitedPlacesByMonthRespBody response = null;
 		List<TopVisitedPlacesByMonthRespBody> responseList = new ArrayList<>();
-		System.out.println("----------------------------------------db hit");
 		try {
 
 			List<TopVisitedByMonth> findByMonth = repository.findByMonth(month);

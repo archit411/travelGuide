@@ -1,6 +1,5 @@
 package com.travelGuide.travelGuide.controller;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -17,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.travelGuide.travelGuide.Pojo.TopVisitedPlacesByMonthReqBody;
 import com.travelGuide.travelGuide.Pojo.TopVisitedPlacesByMonthRespBody;
+import com.travelGuide.travelGuide.service.RedisService;
 import com.travelGuide.travelGuide.service.TopVisiitedPlacesByMonthService;
 
 @RequestMapping("/api")
@@ -26,6 +26,9 @@ public class TopVisitedPlaceByMonthController{
 	
 	@Autowired
 	private TopVisiitedPlacesByMonthService topVisiitedPlacesByMonthService;
+	
+	@Autowired
+	private RedisService rs;
 
 	@PostMapping("/addTopVisitedPlaceByMonth")
 	public TopVisitedPlacesByMonthRespBody addTopVisitedPlaceByMonth(@RequestBody TopVisitedPlacesByMonthReqBody request) {
@@ -54,8 +57,19 @@ public class TopVisitedPlaceByMonthController{
 			String month = today.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH).toLowerCase();
 			
 			if(month!=null) {
+				responseList = rs.get(month, TopVisitedPlacesByMonthRespBody.class); //to find data in cache by key->month
+				if(responseList!=null) {
+					System.out.println("cached data");
+					return responseList;
+				}
+				//db hit in case of cache not found
 				responseList = topVisiitedPlacesByMonthService.getTopVisitedPlaceByMonth(month);
+				System.out.println("db hit");
+				Long ttl = 3600L; //for 3600 sec my data will remain in cache after that delete automatically
+				rs.set(month, responseList , ttl); //data cached , month->key
+				
 			}else {
+				response = new TopVisitedPlacesByMonthRespBody();
 				responseList.add(response);
 				return responseList;
 			}
