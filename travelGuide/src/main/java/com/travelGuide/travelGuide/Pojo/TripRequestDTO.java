@@ -56,7 +56,7 @@ public class TripRequestDTO {
     public int getPeople() {
         return people;
     }
-
+  //Testing
     public void setPeople(int people) {
         this.people = people;
     }

@@ -8,7 +8,7 @@ import {
   FiChevronUp,
 } from "react-icons/fi";
 import "./ItineraryView.css";
-
+//Testing
 export default function ItineraryView({ itinerary, onBack }) {
   const [openDay, setOpenDay] = useState(null);
 

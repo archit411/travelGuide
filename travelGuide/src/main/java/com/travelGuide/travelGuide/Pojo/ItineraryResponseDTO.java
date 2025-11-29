@@ -2,7 +2,7 @@ package com.travelGuide.travelGuide.Pojo;
 
 import java.util.List;
 import java.util.Map;
-
+//Testing
 public class ItineraryResponseDTO {
     private String tripTitle;
     private String destination;

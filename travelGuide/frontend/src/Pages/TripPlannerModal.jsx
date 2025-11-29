@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FiArrowRight, FiLoader, FiX } from "react-icons/fi";
 import { generateItinerary } from "../utils/tripItineraryService";
 import "./TripPlannerModal.css";
-
+//Testing
 export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
   const [step, setStep] = useState("discover");
 const [people, setPeople] = useState(2);
