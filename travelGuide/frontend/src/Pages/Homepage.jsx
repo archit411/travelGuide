@@ -15,8 +15,11 @@ import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
-// import "./StoryCard.css";
+
+import ItineraryView from "./ItineraryView";
 import "./StoryViewer.css";
+import TripPlannerModal from "./TripPlannerModal";
+
 /* ----------------- Helpers ----------------- */
 function timeAgo(t) {
   if (!t) return "Just now";
@@ -154,31 +157,35 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   );
 }
 
-
-/* ----------------- Home Page ----------------- */
+/* ========== MAIN HOME PAGE COMPONENT ========== */
 export default function HomePage() {
   const navigate = useNavigate();
 
+  // State for stories and places
   const [stories, setStories] = useState([]);
   const [topPlaces, setTopPlaces] = useState([]);
   const [loadingPlaces, setLoadingPlaces] = useState(true);
 
+  // State for modals
   const [viewStory, setViewStory] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [showSearch] = useState(false);
+  const [showTripPlanner, setShowTripPlanner] = useState(false);
+  const [generatedItinerary, setGeneratedItinerary] = useState(null);
 
+  // UI State
   const [city, setCity] = useState("Locating...");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [active, setActive] = useState("home");
 
-  /* Responsive listener */
+  /* =============== RESPONSIVE LISTENER =============== */
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  /* Location */
+  /* =============== GET CURRENT LOCATION =============== */
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -196,89 +203,86 @@ export default function HomePage() {
     );
   }, []);
 
-  /* Fetch stories */
-  /* Fetch stories only first time using sessionStorage */
-useEffect(() => {
-  async function loadStories() {
-    const cached = sessionStorage.getItem("stories");
-    if (cached) {
-      setStories(JSON.parse(cached));
-      return;
+  /* =============== FETCH STORIES =============== */
+  useEffect(() => {
+    async function loadStories() {
+      const cached = sessionStorage.getItem("stories");
+      if (cached) {
+        setStories(JSON.parse(cached));
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+
+        const formatted = data.map((s) => ({
+          image: s.image,
+          destination: s.destination,
+          caption: s.caption,
+          userName: s.userName,
+          createdAt: s.createdAt,
+          temprature: s.temprature,
+          crowdLevel: s.crowdLevel,
+          likes: s.likes,
+        }));
+
+        setStories(formatted);
+        sessionStorage.setItem("stories", JSON.stringify(formatted));
+      } catch (e) {
+        console.log("Error loading stories", e);
+      }
     }
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    loadStories();
+  }, []);
 
-      const data = await res.json();
+  /* =============== FETCH TOP PLACES =============== */
+  useEffect(() => {
+    async function loadPlaces() {
+      const cached = sessionStorage.getItem("topPlaces");
+      if (cached) {
+        setTopPlaces(JSON.parse(cached));
+        setLoadingPlaces(false);
+        return;
+      }
 
-      const formatted = data.map((s) => ({
-        image: s.image,
-        destination: s.destination,
-        caption: s.caption,
-        userName: s.userName,
-        createdAt: s.createdAt,
-        temprature: s.temprature,
-        crowdLevel: s.crowdLevel,
-        likes: s.likes,
-      }));
+      setLoadingPlaces(true);
 
-      setStories(formatted);
-      sessionStorage.setItem("stories", JSON.stringify(formatted));
-    } catch (e) {
-      console.log("Error loading stories", e);
-    }
-  }
+      try {
+        const token = localStorage.getItem("token");
 
-  loadStories();
-}, []);
+        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
+        const data = await res.json();
 
-  /* Fetch top places */
-/* Fetch top places only first time using sessionStorage */
-useEffect(() => {
-  async function loadPlaces() {
-    const cached = sessionStorage.getItem("topPlaces");
-    if (cached) {
-      setTopPlaces(JSON.parse(cached));
+        setTopPlaces(data);
+        sessionStorage.setItem("topPlaces", JSON.stringify(data));
+      } catch (e) {
+        console.log("Failed loading places", e);
+      }
+
       setLoadingPlaces(false);
-      return;
     }
 
-    setLoadingPlaces(true);
+    loadPlaces();
+  }, []);
 
-    try {
-      const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await res.json();
-
-      setTopPlaces(data);
-      sessionStorage.setItem("topPlaces", JSON.stringify(data));
-    } catch (e) {
-      console.log("Failed loading places", e);
-    }
-
-    setLoadingPlaces(false);
-  }
-
-  loadPlaces();
-}, []);
-
-
+  /* =============== PROCESS PLACES DATA =============== */
   const places = topPlaces
     .flatMap((p) => [
       p.placeOne && {
@@ -294,23 +298,44 @@ useEffect(() => {
     ])
     .filter(Boolean);
 
-  /* Story viewer handlers */
+  /* =============== STORY VIEWER HANDLERS =============== */
   function openStoryWithList(indexInList) {
-setViewStory({
-  stories: [{
-  image: stories[indexInList]?.image || "/noimage.png",
-  destination: stories[indexInList]?.destination || "Unknown",
-  caption: stories[indexInList]?.caption || "",
-}], // fresh copy
-  index: 0,
-  key: Date.now()                           // force React to remake component
-});
+    setViewStory({
+      stories: [{
+        image: stories[indexInList]?.image || "/noimage.png",
+        destination: stories[indexInList]?.destination || "Unknown",
+        caption: stories[indexInList]?.caption || "",
+      }],
+      index: 0,
+      key: Date.now()
+    });
+  }
 
-}
-function openStory(story) {
-    // To reuse viewer which expects array, pass single-story array.
+  function openStory(story) {
     setViewStory({ stories: [story], index: 0 });
   }
+
+  /* =============== TRIP PLANNER HANDLERS =============== */
+  const handleGenerateItinerary = (itinerary) => {
+    setGeneratedItinerary(itinerary);
+    setShowTripPlanner(false);
+  };
+
+  const handleBackToHome = () => {
+    setGeneratedItinerary(null);
+  };
+
+  /* =============== IF ITINERARY IS GENERATED, SHOW IT =============== */
+  if (generatedItinerary) {
+    return (
+      <ItineraryView 
+        itinerary={generatedItinerary} 
+        onBack={handleBackToHome} 
+      />
+    );
+  }
+
+  /* =============== MAIN RENDER =============== */
   return (
     <div className="homepage-light">
 
@@ -344,9 +369,13 @@ function openStory(story) {
         </div>
       </header>
 
-      {/* ---------- SEARCH BAR ---------- */}
+      {/* ---------- SEARCH BAR / TRIP PLANNER BAR ---------- */}
       <div className="dpg-wrapper">
-        <div className="dpg-bar">
+        <div 
+          className="dpg-bar"
+          onClick={() => setShowTripPlanner(true)}
+          style={{ cursor: "pointer" }}
+        >
           <div className="dpg-item">
             <FiCompass className="dpg-icon" />
             <div>
@@ -374,53 +403,55 @@ function openStory(story) {
           </div>
         </div>
 
-        <button className="create-trip-btn">
+        <button 
+          className="create-trip-btn"
+          onClick={() => setShowTripPlanner(true)}
+        >
           <FiCompass /> Create a Trip
         </button>
       </div>
 
       {/* ---------- FEATURED DESTINATIONS ---------- */}
-      {/* ---------- FEATURED DESTINATIONS ---------- */}
-<section className="section">
-  <div className="section-head">
-    <div>Featured Destinations</div>
-    <span className="view-all">View All</span>
-  </div>
-
-  <div className="featured-grid">
-    {loadingPlaces ? (
-      <p>Loading destinations...</p>
-    ) : places.length === 0 ? (
-      <p>No destinations available</p>
-    ) : (
-      places.map((p, i) => (
-        <div
-          className="place-card"
-          key={i}
-          onClick={() => {
-            console.log("Clicked place:", p); // Debug log
-            navigate(`/destination/${encodeURIComponent(p.name)}`, {
-              state: { place: p },
-            });
-          }}
-          style={{ cursor: "pointer" }}
-        >
-          <div
-            className="place-img"
-            style={{ backgroundImage: `url(${p.img})` }}
-          />
-          <div className="place-overlay">
-            <h3>{p.name}</h3>
-            <p>{p.desc}</p>
-          </div>
+      <section className="section">
+        <div className="section-head">
+          <div>Featured Destinations</div>
+          <span className="view-all">View All</span>
         </div>
-      ))
-    )}
-  </div>
-</section>
+
+        <div className="featured-grid">
+          {loadingPlaces ? (
+            <p>Loading destinations...</p>
+          ) : places.length === 0 ? (
+            <p>No destinations available</p>
+          ) : (
+            places.map((p, i) => (
+              <div
+                className="place-card"
+                key={i}
+                onClick={() => {
+                  console.log("Clicked place:", p);
+                  navigate(`/destination/${encodeURIComponent(p.name)}`, {
+                    state: { place: p },
+                  });
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <div
+                  className="place-img"
+                  style={{ backgroundImage: `url(${p.img})` }}
+                />
+                <div className="place-overlay">
+                  <h3>{p.name}</h3>
+                  <p>{p.desc}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
 
       {/* ---------- HIGHLIGHTS ---------- */}
-       <section className="highlights-section">
+      <section className="highlights-section">
         <div className="section-header">
           <div>Today's Highlights</div>
           <span className="view-all">View All</span>
@@ -565,11 +596,12 @@ function openStory(story) {
           </div>
         )}
       </nav>
-{!isMobile && (
+
+      {/* ---------- FOOTER ---------- */}
+      {!isMobile && (
         <footer className="footer">
           <div className="footer-content">
             <div className="footer-left">
-             
               <div>
                 <h2>TripEZ</h2>
                 <p>Discover destinations, plan your trips & explore the world.</p>
@@ -604,29 +636,45 @@ function openStory(story) {
           <p className="footer-bottom">© 2025 TripEZ. All Rights Reserved.</p>
         </footer>
       )}
-{isMobile && (
-  <div className="travel-hero-footer">
-    <h1>
-      India’s most loved <br />
-      travel companion <span>❤️</span>
-    </h1>
 
-    <div className="thf-line"></div>
+      {isMobile && (
+        <div className="travel-hero-footer">
+          <h1>
+            India's most loved <br />
+            travel companion <span>❤️</span>
+          </h1>
 
-    <p className="thf-brand">TripEZ</p>
-  </div>
-)}
-      {/* ---------- STORY VIEWER ---------- */}
-      {viewStory && <StoryViewer stories={viewStory.stories} index={viewStory.index} onClose={() => setViewStory(null)} />}
+          <div className="thf-line"></div>
 
+          <p className="thf-brand">TripEZ</p>
+        </div>
+      )}
 
-      {/* ---------- ADD POST ---------- */}
+      {/* ========== TRIP PLANNER MODAL ========== */}
+      {showTripPlanner && (
+        <TripPlannerModal 
+          onClose={() => setShowTripPlanner(false)}
+          onGenerateItinerary={handleGenerateItinerary}
+        />
+      )}
+
+      {/* ========== STORY VIEWER ========== */}
+      {viewStory && (
+        <StoryViewer 
+          stories={viewStory.stories} 
+          index={viewStory.index} 
+          onClose={() => setViewStory(null)} 
+        />
+      )}
+
+      {/* ========== ADD POST MODAL ========== */}
       {showAdd && (
         <AddPost
           onClose={() => setShowAdd(false)}
           onAddStory={(s) => setStories((prev) => [s, ...prev])}
         />
       )}
+
     </div>
   );
-}
+} 

@@ -1,0 +1,204 @@
+.itinerary-container {
+  padding: 32px;
+  max-width: 900px;
+  margin: auto;
+  font-family: "Inter", sans-serif;
+  color: #1d1d1f;
+}
+
+.itinerary-back-btn {
+  background: none;
+  border: none;
+  font-size: 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  color: #555;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.itinerary-title-block {
+  margin-bottom: 30px;
+}
+
+.itinerary-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111;
+}
+
+.itinerary-sub {
+  font-size: 16px;
+  color: #555;
+  margin-top: 6px;
+}
+
+/* Chips */
+.itinerary-chips {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.chip {
+  padding: 8px 16px;
+  background: #f3f4f6;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.chip.season {
+  background: #e8f5e9;
+  color: #1b5e20;
+}
+
+/* Weather Alert */
+.weather-alert {
+  margin-top: 18px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #fff9e6;
+  border: 1px solid #ffe6a8;
+}
+
+.weather-alert strong {
+  font-size: 14px;
+}
+
+.itinerary-days-list {
+  margin-top: 30px;
+}
+
+/* Day Card */
+.day-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 14px;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+/* Header */
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+}
+
+.day-header-left {
+  display: flex;
+  gap: 12px;
+}
+
+.day-title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.day-subtitle {
+  color: #666;
+  font-size: 13px;
+}
+
+/* Body */
+.day-body {
+  margin-top: 15px;
+  padding-left: 6px;
+}
+
+.activity {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.act-time {
+  width: 110px;
+  font-weight: 600;
+  color: #111;
+}
+
+.act-content {
+  flex: 1;
+}
+
+.act-title {
+  font-size: 15px;
+}
+
+.act-location {
+  font-size: 14px;
+  margin: 4px 0;
+  color: #444;
+}
+.maps-link {
+  display: inline-block;
+  margin-top: 4px;
+  color: #0a84ff;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.maps-link:hover {
+  text-decoration: underline;
+}
+
+.act-desc {
+  font-size: 14px;
+  color: #555;
+}
+
+.act-meta span {
+  margin-right: 12px;
+  font-size: 13px;
+  color: #444;
+}
+
+.act-notes {
+  font-size: 13px;
+  margin-top: 4px;
+  color: #666;
+}
+
+.day-cost {
+  margin-top: 10px;
+  font-weight: 600;
+}
+
+/* ACTION BUTTONS */
+.itinerary-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.btn-primary {
+  background: #007bff;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-secondary {
+  background: #f2f2f2;
+  padding: 12px 20px;
+  border-radius: 10px;
+  cursor: pointer;
+  border: none;
+}
+
+
+
+.chip.crowd {
+  background: #fff3f3;
+  color: #b71c1c;
+  font-weight: 500;
+}
