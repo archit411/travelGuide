@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FiDownload,
   FiShare2,
@@ -15,75 +15,100 @@ import "./ItineraryView.css";
 
 export default function ItineraryView({ itinerary, onBack }) {
   const [openDay, setOpenDay] = useState(null);
+  const [weather, setWeather] = useState(null);
 
-  const toggleDay = (i) => {
-    setOpenDay(openDay === i ? null : i);
-  };
+  const toggleDay = (i) => setOpenDay(openDay === i ? null : i);
 
-  // ------------------------------
-  // 📌 GENERATE PDF
-  // ------------------------------
+  // --------------------------
+  // 🌦 REAL WEATHER FETCH
+  // --------------------------
+  useEffect(() => {
+    if (!itinerary.destination) return;
+
+    const fetchWeather = async () => {
+      try {
+        const resp = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
+            itinerary.destination
+          )}&units=metric&appid=YOUR_OPENWEATHER_API_KEY`
+        );
+
+        const data = await resp.json();
+
+        if (data.main) {
+          setWeather({
+            temp: data.main.temp,
+            feels: data.main.feels_like,
+            desc: data.weather[0].description,
+            icon: data.weather[0].icon,
+          });
+        }
+      } catch (e) {
+        console.log("Weather Error:", e);
+      }
+    };
+
+    fetchWeather();
+  }, [itinerary.destination]);
+
+  // --------------------------
+  // PDF GENERATION
+  // --------------------------
   const downloadPDF = () => {
     const doc = new jsPDF();
-
     doc.setFontSize(20);
     doc.text(itinerary.tripTitle || "Trip Itinerary", 14, 16);
 
-    doc.setFontSize(12);
-    doc.text(itinerary.summary || "", 14, 26);
-
     itinerary.days?.forEach((day, index) => {
-      const startY = 40 + index * 70;
-
+      const startY = 30 + index * 70;
       doc.setFontSize(14);
       doc.text(`Day ${index + 1} — ${day.theme || ""}`, 14, startY);
 
-      const rows = day.activities?.map((a) => [
-        a.time || "",
-        a.activity || a.description || "",
-        a.location || "",
-        a.duration || "",
-        a.estimatedCost || "",
-      ]);
-
       autoTable(doc, {
-        startY: startY + 6,
+        startY: startY + 5,
         head: [["Time", "Activity", "Location", "Duration", "Cost"]],
-        body: rows,
+        body: day.activities?.map((a) => [
+          a.time || "",
+          a.activity || a.description || "",
+          a.location || "",
+          a.duration || "",
+          a.estimatedCost || "",
+        ]),
         theme: "grid",
-        styles: { fontSize: 9 }
+        styles: { fontSize: 9 },
       });
-
     });
 
     doc.save(`${itinerary.tripTitle}.pdf`);
   };
 
-  // ------------------------------
-  // 🚀 START TRIP (Live Tracking)
-  // ------------------------------
+  // --------------------------
+  // 🚀 START TRIP
+  // --------------------------
   const startTrip = () => {
     const tripData = {
       ...itinerary,
-      currentDayIndex: 0,  // ALWAYS START AT DAY 1 (index 0)
+      currentDayIndex: 0,
       completed: {},
     };
 
-    // Save values for HomePage + TripProgressCard
     localStorage.setItem("activeTrip", JSON.stringify(tripData));
-    localStorage.setItem("currentDayIndex", 0);
+    localStorage.setItem("currentDayIndex", "0");
 
     alert("Trip Started! Go to Home Page to continue.");
   };
 
-  // ------------------------------
-  // 📤 SHARE
-  // ------------------------------
+  // --------------------------
+  // 📤 SHARE — FIXED FUNCTION
+  // --------------------------
   const shareItinerary = () => {
     const text = `${itinerary.tripTitle}\n${itinerary.summary}`;
 
     if (navigator.share) {
-      navigator.share({ title: itinerary.tripTitle, text });
+      navigator.share({
+        title: itinerary.tripTitle,
+        text,
+      });
     } else {
       alert(text);
     }
@@ -97,39 +122,42 @@ export default function ItineraryView({ itinerary, onBack }) {
         <FiArrowLeft /> Back
       </button>
 
-      {/* 🏔 Header Block */}
+      {/* Header */}
       <div className="itinerary-title-block">
         <h1 className="itinerary-title">{itinerary.tripTitle}</h1>
         <p className="itinerary-sub">{itinerary.summary}</p>
+
+        {/* 🌦 LIVE WEATHER */}
+        {weather && (
+          <div className="weather-live">
+            <img
+              src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
+              alt="weather"
+              className="weather-icon"
+            />
+            <div>
+              <strong>{weather.temp}°C</strong> • {weather.desc}
+              <div className="feels-like">Feels like {weather.feels}°C</div>
+            </div>
+          </div>
+        )}
 
         {/* Chips */}
         <div className="itinerary-chips">
           <div className="chip">💰 {itinerary.totalEstimatedCost || "—"}</div>
 
           <div className="chip">
-            <FiCalendar /> {itinerary.days?.length || itinerary.duration} Days
+            <FiCalendar /> {itinerary.days?.length} Days
           </div>
 
-          <div className="chip crowd">
-            🧍 {itinerary.crowdLevel || "Medium"}
-          </div>
-
-          <div className="chip season">🟢 Oct–Mar (Best Season)</div>
-        </div>
-
-        {/* Weather Sample */}
-        <div className="weather-alert">
-          <strong>⚠ WEATHER ALERT</strong>
-          <p>Warm & Pleasant (25–32°C)</p>
+          <div className="chip crowd">🧍 {itinerary.crowdLevel}</div>
         </div>
       </div>
 
-      {/* 📅 Day Cards */}
+      {/* Day Cards */}
       <div className="itinerary-days-list">
         {itinerary.days?.map((day, idx) => (
           <div className="day-card" key={idx}>
-            
-            {/* Header */}
             <div className="day-header" onClick={() => toggleDay(idx)}>
               <div className="day-header-left">
                 <FiCalendar className="day-icon" />
@@ -137,18 +165,17 @@ export default function ItineraryView({ itinerary, onBack }) {
                   <div className="day-title">
                     Day {idx + 1} — {day.date}
                   </div>
-                  {day.theme && <div className="day-subtitle">{day.theme}</div>}
+                  {day.theme && (
+                    <div className="day-subtitle">{day.theme}</div>
+                  )}
                 </div>
               </div>
 
-              {/* Arrow */}
-              <div>{openDay === idx ? <FiChevronUp /> : <FiChevronDown />}</div>
+              {openDay === idx ? <FiChevronUp /> : <FiChevronDown />}
             </div>
 
-            {/* Collapse */}
             {openDay === idx && (
               <div className="day-body">
-                
                 {day.activities?.map((a, i) => (
                   <div className="activity" key={i}>
                     <div className="act-time">{a.time}</div>
@@ -158,42 +185,31 @@ export default function ItineraryView({ itinerary, onBack }) {
                         {a.activity || a.description}
                       </strong>
 
-                      {/* Google Maps Link */}
+                      {a.location && (
+                        <p className="act-location">📍 {a.location}</p>
+                      )}
+
                       {a.mapsLink && (
                         <a
-                          className="maps-link"
                           href={a.mapsLink}
                           target="_blank"
-                          rel="noopener noreferrer"
+                          className="maps-link"
                         >
-                          📍 Open in Google Maps
+                          Open in Google Maps
                         </a>
                       )}
 
-                      {/* Location */}
-                      {a.location && <p className="act-location">📍 {a.location}</p>}
+                      {a.description && (
+                        <p className="act-desc">{a.description}</p>
+                      )}
 
-                      {/* Description */}
-                      {a.description && <p className="act-desc">{a.description}</p>}
-
-                      {/* Meta */}
                       <div className="act-meta">
                         {a.duration && <span>⏱ {a.duration}</span>}
                         {a.estimatedCost && <span>💰 {a.estimatedCost}</span>}
                       </div>
-
-                      {/* Notes */}
-                      {a.notes && <p className="act-notes">📝 {a.notes}</p>}
                     </div>
                   </div>
                 ))}
-
-                {/* Daily Cost */}
-                {day.dailyEstimatedCost && (
-                  <div className="day-cost">
-                    💵 Daily Cost: {day.dailyEstimatedCost}
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -202,7 +218,6 @@ export default function ItineraryView({ itinerary, onBack }) {
 
       {/* BUTTONS */}
       <div className="itinerary-actions">
-
         <button className="btn-primary" onClick={downloadPDF}>
           <FiDownload /> Download PDF
         </button>
@@ -214,7 +229,6 @@ export default function ItineraryView({ itinerary, onBack }) {
         <button className="btn-start-trip" onClick={startTrip}>
           🚀 Start Trip
         </button>
-
       </div>
     </div>
   );

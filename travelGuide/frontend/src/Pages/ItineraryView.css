@@ -226,3 +226,52 @@
     width: 80px;
   }
 }
+/* ---------------- MOBILE OPTIMIZED ---------------- */
+@media (max-width: 480px) {
+  .itinerary-container {
+    padding: 12px;
+  }
+
+  .itinerary-title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+
+  .itinerary-sub {
+    font-size: 14px;
+  }
+
+  .day-header {
+    flex-direction: row;
+    padding: 10px;
+  }
+
+  .day-title {
+    font-size: 16px;
+  }
+
+  .itinerary-chips {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .chip {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .weather-live {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.06);
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
+  }
+
+  .weather-icon {
+    width: 55px;
+    height: 55px;
+  }
+}
