@@ -1,0 +1,39 @@
+.ai-process-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 20, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+}
+
+.ai-process-box {
+  text-align: center;
+  animation: fadeIn 0.4s ease;
+}
+
+.ai-lottie {
+  width: 180px;
+  height: 180px;
+  margin: auto;
+}
+
+.ai-process-text {
+  color: white;
+  font-size: 18px;
+  margin-top: 15px;
+  font-weight: 600;
+  animation: textPulse 1s ease infinite;
+}
+
+@keyframes textPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

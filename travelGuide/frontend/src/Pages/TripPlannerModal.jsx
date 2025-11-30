@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { FiArrowRight, FiLoader, FiX } from "react-icons/fi";
 import { generateItinerary } from "../utils/tripItineraryService";
+import ProcessingAnimation from "./ProcessingAnimation"; 
 import "./TripPlannerModal.css";
+import loadingAnimation from "../lottie/loadingAnimation.json";
+
+
 
 export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
   const [step, setStep] = useState("discover");
@@ -23,49 +27,82 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleGenerate = async () => {
-    setError("");
-    if (!destination || !startDate) {
-      setError("Please provide destination and start date.");
-      return;
-    }
+  // Processing animation overlay
+  const [showProcessing, setShowProcessing] = useState(false);
 
-    const payload = {
-      destination,
-      duration: parseInt(duration),
-      startDate,
-      budget,
-      interests,
-      crowdLevel,
-      transport,
-      people: parseInt(people),
-    };
+  // --------------------------------------------------------
+  // GENERATE ITINERARY (AI CALL)
+  // --------------------------------------------------------
+ const handleGenerate = async () => {
+  setError("");
 
-    setLoading(true);
-    try {
-      const itinerary = await generateItinerary(payload);
-      onGenerateItinerary(itinerary);
-    } catch (e) {
-      setError(e.message || "Failed to generate itinerary.");
-    } finally {
-      setLoading(false);
-    }
+  if (!destination || !startDate) {
+    setError("Please provide destination and start date.");
+    return;
+  }
+
+  const payload = {
+    destination,
+    duration: parseInt(duration),
+    startDate,
+    budget,
+    interests,
+    crowdLevel,
+    transport,
+    people: parseInt(people),
   };
 
+  // Show animation instantly
+  setShowProcessing(true);
+
+  try {
+    const itinerary = await generateItinerary(payload);
+
+    // Wait a bit before showing the itinerary (smooth transition)
+    setTimeout(() => {
+      setShowProcessing(false);
+      onGenerateItinerary(itinerary);
+    }, 2000);
+
+  } catch (e) {
+    setShowProcessing(false);
+    setError(e.message || "Failed to generate itinerary.");
+  }
+};
+
+
+  // --------------------------------------------------------
+  // RENDER
+  // --------------------------------------------------------
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="trip-planner-modal" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="trip-planner-modal"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
         <button className="modal-close" onClick={onClose}>
           <FiX size={20} />
         </button>
 
+        {/* HEADER */}
         <div className="modal-header">
           <h2>Plan Your Trip</h2>
           <p>Discover • Plan • Go</p>
         </div>
 
-        {/* ---------------- DISCOVER ---------------- */}
-        {step === "discover" && (
+        {/* ⭐ FULL SCREEN PROCESSING ANIMATION ⭐ */}
+       {/* FULL-SCREEN ANIMATION (BLOCKS EVERYTHING) */}
+{showProcessing && (
+  <ProcessingAnimation animation={loadingAnimation} />
+)}
+
+
+
+        {/* ======================================================
+           DISCOVER STEP
+        ====================================================== */}
+        {!showProcessing && step === "discover" && (
           <div className="step-content">
             <h3>Where do you want to go?</h3>
 
@@ -106,8 +143,10 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
           </div>
         )}
 
-        {/* ---------------- PLAN ---------------- */}
-        {step === "plan" && (
+        {/* ======================================================
+           PLAN STEP
+        ====================================================== */}
+        {!showProcessing && step === "plan" && (
           <div className="step-content">
             <h3>Trip Schedule</h3>
 
@@ -137,15 +176,21 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
               <label>No. of People</label>
               <input
                 type="number"
-                className="input-field"
                 min="1"
+                className="input-field"
                 value={people}
                 onChange={(e) => setPeople(e.target.value)}
               />
             </div>
 
             <div className="step-nav">
-              <button className="step-btn secondary" onClick={() => setStep("discover")}>← Back</button>
+              <button
+                className="step-btn secondary"
+                onClick={() => setStep("discover")}
+              >
+                ← Back
+              </button>
+
               <button
                 className="step-btn primary"
                 onClick={() => setStep("go")}
@@ -157,11 +202,14 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
           </div>
         )}
 
-        {/* ---------------- GO ---------------- */}
-        {step === "go" && (
+        {/* ======================================================
+           GO STEP
+        ====================================================== */}
+        {!showProcessing && step === "go" && (
           <div className="step-content">
             <h3>Preferences</h3>
 
+            {/* Budget */}
             <div className="form-group">
               <label>Budget</label>
               <div className="budget-options">
@@ -177,6 +225,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
               </div>
             </div>
 
+            {/* Transport */}
             <div className="form-group">
               <label>Transport</label>
               <select
@@ -191,6 +240,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
               </select>
             </div>
 
+            {/* Crowd Level */}
             <div className="form-group">
               <label>Crowd Level</label>
               <select
@@ -205,15 +255,26 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
             </div>
 
             <div className="step-nav">
-              <button className="step-btn secondary" onClick={() => setStep("plan")}>← Back</button>
-
-              <button className="step-btn generate primary" onClick={handleGenerate} disabled={loading}>
-                {loading ? <><FiLoader className="spinner" /> Generating…</> : "Generate Itinerary"}
+              <button
+                className="step-btn secondary"
+                onClick={() => setStep("plan")}
+              >
+                ← Back
               </button>
+
+             <button
+  className="step-btn generate primary"
+  onClick={handleGenerate}
+  disabled={loading}
+>
+  Generate Itinerary
+</button>
+
             </div>
           </div>
         )}
 
+        {/* ERROR */}
         {error && <div className="error-message">{error}</div>}
       </div>
     </div>

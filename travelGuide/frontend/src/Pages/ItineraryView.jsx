@@ -11,7 +11,6 @@ import {
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 
-
 import "./ItineraryView.css";
 
 export default function ItineraryView({ itinerary, onBack }) {
@@ -48,12 +47,12 @@ export default function ItineraryView({ itinerary, onBack }) {
       ]);
 
       autoTable(doc, {
-  startY: startY + 6,
-  head: [["Time", "Activity", "Location", "Duration", "Cost"]],
-  body: rows,
-  theme: "grid",
-  styles: { fontSize: 9 }
-});
+        startY: startY + 6,
+        head: [["Time", "Activity", "Location", "Duration", "Cost"]],
+        body: rows,
+        theme: "grid",
+        styles: { fontSize: 9 }
+      });
 
     });
 
@@ -66,11 +65,14 @@ export default function ItineraryView({ itinerary, onBack }) {
   const startTrip = () => {
     const tripData = {
       ...itinerary,
-      currentDay: 1,
+      currentDayIndex: 0,  // ALWAYS START AT DAY 1 (index 0)
       completed: {},
     };
 
+    // Save values for HomePage + TripProgressCard
     localStorage.setItem("activeTrip", JSON.stringify(tripData));
+    localStorage.setItem("currentDayIndex", 0);
+
     alert("Trip Started! Go to Home Page to continue.");
   };
 
@@ -133,7 +135,7 @@ export default function ItineraryView({ itinerary, onBack }) {
                 <FiCalendar className="day-icon" />
                 <div>
                   <div className="day-title">
-                    Day {day.day || idx + 1} — {day.date}
+                    Day {idx + 1} — {day.date}
                   </div>
                   {day.theme && <div className="day-subtitle">{day.theme}</div>}
                 </div>

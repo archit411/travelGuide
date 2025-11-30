@@ -24,7 +24,9 @@ function distanceKm(lat1, lon1, lat2, lon2) {
 }
 
 export default function TripProgressCard({ trip, onComplete }) {
-  const today = trip.days[0];
+    const currentDay = parseInt(localStorage.getItem("currentDayIndex") || 0);
+
+   const today = trip || {};
   const [userLoc, setUserLoc] = useState(null);
   const [visited, setVisited] = useState(
     JSON.parse(localStorage.getItem("visitedPlaces") || "{}")
@@ -191,8 +193,9 @@ export default function TripProgressCard({ trip, onComplete }) {
       </div>
 
       <button className="tpc-complete-btn" onClick={onComplete}>
-        Clear Trip
-      </button>
+  Finish Day
+</button>
+
     </div>
   );
 }

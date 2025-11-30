@@ -165,6 +165,9 @@ const [activeTrip, setActiveTrip] = useState(
   JSON.parse(localStorage.getItem("activeTrip")) || null
 );
 const [showItineraryPage, setShowItineraryPage] = useState(false);
+const [currentDay, setCurrentDay] = useState(
+  parseInt(localStorage.getItem("currentTripDay") || "1")
+);
 
   // State for stories and places
   const [stories, setStories] = useState([]);
@@ -351,18 +354,32 @@ if (showItineraryPage && generatedItinerary) {
       itinerary={generatedItinerary}
       onBack={() => setShowItineraryPage(false)}
       onStartTrip={() => {
-        localStorage.setItem("activeTrip", JSON.stringify(generatedItinerary));
-        navigate("/homepage");
-        setActiveTrip(generatedItinerary);
-        setShowItineraryPage(false);
-        setGeneratedItinerary(null);
-      }}
+  localStorage.setItem("activeTrip", JSON.stringify(generatedItinerary));
+  localStorage.setItem("currentTripDay", 1);   // 🔥 reset to Day 1
+  setCurrentDay(1);
+  setActiveTrip(generatedItinerary);
+  setShowItineraryPage(false);
+  setGeneratedItinerary(null);
+}}
+
     />
   );
 }
+const handleDayComplete = () => {
+  const next = currentDay + 1;
 
-
-
+  if (next <= activeTrip.days.length) {
+    // Move to next day
+    localStorage.setItem("currentTripDay", next);
+    setCurrentDay(next);
+  } else {
+    // Trip finished
+    localStorage.removeItem("activeTrip");
+    localStorage.removeItem("currentTripDay");
+    setActiveTrip(null);
+    setCurrentDay(1);
+  }
+};
 
 
 
@@ -445,11 +462,10 @@ if (showItineraryPage && generatedItinerary) {
 
 {activeTrip?.days?.length > 0 && (
   <TripProgressCard
-    trip={activeTrip}
-    onComplete={() => {
-      localStorage.removeItem("activeTrip");
-      setActiveTrip(null);
-    }}
+    trip={activeTrip.days[currentDay - 1]}  // 🔥 show correct day
+    currentDay={currentDay}
+    totalDays={activeTrip.days.length}
+    onComplete={() => handleDayComplete()}
   />
 )}
 
