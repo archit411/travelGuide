@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { FiArrowRight, FiLoader, FiX } from "react-icons/fi";
 import { generateItinerary } from "../utils/tripItineraryService";
 import "./TripPlannerModal.css";
-//Testing
+
 export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
   const [step, setStep] = useState("discover");
-const [people, setPeople] = useState(2);
+  const [people, setPeople] = useState(2);
 
   // Discover
   const [destination, setDestination] = useState("");
@@ -30,17 +30,16 @@ const [people, setPeople] = useState(2);
       return;
     }
 
-  const payload = {
-  destination,
-  duration: parseInt(duration),
-  startDate,
-  budget,
-  interests,
-  crowdLevel,
-  transport,
-  people: parseInt(people)   
-};
-
+    const payload = {
+      destination,
+      duration: parseInt(duration),
+      startDate,
+      budget,
+      interests,
+      crowdLevel,
+      transport,
+      people: parseInt(people),
+    };
 
     setLoading(true);
     try {
@@ -65,16 +64,18 @@ const [people, setPeople] = useState(2);
           <p>Discover • Plan • Go</p>
         </div>
 
+        {/* ---------------- DISCOVER ---------------- */}
         {step === "discover" && (
           <div className="step-content">
-            <h3>Where to?</h3>
+            <h3>Where do you want to go?</h3>
+
             <div className="form-group">
               <label>Destination *</label>
               <input
                 className="input-field"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
-                placeholder="e.g., Goa, Jaipur"
+                placeholder="e.g., Goa, Manali, Jaipur"
               />
             </div>
 
@@ -96,7 +97,7 @@ const [people, setPeople] = useState(2);
             </div>
 
             <button
-              className="step-btn"
+              className="step-btn primary"
               onClick={() => setStep("plan")}
               disabled={!destination}
             >
@@ -105,9 +106,10 @@ const [people, setPeople] = useState(2);
           </div>
         )}
 
+        {/* ---------------- PLAN ---------------- */}
         {step === "plan" && (
           <div className="step-content">
-            <h3>When & How long?</h3>
+            <h3>Trip Schedule</h3>
 
             <div className="form-group">
               <label>Start Date *</label>
@@ -120,7 +122,7 @@ const [people, setPeople] = useState(2);
             </div>
 
             <div className="form-group">
-              <label>Duration (days): {duration}</label>
+              <label>Duration: {duration} days</label>
               <input
                 type="range"
                 min="1"
@@ -129,25 +131,23 @@ const [people, setPeople] = useState(2);
                 onChange={(e) => setDuration(e.target.value)}
                 className="input-slider"
               />
-              <div className="form-group">
-  <label>No. of People</label>
-  <input
-    type="number"
-    className="input-field"
-    min="1"
-    value={people}
-    onChange={(e) => setPeople(e.target.value)}
-  />
-</div>
+            </div>
 
+            <div className="form-group">
+              <label>No. of People</label>
+              <input
+                type="number"
+                className="input-field"
+                min="1"
+                value={people}
+                onChange={(e) => setPeople(e.target.value)}
+              />
             </div>
 
             <div className="step-nav">
-              <button className="step-btn back" onClick={() => setStep("discover")}>
-                ← Back
-              </button>
+              <button className="step-btn secondary" onClick={() => setStep("discover")}>← Back</button>
               <button
-                className="step-btn"
+                className="step-btn primary"
                 onClick={() => setStep("go")}
                 disabled={!startDate}
               >
@@ -157,9 +157,10 @@ const [people, setPeople] = useState(2);
           </div>
         )}
 
+        {/* ---------------- GO ---------------- */}
         {step === "go" && (
           <div className="step-content">
-            <h3>Budget & Transport</h3>
+            <h3>Preferences</h3>
 
             <div className="form-group">
               <label>Budget</label>
@@ -204,21 +205,10 @@ const [people, setPeople] = useState(2);
             </div>
 
             <div className="step-nav">
-              <button className="step-btn back" onClick={() => setStep("plan")}>
-                ← Back
-              </button>
-              <button
-                className="step-btn generate"
-                onClick={handleGenerate}
-                disabled={loading}
-              >
-                {loading ? (
-                  <>
-                    <FiLoader className="spinner" /> Generating...
-                  </>
-                ) : (
-                  "Generate Itinerary"
-                )}
+              <button className="step-btn secondary" onClick={() => setStep("plan")}>← Back</button>
+
+              <button className="step-btn generate primary" onClick={handleGenerate} disabled={loading}>
+                {loading ? <><FiLoader className="spinner" /> Generating…</> : "Generate Itinerary"}
               </button>
             </div>
           </div>

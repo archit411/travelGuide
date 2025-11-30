@@ -15,6 +15,7 @@ import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
+import TripProgressCard from "./TripProgressCard";
 
 import ItineraryView from "./ItineraryView";
 import "./StoryViewer.css";
@@ -160,6 +161,10 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
 /* ========== MAIN HOME PAGE COMPONENT ========== */
 export default function HomePage() {
   const navigate = useNavigate();
+const [activeTrip, setActiveTrip] = useState(
+  JSON.parse(localStorage.getItem("activeTrip")) || null
+);
+const [showItineraryPage, setShowItineraryPage] = useState(false);
 
   // State for stories and places
   const [stories, setStories] = useState([]);
@@ -317,28 +322,54 @@ export default function HomePage() {
 
   /* =============== TRIP PLANNER HANDLERS =============== */
   const handleGenerateItinerary = (itinerary) => {
-    setGeneratedItinerary(itinerary);
-    setShowTripPlanner(false);
-  };
+  setGeneratedItinerary(itinerary);
+  setShowTripPlanner(false);
+  setShowItineraryPage(true);   // 👈 important
+};
+
 
   const handleBackToHome = () => {
     setGeneratedItinerary(null);
   };
-
-  /* =============== IF ITINERARY IS GENERATED, SHOW IT =============== */
+useEffect(() => {
   if (generatedItinerary) {
-    return (
-      <ItineraryView 
-        itinerary={generatedItinerary} 
-        onBack={handleBackToHome} 
-      />
-    );
+    localStorage.setItem("lastGeneratedItinerary", JSON.stringify(generatedItinerary));
   }
+}, [generatedItinerary]);
+useEffect(() => {
+  const saved = localStorage.getItem("lastGeneratedItinerary");
+  if (saved && !activeTrip) {
+    setGeneratedItinerary(JSON.parse(saved));
+  }
+}, []);
+  /* =============== IF ITINERARY IS GENERATED, SHOW IT =============== */
+const showItineraryView = Boolean(generatedItinerary);
+
+if (showItineraryPage && generatedItinerary) {
+  return (
+    <ItineraryView
+      itinerary={generatedItinerary}
+      onBack={() => setShowItineraryPage(false)}
+      onStartTrip={() => {
+        localStorage.setItem("activeTrip", JSON.stringify(generatedItinerary));
+        navigate("/homepage");
+        setActiveTrip(generatedItinerary);
+        setShowItineraryPage(false);
+        setGeneratedItinerary(null);
+      }}
+    />
+  );
+}
+
+
+
+
+
 
   /* =============== MAIN RENDER =============== */
   return (
     <div className="homepage-light">
-
+{/* {itineraryViewComponent} */}
       {/* ---------- HEADER ---------- */}
       <header className="header-main">
         <div className="trip-header-inner">
@@ -410,6 +441,18 @@ export default function HomePage() {
           <FiCompass /> Create a Trip
         </button>
       </div>
+{/* ====== ACTIVE TRIP CARD (Day-wise checklist) ====== */}
+
+{activeTrip?.days?.length > 0 && (
+  <TripProgressCard
+    trip={activeTrip}
+    onComplete={() => {
+      localStorage.removeItem("activeTrip");
+      setActiveTrip(null);
+    }}
+  />
+)}
+
 
       {/* ---------- FEATURED DESTINATIONS ---------- */}
       <section className="section">

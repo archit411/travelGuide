@@ -1,70 +1,93 @@
+/* Overlay */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 34, 90, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1200;
+  padding: 20px;
 }
 
+/* Modal Box */
 .trip-planner-modal {
   width: 100%;
-  max-width: 520px;
-  background: linear-gradient(135deg,#667eea,#764ba2);
-  color: #fff;
-  border-radius: 16px;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 18px;
   padding: 28px;
   position: relative;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  animation: fadeIn 0.3s ease;
 }
 
+/* Close Button */
 .modal-close {
   position: absolute;
   right: 14px;
   top: 14px;
-  background: rgba(255,255,255,0.15);
+  background: #e8f0ff;
   border: none;
-  color: #fff;
+  color: #1a4cd3;
   padding: 8px;
   border-radius: 50%;
   cursor: pointer;
 }
 
+/* Header */
 .modal-header h2 {
-  margin: 0 0 6px 0;
-  font-size: 20px;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a4cd3;
 }
 
 .modal-header p {
-  margin: 0 0 18px 0;
-  opacity: 0.9;
+  margin-top: 4px;
+  color: #4a4a4a;
+  font-size: 14px;
 }
 
+/* Section Headings */
 .step-content h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
   margin-bottom: 14px;
-  font-size: 16px;
 }
 
+/* Form Fields */
 .form-group {
   margin-bottom: 16px;
 }
 
+.label {
+  color: #333;
+}
+
 .input-field {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 2px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.06);
-  color: #fff;
-  font-size: 14px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1.5px solid #dce4f8;
+  background: #f8faff;
+  font-size: 15px;
+  color: #1a1a1a;
+}
+
+.input-field:focus {
+  border-color: #1a4cd3;
+  outline: none;
+  background: #ffffff;
 }
 
 .input-slider {
   width: 100%;
-  margin-top: 8px;
 }
 
+/* Budget Buttons */
 .budget-options {
   display: flex;
   gap: 8px;
@@ -72,54 +95,72 @@
 
 .budget-btn {
   padding: 10px 12px;
-  border-radius: 8px;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.12);
-  color: #fff;
+  border-radius: 10px;
+  border: 1.5px solid #d9e4ff;
+  background: #f4f7ff;
+  color: #1a1a1a;
   cursor: pointer;
   font-weight: 600;
+  transition: 0.2s;
 }
 
 .budget-btn.active {
-  background: #fff;
-  color: #667eea;
-  transform: scale(1.03);
+  background: #1a4cd3;
+  border-color: #1a4cd3;
+  color: #fff;
+  transform: scale(1.05);
 }
 
+/* Buttons */
 .step-btn {
   width: 100%;
-  margin-top: 12px;
   padding: 12px;
-  border-radius: 10px;
-  border: none;
-  background: #fff;
-  color: #667eea;
+  border-radius: 12px;
+  font-size: 15px;
   font-weight: 700;
   cursor: pointer;
+  border: none;
+  transition: 0.2s;
 }
 
-.step-btn.back {
-  background: rgba(255,255,255,0.12);
+.step-btn.primary {
+  background: #1a4cd3;
   color: #fff;
+}
+
+.step-btn.primary:disabled {
+  background: #9db6ff;
+}
+
+.step-btn.secondary {
+  background: #eef3ff;
+  color: #1a4cd3;
 }
 
 .step-btn.generate {
-  background: linear-gradient(135deg,#f093fb,#f5576c);
-  color: #fff;
+  margin-top: 10px;
 }
 
+/* Error Message */
 .error-message {
-  margin-top: 12px;
-  background: #ff6b6b;
-  color: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  margin-top: 16px;
+  padding: 12px;
+  background: #ffdddd;
+  color: #b30000;
+  border-radius: 10px;
 }
 
+/* Spinner */
 .spinner {
   animation: spin 1s linear infinite;
   display: inline-block;
-  margin-right: 8px;
 }
 
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}

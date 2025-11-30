@@ -1,0 +1,174 @@
+.trip-progress-card {
+  background: #ffffff;
+  padding: 22px;
+  border-radius: 22px;
+  margin: 20px auto;
+  width: 94%;
+  border: 1px solid #f3f3f3;
+  box-shadow:
+    0 2px 6px rgba(0,0,0,0.03),
+    0 6px 20px rgba(0,0,0,0.06);
+}
+
+.tpc-title {
+  font-size: 20px;
+  font-weight: 800;
+  margin-bottom: 18px;
+  letter-spacing: -0.3px;
+  color: #1a1a1a;
+}
+
+.tpc-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 20px;
+  padding-bottom: 12px;
+  scroll-snap-type: x mandatory;
+}
+.tpc-scroll::-webkit-scrollbar { display: none; }
+
+.tpc-card {
+  min-width: 280px;
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid #e9e9e9;
+  scroll-snap-align: start;
+  overflow: hidden;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+  transition: transform 0.18s ease;
+}
+.tpc-card:hover {
+  transform: translateY(-4px);
+}
+
+.tpc-map {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.tpc-body {
+  padding: 16px;
+}
+
+.tpc-body h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: #222;
+}
+
+.tpc-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #666;
+  margin-bottom: 8px;
+}
+
+/* Meta row */
+.tpc-meta {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #444;
+}
+
+.tpc-meta span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Premium CTA buttons */
+.tpc-nav-btn {
+  width: 100%;
+  padding: 11px 0;
+  background: #007aff;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  letter-spacing: -0.2px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  box-shadow: 0 3px 10px rgba(0,122,255,0.25);
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  align-items: center;
+}
+
+.tpc-map-icon {
+  width: 18px;
+  height: 18px;
+}
+
+/* Uber / Ola */
+.tpc-uber,
+.tpc-ola {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  font-weight: 700;
+  text-align: center;
+  display: block;
+  text-decoration: none;
+  margin-bottom: 8px;
+}
+
+.tpc-uber { background: #000; color: #fff; }
+.tpc-ola { background: #f7b500; color: #fff; }
+
+/* ETA */
+.tpc-calc-btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  background: #eef3ff;
+  color: #0a53ff;
+  border: 1px solid #c7d8ff;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.tpc-eta {
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+.tpc-eta .red { color: #ff3b30; font-weight: 700; }
+.tpc-eta .green { color: #1fbf4d; font-weight: 700; }
+
+/* Visited */
+.tpc-visit {
+  width: 100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #d6e0ff;
+  background: #f4f6ff;
+  font-weight: 700;
+  color: #0a43d5;
+}
+
+.tpc-visit.visited {
+  background: #28c76f;
+  color: #fff;
+  border-color: #28c76f;
+}
+
+/* Clear trip */
+.tpc-complete-btn {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  background: #ff4f4f;
+  color: #fff;
+  border-radius: 14px;
+  font-weight: 800;
+  border: none;
+  font-size: 16px;
+}
