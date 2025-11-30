@@ -33,7 +33,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
   // --------------------------------------------------------
   // GENERATE ITINERARY (AI CALL)
   // --------------------------------------------------------
- const handleGenerate = async () => {
+const handleGenerate = async () => {
   setError("");
 
   if (!destination || !startDate) {
@@ -52,21 +52,22 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary }) {
     people: parseInt(people),
   };
 
-  // Show animation instantly
+  // 1️⃣ Immediately show animation
   setShowProcessing(true);
 
   try {
+    // 2️⃣ Generate itinerary in background
     const itinerary = await generateItinerary(payload);
 
-    // Wait a bit before showing the itinerary (smooth transition)
+    // 3️⃣ When animation finishes → send back itinerary
     setTimeout(() => {
       setShowProcessing(false);
       onGenerateItinerary(itinerary);
-    }, 2000);
-
+    }, 3500); // animation duration
   } catch (e) {
     setShowProcessing(false);
-    setError(e.message || "Failed to generate itinerary.");
+    console.log("Generation Error:", e);
+    setError("Failed to generate itinerary. Please try again.");
   }
 };
 

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Lottie from "lottie-react";
-import loadingAnimation from "../lottie/loadingAnimation.json";
+import loadingAnimation from "../lottie/loadingAnimation.json"; // ✅ Correct import
 
 import "./ProcessingAnimation.css";
 
@@ -23,7 +23,7 @@ export default function ProcessingAnimation({ onDone }) {
       if (index < messages.length) {
         setMessageIndex(index);
       }
-    }, 4000);
+    }, 1000);
 
     // Finish animation after 4.5 seconds
     const timer = setTimeout(() => {
