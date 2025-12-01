@@ -1,13 +1,28 @@
-/* Container */
+/* ===============================
+   MAIN CONTAINER — SCROLL SAFE
+   =============================== */
 .itinerary-container {
   padding: 28px;
   max-width: 900px;
   margin: auto;
   font-family: "Inter", sans-serif;
   color: #0f172a;
+  height: 100vh;
+  overflow-y: auto;
+  box-sizing: border-box;
 }
 
-/* Back Button */
+/* Mobile fix: smaller padding */
+@media (max-width: 600px) {
+  .itinerary-container {
+    padding: 14px;
+    overflow-y: scroll;
+  }
+}
+
+/* ===============================
+   BACK BUTTON
+   =============================== */
 .itinerary-back-btn {
   background: none;
   border: none;
@@ -19,12 +34,20 @@
   align-items: center;
   gap: 6px;
   transition: 0.2s;
+  position: sticky;
+  top: 10px;
+  z-index: 20;
+  background: white;
+  padding: 8px 0;
 }
+
 .itinerary-back-btn:hover {
   color: #1e40af;
 }
 
-/* Title Block */
+/* ===============================
+   TITLE BLOCK
+   =============================== */
 .itinerary-title-block {
   margin-bottom: 32px;
   padding: 20px;
@@ -45,7 +68,9 @@
   margin-top: 6px;
 }
 
-/* Chips */
+/* ===============================
+   CHIPS
+   =============================== */
 .itinerary-chips {
   display: flex;
   gap: 10px;
@@ -74,26 +99,61 @@
   color: #047857;
 }
 
-/* Weather Alert */
-.weather-alert {
-  margin-top: 18px;
-  padding: 16px;
+/* ===============================
+   LIVE WEATHER BLOCK
+   =============================== */
+.weather-live {
+  margin-top: 16px;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
   border-radius: 12px;
-  background: #fff9e6;
-  border: 1px solid #ffe6a8;
+  background: #f1faff;
+  border: 1px solid #d3edff;
 }
 
-/* Day List Container */
+.weather-live img {
+  width: 48px;
+  height: 48px;
+}
+
+.weather-live p {
+  margin: 0;
+  font-size: 15px;
+  color: #334155;
+}
+
+/* ===============================
+   DAYS LIST (scrollable section)
+   =============================== */
 .itinerary-days-list {
   margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  max-height: calc(100vh - 350px);
+  overflow-y: auto;
+  padding-right: 6px;
 }
 
-/* Day Card */
+.itinerary-days-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.itinerary-days-list::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 10px;
+}
+
+/* ===============================
+   DAY CARD
+   =============================== */
 .day-card {
   background: white;
   border-radius: 14px;
   padding: 18px 20px;
-  margin-bottom: 16px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 4px 8px rgba(15, 23, 42, 0.05);
 }
@@ -121,7 +181,9 @@
   color: #64748b;
 }
 
-/* Activities */
+/* ===============================
+   DAY BODY + ACTIVITIES
+   =============================== */
 .day-body {
   margin-top: 16px;
   padding-left: 4px;
@@ -167,66 +229,50 @@
   color: #6b7280;
 }
 
-/* Footer Buttons */
+/* ===============================
+   FOOTER BUTTONS
+   =============================== */
 .itinerary-actions {
   display: flex;
   gap: 14px;
   margin-top: 32px;
 }
 
-/* Primary Button */
+/* Buttons */
+.btn-primary,
+.btn-secondary,
+.btn-start-trip {
+  padding: 12px 20px;
+  border-radius: 12px;
+  cursor: pointer;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  flex: 1;
+}
+
 .btn-primary {
   background: #2563eb;
   color: white;
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  flex: 1;
 }
 
-/* Secondary Button */
 .btn-secondary {
   background: #f1f5f9;
   color: #1e293b;
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  flex: 1;
 }
 
-/* Start Trip Button */
 .btn-start-trip {
   background: #10b981;
   color: white;
-  padding: 12px 20px;
-  border-radius: 12px;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  font-weight: 600;
-  flex: 1;
 }
+
 .btn-start-trip:hover {
   background: #059669;
 }
 
-/* Mobile Responsive */
-@media (max-width: 600px) {
-  .itinerary-actions {
-    flex-direction: column;
-  }
-
-  .act-time {
-    width: 80px;
-  }
-}
-/* ---------------- MOBILE OPTIMIZED ---------------- */
+/* ===============================
+   MOBILE OPTIMIZED
+   =============================== */
 @media (max-width: 480px) {
   .itinerary-container {
     padding: 12px;
@@ -241,15 +287,6 @@
     font-size: 14px;
   }
 
-  .day-header {
-    flex-direction: row;
-    padding: 10px;
-  }
-
-  .day-title {
-    font-size: 16px;
-  }
-
   .itinerary-chips {
     flex-wrap: wrap;
     gap: 6px;
@@ -260,18 +297,26 @@
     font-size: 13px;
   }
 
-  .weather-live {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(0,0,0,0.06);
-    padding: 10px;
-    border-radius: 10px;
-    margin: 10px 0;
+  .day-header {
+    padding: 10px 2px;
   }
 
-  .weather-icon {
-    width: 55px;
-    height: 55px;
+  .act-time {
+    width: 70px;
+    font-size: 13px;
+  }
+
+  .itinerary-actions {
+    flex-direction: column;
+  }
+
+  .weather-live {
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .weather-live img {
+    width: 42px;
+    height: 42px;
   }
 }

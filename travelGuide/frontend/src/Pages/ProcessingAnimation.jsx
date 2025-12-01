@@ -4,7 +4,7 @@ import loadingAnimation from "../lottie/loadingAnimation.json"; // ✅ Correct i
 
 import "./ProcessingAnimation.css";
 
-export default function ProcessingAnimation({ onDone }) {
+export default function ProcessingAnimation({ message = "Creating your trip...", onDone = () => {} }) {
   const messages = [
     "Creating your perfect trip…",
     "Finding best places for you…",
