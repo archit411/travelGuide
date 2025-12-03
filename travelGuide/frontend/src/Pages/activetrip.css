@@ -1,0 +1,343 @@
+/* Background Gradient */
+.vtp-wrapper {
+  background: linear-gradient(180deg, #f7f9fc, #eef1f6);
+  min-height: 100vh;
+}
+
+/* Banner */
+.vtp-banner {
+  position: relative;
+}
+
+.vtp-banner-img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-bottom-left-radius: 34px;
+  border-bottom-right-radius: 34px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+}
+
+.vtp-banner-overlay {
+  position: absolute;
+  bottom: 0;
+  height: 70px;
+  width: 100%;
+  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.45));
+  border-bottom-left-radius: 34px;
+  border-bottom-right-radius: 34px;
+}
+
+.vtp-back {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  padding: 10px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(255,255,255,0.5);
+  backdrop-filter: blur(10px);
+  border-radius: 50%;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
+  z-index: 20;
+}
+
+.vtp-date-range {
+  position: absolute;
+  bottom: 16px;
+  left: 18px;
+  color: white;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* Body */
+.vtp-body {
+  background: #fff;
+  margin-top: -28px;
+  border-radius: 32px;
+  padding: 28px 22px;
+  box-shadow: 0 -8px 18px rgba(0,0,0,0.08);
+}
+
+/* Day Header */
+.vtp-day-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.vtp-day-circle {
+  width: 60px;
+  height: 60px;
+  background: linear-gradient(135deg, #3c7bff, #6ba1ff);
+  border-radius: 50%;
+  color: white;
+  font-size: 22px;
+  font-weight: 700;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 14px rgba(61,123,255,0.4);
+}
+
+.vtp-day-title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.vtp-day-date {
+  margin: 0;
+  color: #727e90;
+  font-size: 15px;
+}
+
+/* Vertical Timeline */
+.vtp-timeline {
+  position: relative;
+  margin-top: 26px;
+}
+
+.vtp-line {
+  position: absolute;
+  left: 34px;
+  width: 5px;
+  background: #e1e6f0;
+  top: 0;
+  bottom: 0;
+  border-radius: 8px;
+}
+
+/* Fill line */
+.vtp-line-fill {
+  position: absolute;
+  left: 34px;
+  width: 5px;
+  background: #4caf50;
+  bottom: 0;
+  border-radius: 8px;
+  transition: height .3s ease;
+}
+
+/* Cards container */
+.vtp-cards {
+  margin-left: 70px;
+  width: 100%;
+}
+
+.vtp-item-wrapper {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+/* Timeline Dot */
+.vtp-dot {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #3478ff, #5da0ff);
+  border-radius: 50%;
+  position: absolute;
+  left: -44px;
+  top: 18px;
+  z-index: 10;
+  border: 3px solid #eef2ff;
+  box-shadow: 0 0 12px rgba(52,120,255,0.75);
+}
+
+/* GREEN Completed Dot */
+.vtp-visited .vtp-dot {
+  background: #4caf50 !important;
+  box-shadow: 0 0 12px rgba(0,150,0,0.8);
+  border-color: #d7ffd7;
+}
+
+/* Card */
+.vtp-card {
+  background: white;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  border: 1px solid #f1f3f7;
+}
+
+.vtp-img {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.vtp-title {
+  margin-top: 16px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.vtp-desc {
+  margin-top: 6px;
+  font-size: 15px;
+  color: #555;
+  line-height: 1.45;
+}
+
+.vtp-location {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* Buttons */
+.vtp-buttons a {
+  display: inline-block;
+  padding: 12px 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  margin-right: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-dir {
+  background: linear-gradient(135deg,#3c7bff,#5e97ff);
+  color: white;
+}
+
+.btn-uber {
+  background: #000;
+  color: white;
+}
+
+.btn-ola {
+  background: #ffcf4a;
+  color: #000;
+}
+
+/* Mark Visited Button */
+.vtp-visit-btn {
+  margin-top: 12px;
+  width: 100%;
+  padding: 12px;
+  font-size: 15px;
+  border-radius: 12px;
+  border: none;
+  font-weight: 600;
+  background: #edf0f6;
+  color: #2f4a67;
+}
+
+.vtp-visit-btn.done {
+  background: #4caf50;
+  color: white;
+}
+
+/* Day Navigation Buttons */
+.vtp-day-nav {
+  margin-top: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.vtp-nav-btn {
+  padding: 15px;
+  border-radius: 16px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.vtp-nav-btn.primary {
+  background: linear-gradient(135deg,#3d7bff,#5a92ff);
+  color: white;
+}
+
+.vtp-nav-btn.secondary {
+  background: #f1f4fa;
+  border: 1px solid #d7ddea;
+  color: #333;
+}
+
+/* Finish Trip */
+.vtp-finish-trip {
+  padding: 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg,#ff6b6b,#ff3d3d);
+  color: white;
+  font-size: 17px;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 4px 14px rgba(255,80,80,0.4);
+}
+
+
+
+
+.active-trip-card-premium {
+  background: #fff;
+  border-radius: 22px;
+  padding: 18px 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  border: 1px solid #eef2f7;
+  margin-top: 20px;
+  transition: 0.2s ease;
+}
+
+.active-trip-card-premium:hover {
+  transform: translateY(-3px);
+}
+
+.atp-premium-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.atp-premium-day {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg,#3d7bff,#6aa3ff);
+  border-radius: 50%;
+  color: white;
+  display: flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 4px 12px rgba(61,123,255,0.4);
+}
+
+.atp-premium-dest {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #222;
+}
+
+.atp-premium-dates {
+  margin: 0;
+  font-size: 14px;
+  color: #70788a;
+}
+
+.atp-premium-arrow {
+  font-size: 28px;
+  position: absolute;
+  right: 18px;
+  top: 28px;
+  color: #999;
+}
+
+.atp-premium-progress {
+  width: 100%;
+  height: 6px;
+  background: #e3e8ee;
+  border-radius: 8px;
+  margin-top: 14px;
+  overflow: hidden;
+}
+
+.atp-premium-progress-fill {
+  height: 6px;
+  background: linear-gradient(135deg,#3d7bff,#6aa3ff);
+  border-radius: 8px;
+  transition: width .3s;
+}

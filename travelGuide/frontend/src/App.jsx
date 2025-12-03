@@ -11,6 +11,7 @@ import SavedStories from "./Pages/SavedStories";
 import Layout from "../src/Pages/Layout";
 import FeedPage from "./Pages/FeedPage";
 import Onboarding from "./Pages/onBoarding";
+import ActiveTripPage from "./Pages/ActiveTripPage";
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
         {/*Routes without BottomNav */}
         <Route path="/destination/:id" element={<DestinationPage />} />
         <Route path="/livestories" element={<LiveStories />} />
+<Route path="/active-trip" element={<ActiveTripPage />} />
 
         {/* Catch-all */}
         <Route path="*" element={<Navigate to="/login" replace />} />

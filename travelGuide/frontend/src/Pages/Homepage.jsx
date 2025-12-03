@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import "./HomePage.css";
 import "./Highlights.css";
+import './activetrip.css';
 import {
   FiPlus,
   FiUser,
@@ -43,29 +44,39 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   /* -------------------------------------------------
       🔥 FULL SCROLL LOCK (Desktop + Mobile + iOS)
   --------------------------------------------------- */
-  useEffect(() => {
-    const preventScroll = (e) => e.preventDefault();
+useEffect(() => {
+  const preventScroll = (e) => e.preventDefault();
 
-    // Lock screen (desktop + android)
-    document.body.style.overflow = "hidden";
-    document.body.style.position = "fixed";
-    document.body.style.width = "100%";
+  // Save current scroll position
+  const scrollY = window.scrollY;
 
-    // Lock touch scroll (iOS + Android)
-    document.addEventListener("touchmove", preventScroll, {
-      passive: false,
-    });
+  // LOCK SCREEN
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.overflow = "hidden";
+  document.body.style.width = "100%";
 
-    return () => {
-      // Reset scroll behavior
-      document.body.style.overflow = "auto";
-      document.body.style.position = "static";
-      document.body.style.width = "auto";
+  // Prevent touch scroll
+  document.addEventListener("touchmove", preventScroll, { passive: false });
 
-      // Re-enable touch scroll
-      document.removeEventListener("touchmove", preventScroll);
-    };
-  }, []);
+  return () => {
+    // UNLOCK SCREEN SAFELY
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.overflow = "";
+    document.body.style.width = "";
+
+    document.removeEventListener("touchmove", preventScroll);
+
+    // Restore scroll position
+    window.scrollTo(0, scrollY);
+  };
+}, []);
+
 
   /* ------------------------------------------------- */
 
@@ -451,23 +462,41 @@ const handleDayComplete = () => {
           </div>
         </div>
 
-        <button 
-          className="create-trip-btn"
-          onClick={() => setShowTripPlanner(true)}
-        >
-          <FiCompass /> Create a Trip
-        </button>
+        <button
+  className="ai-create-trip-btn"
+  onClick={() => setShowTripPlanner(true)}
+>
+  <span className="ai-icon">✧˖°</span>
+  <span>Create Trip with AI</span>
+</button>
+
       </div>
 {/* ====== ACTIVE TRIP CARD (Day-wise checklist) ====== */}
 
-{activeTrip?.days?.length > 0 && (
-  <TripProgressCard
-    trip={activeTrip.days[currentDay - 1]}  // 🔥 show correct day
-    currentDay={currentDay}
-    totalDays={activeTrip.days.length}
-    onComplete={() => handleDayComplete()}
-  />
-)}
+<div className="active-trip-card-premium" onClick={() => navigate("/active-trip")}>
+
+  <div className="atp-premium-left">
+    <div className="atp-premium-day">D{currentDay}</div>
+
+    <div>
+      <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
+      <p className="atp-premium-dates">
+        {activeTrip.startDate} → {activeTrip.endDate}
+      </p>
+    </div>
+  </div>
+
+  <div className="atp-premium-arrow">›</div>
+
+  <div className="atp-premium-progress">
+    <div
+      className="atp-premium-progress-fill"
+      style={{ width: `${(currentDay / activeTrip.days.length) * 100}%` }}
+    ></div>
+  </div>
+
+</div>
+
 
 
       {/* ---------- FEATURED DESTINATIONS ---------- */}
@@ -564,97 +593,62 @@ const handleDayComplete = () => {
 
       {/* ---------- NAV ---------- */}
       <nav className="bottom-nav">
-        {!isMobile && (
-          <div className="nav-web">
-            {[
-              {
-                id: "home",
-                label: "Home",
-                icon: <FiHome />,
-                path: "/homepage",
-              },
-              {
-                id: "food",
-                label: "Food",
-                icon: <FaUtensils />,
-                path: "/food",
-              },
-              {
-                id: "feed",
-                label: "Feed",
-                icon: <FiSearch />,
-                path: "/feed",
-              },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-btn ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-ic">{item.icon}</div>
-                <div className="nav-label">{item.label}</div>
-              </button>
-            ))}
-          </div>
-        )}
 
-        {isMobile && (
-          <div className="nav-mobile">
-            {[
-              {
-                id: "home",
-                label: "Home",
-                icon: <FiHome />,
-                path: "/homepage",
-              },
-              {
-                id: "food",
-                label: "Food",
-                icon: <FaUtensils />,
-                path: "/food",
-              },
-              {
-                id: "upload",
-                label: "Upload",
-                icon: <FiX style={{ transform: "rotate(45deg)" }} />,
-              },
-              {
-                id: "story",
-                label: "Story",
-                icon: <FiSearch />,
-                path: "/feed",
-              },
-              {
-                id: "profile",
-                label: "Profile",
-                icon: <FiUser />,
-                path: "/profile",
-              },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-btn ${
-                  item.id === "upload" ? "upload-btn" : ""
-                } ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                  if (item.id === "upload") {
-                    setShowAdd(true);
-                    return;
-                  }
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-ic">{item.icon}</div>
-                <div className="nav-label">{item.label}</div>
-              </button>
-            ))}
-          </div>
-        )}
-      </nav>
+  {/* DESKTOP NAV */}
+  {!isMobile && (
+    <div className="nav-web">
+      {[
+        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+        { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+      ].map((item) => (
+        <button
+          key={item.id}
+          className={`nav-btn ${active === item.id ? "active" : ""}`}
+          onClick={() => {
+            setActive(item.id);
+            navigate(item.path);
+          }}
+        >
+          <div className="nav-ic">{item.icon}</div>
+          <div className="nav-label">{item.label}</div>
+        </button>
+      ))}
+    </div>
+  )}
+
+  {/* MOBILE — PREMIUM FLOATING NAV */}
+  {isMobile && (
+    <div className="nav-mobile-new">
+      {[
+        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+        { id: "upload", label: "", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+        { id: "story", label: "Feed", icon: <FiSearch />, path: "/feed" },
+        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+      ].map((item) => (
+        <button
+          key={item.id}
+          className={`nav-mobile-btn ${
+            item.id === "upload" ? "upload-center" : ""
+          } ${active === item.id ? "active" : ""}`}
+          onClick={() => {
+            if (item.id === "upload") {
+              setShowAdd(true);
+              return;
+            }
+            setActive(item.id);
+            navigate(item.path);
+          }}
+        >
+          <div className="nav-icon">{item.icon}</div>
+          {item.label && <span className="nav-text">{item.label}</span>}
+        </button>
+      ))}
+    </div>
+  )}
+</nav>
+
 
       {/* ---------- FOOTER ---------- */}
       {!isMobile && (
