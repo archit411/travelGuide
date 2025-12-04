@@ -17,12 +17,11 @@ import { useNavigate } from "react-router-dom";
 import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
 import TripProgressCard from "./TripProgressCard";
-
 import ItineraryView from "./ItineraryView";
 import "./StoryViewer.css";
 import TripPlannerModal from "./TripPlannerModal";
 
-/* ----------------- Helpers ----------------- */
+/* ---------------- Helpers ---------------- */
 function timeAgo(t) {
   if (!t) return "Just now";
   const sec = Math.floor((Date.now() - Date.parse(t)) / 1000);
@@ -41,44 +40,32 @@ function StoryViewer({ stories, index: startIndex = 0, onClose }) {
   const timerRef = useRef(null);
   const duration = 15000;
 
-  /* -------------------------------------------------
-      🔥 FULL SCROLL LOCK (Desktop + Mobile + iOS)
-  --------------------------------------------------- */
-useEffect(() => {
-  const preventScroll = (e) => e.preventDefault();
+  useEffect(() => {
+    const preventScroll = (e) => e.preventDefault();
+    const scrollY = window.scrollY;
 
-  // Save current scroll position
-  const scrollY = window.scrollY;
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = "0";
+    document.body.style.right = "0";
+    document.body.style.overflow = "hidden";
+    document.body.style.width = "100%";
 
-  // LOCK SCREEN
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${scrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.overflow = "hidden";
-  document.body.style.width = "100%";
+    document.addEventListener("touchmove", preventScroll, { passive: false });
 
-  // Prevent touch scroll
-  document.addEventListener("touchmove", preventScroll, { passive: false });
+    return () => {
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.overflow = "";
+      document.body.style.width = "";
 
-  return () => {
-    // UNLOCK SCREEN SAFELY
-    document.body.style.position = "";
-    document.body.style.top = "";
-    document.body.style.left = "";
-    document.body.style.right = "";
-    document.body.style.overflow = "";
-    document.body.style.width = "";
+      document.removeEventListener("touchmove", preventScroll);
 
-    document.removeEventListener("touchmove", preventScroll);
-
-    // Restore scroll position
-    window.scrollTo(0, scrollY);
-  };
-}, []);
-
-
-  /* ------------------------------------------------- */
+      window.scrollTo(0, scrollY);
+    };
+  }, []);
 
   useEffect(() => {
     if (!stories || !stories.length) return;
@@ -131,10 +118,7 @@ useEffect(() => {
 
   return (
     <div className="story-viewer-overlay" onClick={onClose}>
-      <div
-        className="story-viewer-card"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="story-viewer-card" onClick={(e) => e.stopPropagation()}>
         <button className="story-close-btn" onClick={onClose}>
           <FiX size={18} />
         </button>
@@ -169,42 +153,37 @@ useEffect(() => {
   );
 }
 
-/* ========== MAIN HOME PAGE COMPONENT ========== */
+/* ================= MAIN HOME PAGE ================= */
 export default function HomePage() {
   const navigate = useNavigate();
-const [activeTrip, setActiveTrip] = useState(
-  JSON.parse(localStorage.getItem("activeTrip")) || null
-);
-const [showItineraryPage, setShowItineraryPage] = useState(false);
-const [currentDay, setCurrentDay] = useState(
-  parseInt(localStorage.getItem("currentTripDay") || "1")
-);
 
-  // State for stories and places
+  const [activeTrip, setActiveTrip] = useState(
+    JSON.parse(localStorage.getItem("activeTrip")) || null
+  );
+  const [showItineraryPage, setShowItineraryPage] = useState(false);
+  const [currentDay, setCurrentDay] = useState(
+    parseInt(localStorage.getItem("currentTripDay") || "1")
+  );
+
   const [stories, setStories] = useState([]);
   const [topPlaces, setTopPlaces] = useState([]);
   const [loadingPlaces, setLoadingPlaces] = useState(true);
 
-  // State for modals
   const [viewStory, setViewStory] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [showSearch] = useState(false);
   const [showTripPlanner, setShowTripPlanner] = useState(false);
   const [generatedItinerary, setGeneratedItinerary] = useState(null);
 
-  // UI State
   const [city, setCity] = useState("Locating...");
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [active, setActive] = useState("home");
 
-  /* =============== RESPONSIVE LISTENER =============== */
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  /* =============== GET CURRENT LOCATION =============== */
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
@@ -221,8 +200,7 @@ const [currentDay, setCurrentDay] = useState(
       () => setCity("Unknown")
     );
   }, []);
-//Testing
-  /* =============== FETCH STORIES =============== */
+
   useEffect(() => {
     async function loadStories() {
       const cached = sessionStorage.getItem("stories");
@@ -264,7 +242,6 @@ const [currentDay, setCurrentDay] = useState(
     loadStories();
   }, []);
 
-  /* =============== FETCH TOP PLACES =============== */
   useEffect(() => {
     async function loadPlaces() {
       const cached = sessionStorage.getItem("topPlaces");
@@ -301,7 +278,6 @@ const [currentDay, setCurrentDay] = useState(
     loadPlaces();
   }, []);
 
-  /* =============== PROCESS PLACES DATA =============== */
   const places = topPlaces
     .flatMap((p) => [
       p.placeOne && {
@@ -317,95 +293,63 @@ const [currentDay, setCurrentDay] = useState(
     ])
     .filter(Boolean);
 
-  /* =============== STORY VIEWER HANDLERS =============== */
-  function openStoryWithList(indexInList) {
-    setViewStory({
-      stories: [{
-        image: stories[indexInList]?.image || "/noimage.png",
-        destination: stories[indexInList]?.destination || "Unknown",
-        caption: stories[indexInList]?.caption || "",
-      }],
-      index: 0,
-      key: Date.now()
-    });
-  }
-
   function openStory(story) {
     setViewStory({ stories: [story], index: 0 });
   }
 
-  /* =============== TRIP PLANNER HANDLERS =============== */
   const handleGenerateItinerary = (itinerary) => {
-  setGeneratedItinerary(itinerary);
-  setShowTripPlanner(false);
-  setShowItineraryPage(true);   // 👈 important
-};
-
-
-  const handleBackToHome = () => {
-    setGeneratedItinerary(null);
+    setGeneratedItinerary(itinerary);
+    setShowTripPlanner(false);
+    setShowItineraryPage(true);
   };
-useEffect(() => {
-  if (generatedItinerary) {
-    localStorage.setItem("lastGeneratedItinerary", JSON.stringify(generatedItinerary));
+
+  useEffect(() => {
+    if (generatedItinerary) {
+      localStorage.setItem(
+        "lastGeneratedItinerary",
+        JSON.stringify(generatedItinerary)
+      );
+    }
+  }, [generatedItinerary]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("lastGeneratedItinerary");
+    if (saved && !activeTrip) {
+      setGeneratedItinerary(JSON.parse(saved));
+    }
+  }, []);
+
+  if (showItineraryPage && generatedItinerary) {
+    return (
+      <ItineraryView
+        itinerary={generatedItinerary}
+        onBack={() => setShowItineraryPage(false)}
+        onStartTrip={() => {
+          localStorage.setItem(
+            "activeTrip",
+            JSON.stringify(generatedItinerary)
+          );
+          localStorage.setItem("currentTripDay", 1);
+          setCurrentDay(1);
+          setActiveTrip(generatedItinerary);
+          setShowItineraryPage(false);
+          setGeneratedItinerary(null);
+        }}
+      />
+    );
   }
-}, [generatedItinerary]);
-useEffect(() => {
-  const saved = localStorage.getItem("lastGeneratedItinerary");
-  if (saved && !activeTrip) {
-    setGeneratedItinerary(JSON.parse(saved));
-  }
-}, []);
-  /* =============== IF ITINERARY IS GENERATED, SHOW IT =============== */
-const showItineraryView = Boolean(generatedItinerary);
 
-if (showItineraryPage && generatedItinerary) {
-  return (
-    <ItineraryView
-      itinerary={generatedItinerary}
-      onBack={() => setShowItineraryPage(false)}
-      onStartTrip={() => {
-  localStorage.setItem("activeTrip", JSON.stringify(generatedItinerary));
-  localStorage.setItem("currentTripDay", 1);   // 🔥 reset to Day 1
-  setCurrentDay(1);
-  setActiveTrip(generatedItinerary);
-  setShowItineraryPage(false);
-  setGeneratedItinerary(null);
-}}
-
-    />
-  );
-}
-const handleDayComplete = () => {
-  const next = currentDay + 1;
-
-  if (next <= activeTrip.days.length) {
-    // Move to next day
-    localStorage.setItem("currentTripDay", next);
-    setCurrentDay(next);
-  } else {
-    // Trip finished
-    localStorage.removeItem("activeTrip");
-    localStorage.removeItem("currentTripDay");
-    setActiveTrip(null);
-    setCurrentDay(1);
-  }
-};
-
-
-
-  /* =============== MAIN RENDER =============== */
   return (
     <div className="homepage-light">
-{/* {itineraryViewComponent} */}
-      {/* ---------- HEADER ---------- */}
       <header className="header-main">
         <div className="trip-header-inner">
           <div className="trip-logo">
             <div className="logo-circle">
               <i className="fa-solid fa-location-dot"></i>
             </div>
-            <span className="logo-text">TripEZ<span>.in</span></span>
+            <span className="logo-text">
+              TripEZ<span>.in</span>
+            </span>
           </div>
 
           <div className="trip-header-right">
@@ -428,9 +372,8 @@ const handleDayComplete = () => {
         </div>
       </header>
 
-      {/* ---------- SEARCH BAR / TRIP PLANNER BAR ---------- */}
       <div className="dpg-wrapper">
-        <div 
+        <div
           className="dpg-bar"
           onClick={() => setShowTripPlanner(true)}
           style={{ cursor: "pointer" }}
@@ -442,6 +385,7 @@ const handleDayComplete = () => {
               <div className="dpg-sub">Where?</div>
             </div>
           </div>
+
           <div className="dpg-divider"></div>
 
           <div className="dpg-item">
@@ -453,6 +397,7 @@ const handleDayComplete = () => {
           </div>
 
           <div className="dpg-divider"></div>
+
           <div className="dpg-item">
             <FiNavigation className="dpg-icon" />
             <div>
@@ -463,43 +408,47 @@ const handleDayComplete = () => {
         </div>
 
         <button
-  className="ai-create-trip-btn"
-  onClick={() => setShowTripPlanner(true)}
->
-  <span className="ai-icon">✧˖°</span>
-  <span>Create Trip with AI</span>
-</button>
-
+          className="ai-create-trip-btn"
+          onClick={() => setShowTripPlanner(true)}
+        >
+          <span className="ai-icon">✧˖°</span>
+          <span>Create Trip with AI</span>
+        </button>
       </div>
-{/* ====== ACTIVE TRIP CARD (Day-wise checklist) ====== */}
 
-<div className="active-trip-card-premium" onClick={() => navigate("/active-trip")}>
+      {/* ========================= FIXED ACTIVE TRIP CARD ========================= */}
+      {activeTrip && (
+        <div
+          className="active-trip-card-premium"
+          onClick={() => navigate("/active-trip")}
+        >
+          <div className="atp-premium-left">
+            <div className="atp-premium-day">D{currentDay}</div>
 
-  <div className="atp-premium-left">
-    <div className="atp-premium-day">D{currentDay}</div>
+            <div>
+              <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
+              <p className="atp-premium-dates">
+                {activeTrip.startDate} → {activeTrip.endDate}
+              </p>
+            </div>
+          </div>
 
-    <div>
-      <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
-      <p className="atp-premium-dates">
-        {activeTrip.startDate} → {activeTrip.endDate}
-      </p>
-    </div>
-  </div>
+          <div className="atp-premium-arrow">›</div>
 
-  <div className="atp-premium-arrow">›</div>
+          <div className="atp-premium-progress">
+            <div
+              className="atp-premium-progress-fill"
+              style={{
+                width: `${
+                  (currentDay / activeTrip.days.length) * 100
+                }%`,
+              }}
+            ></div>
+          </div>
+        </div>
+      )}
+      {/* ======================================================================== */}
 
-  <div className="atp-premium-progress">
-    <div
-      className="atp-premium-progress-fill"
-      style={{ width: `${(currentDay / activeTrip.days.length) * 100}%` }}
-    ></div>
-  </div>
-
-</div>
-
-
-
-      {/* ---------- FEATURED DESTINATIONS ---------- */}
       <section className="section">
         <div className="section-head">
           <div>Featured Destinations</div>
@@ -538,7 +487,6 @@ const handleDayComplete = () => {
         </div>
       </section>
 
-      {/* ---------- HIGHLIGHTS ---------- */}
       <section className="highlights-section">
         <div className="section-header">
           <div>Today's Highlights</div>
@@ -547,117 +495,137 @@ const handleDayComplete = () => {
 
         <div className="highlights-scroll">
           {stories.map((story, idx) => (
-            <div className="highlight-card" key={idx} onClick={() => openStory(story)}>
-
-              {/* FULL IMAGE */}
+            <div
+              className="highlight-card"
+              key={idx}
+              onClick={() => openStory(story)}
+            >
               <div
                 className="highlight-image"
                 style={{ backgroundImage: `url(${story.image})` }}
               ></div>
 
-              {/* TOP — Avatar + Name + Crowd */}
               <div className="hl-top-row">
                 <div className="hl-user-info">
-                  <div className="hl-avatar">{story.userName?.charAt(0) || "U"}</div>
+                  <div className="hl-avatar">
+                    {story.userName?.charAt(0) || "U"}
+                  </div>
                   <div className="hl-user-text">
                     <div className="hl-name">{story.userName || "User"}</div>
                     <div className="hl-time">{timeAgo(story.createdAt)}</div>
                   </div>
                 </div>
 
-                <div className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}>
+                <div
+                  className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}
+                >
                   {story.crowdLevel}
                 </div>
               </div>
 
-              {/* MIDDLE BADGES */}
               <div className="hl-badges-row">
-                <div className="hl-badge">🌡 {story.temprature || "--"}°C</div>
+                <div className="hl-badge">
+                  🌡 {story.temprature || "--"}°C
+                </div>
                 <div className="hl-badge">❤️ {story.likes || 0}</div>
               </div>
 
-              {/* BOTTOM TEXT */}
               <div className="hl-text-block">
-                <div className="hl-title">{story.destination || "Unknown"}</div>
+                <div className="hl-title">
+                  {story.destination || "Unknown"}
+                </div>
                 <div className="hl-desc">
                   {story.caption?.length > 70
                     ? story.caption.slice(0, 70) + "..."
                     : story.caption || "No caption"}
                 </div>
               </div>
-
             </div>
           ))}
         </div>
       </section>
 
-      {/* ---------- NAV ---------- */}
       <nav className="bottom-nav">
+        {!isMobile && (
+          <div className="nav-web">
+            {[
+              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+              { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-btn ${
+                  active === item.id ? "active" : ""
+                }`}
+                onClick={() => {
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-ic">{item.icon}</div>
+                <div className="nav-label">{item.label}</div>
+              </button>
+            ))}
+          </div>
+        )}
 
-  {/* DESKTOP NAV */}
-  {!isMobile && (
-    <div className="nav-web">
-      {[
-        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-        { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-      ].map((item) => (
-        <button
-          key={item.id}
-          className={`nav-btn ${active === item.id ? "active" : ""}`}
-          onClick={() => {
-            setActive(item.id);
-            navigate(item.path);
-          }}
-        >
-          <div className="nav-ic">{item.icon}</div>
-          <div className="nav-label">{item.label}</div>
-        </button>
-      ))}
-    </div>
-  )}
+        {isMobile && (
+          <div className="nav-mobile-new">
+            {[
+              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+              {
+                id: "upload",
+                label: "",
+                icon: <FiX style={{ transform: "rotate(45deg)" }} />,
+              },
+              {
+                id: "story",
+                label: "Feed",
+                icon: <FiSearch />,
+                path: "/feed",
+              },
+              {
+                id: "profile",
+                label: "Profile",
+                icon: <FiUser />,
+                path: "/profile",
+              },
+            ].map((item) => (
+              <button
+                key={item.id}
+                className={`nav-mobile-btn ${
+                  item.id === "upload" ? "upload-center" : ""
+                } ${active === item.id ? "active" : ""}`}
+                onClick={() => {
+                  if (item.id === "upload") {
+                    setShowAdd(true);
+                    return;
+                  }
+                  setActive(item.id);
+                  navigate(item.path);
+                }}
+              >
+                <div className="nav-icon">{item.icon}</div>
+                {item.label && (
+                  <span className="nav-text">{item.label}</span>
+                )}
+              </button>
+            ))}
+          </div>
+        )}
+      </nav>
 
-  {/* MOBILE — PREMIUM FLOATING NAV */}
-  {isMobile && (
-    <div className="nav-mobile-new">
-      {[
-        { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-        { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-        { id: "upload", label: "", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-        { id: "story", label: "Feed", icon: <FiSearch />, path: "/feed" },
-        { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-      ].map((item) => (
-        <button
-          key={item.id}
-          className={`nav-mobile-btn ${
-            item.id === "upload" ? "upload-center" : ""
-          } ${active === item.id ? "active" : ""}`}
-          onClick={() => {
-            if (item.id === "upload") {
-              setShowAdd(true);
-              return;
-            }
-            setActive(item.id);
-            navigate(item.path);
-          }}
-        >
-          <div className="nav-icon">{item.icon}</div>
-          {item.label && <span className="nav-text">{item.label}</span>}
-        </button>
-      ))}
-    </div>
-  )}
-</nav>
-
-
-      {/* ---------- FOOTER ---------- */}
       {!isMobile && (
         <footer className="footer">
           <div className="footer-content">
             <div className="footer-left">
               <div>
                 <h2>TripEZ</h2>
-                <p>Discover destinations, plan your trips & explore the world.</p>
+                <p>
+                  Discover destinations, plan your trips & explore the world.
+                </p>
               </div>
             </div>
 
@@ -686,7 +654,9 @@ const handleDayComplete = () => {
             </div>
           </div>
 
-          <p className="footer-bottom">© 2025 TripEZ. All Rights Reserved.</p>
+          <p className="footer-bottom">
+            © 2025 TripEZ. All Rights Reserved.
+          </p>
         </footer>
       )}
 
@@ -703,31 +673,27 @@ const handleDayComplete = () => {
         </div>
       )}
 
-      {/* ========== TRIP PLANNER MODAL ========== */}
       {showTripPlanner && (
-        <TripPlannerModal 
+        <TripPlannerModal
           onClose={() => setShowTripPlanner(false)}
           onGenerateItinerary={handleGenerateItinerary}
         />
       )}
 
-      {/* ========== STORY VIEWER ========== */}
       {viewStory && (
-        <StoryViewer 
-          stories={viewStory.stories} 
-          index={viewStory.index} 
-          onClose={() => setViewStory(null)} 
+        <StoryViewer
+          stories={viewStory.stories}
+          index={viewStory.index}
+          onClose={() => setViewStory(null)}
         />
       )}
 
-      {/* ========== ADD POST MODAL ========== */}
       {showAdd && (
         <AddPost
           onClose={() => setShowAdd(false)}
           onAddStory={(s) => setStories((prev) => [s, ...prev])}
         />
       )}
-
     </div>
   );
-} 
+}
