@@ -162,8 +162,9 @@ export default function HomePage() {
   );
   const [showItineraryPage, setShowItineraryPage] = useState(false);
   const [currentDay, setCurrentDay] = useState(
-    parseInt(localStorage.getItem("currentTripDay") || "1")
-  );
+  (parseInt(localStorage.getItem("currentDayIndex") || "0")) + 1
+);
+
 
   const [stories, setStories] = useState([]);
   const [topPlaces, setTopPlaces] = useState([]);
@@ -183,6 +184,21 @@ export default function HomePage() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
+// 🔥 Keep homepage in sync with current trip day
+useEffect(() => {
+  const syncDay = () => {
+    const storedDay = parseInt(localStorage.getItem("currentDayIndex") || "0");
+    setCurrentDay(storedDay + 1); // convert index → day number
+  };
+
+  // Run once when page is shown
+  syncDay();
+
+  // Run every time user focuses back on this tab/page
+  window.addEventListener("focus", syncDay);
+
+  return () => window.removeEventListener("focus", syncDay);
+}, []);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -417,37 +433,35 @@ export default function HomePage() {
       </div>
 
       {/* ========================= FIXED ACTIVE TRIP CARD ========================= */}
-      {activeTrip && (
+     {activeTrip && (
   <div 
-    className="active-trip-card-premium" 
+    className="active-trip-card-premium enhanced"
     onClick={() => navigate("/active-trip")}
   >
-  
-    <div className="atp-premium-left">
-      <div className="atp-premium-day">D{currentDay}</div>
+    <div className="atp-left">
+      <div className="atp-day-badge">D{currentDay}</div>
 
-      <div className="active-trip-card">
-        <div className="atp-premium-top">
-          <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
-          <p className="atp-premium-dates">
-            {activeTrip.startDate} → {activeTrip.endDate}
-          </p>
-        </div>
+      <div className="atp-info">
+        <h3 className="atp-dest">{activeTrip.destination}</h3>
+        <p className="atp-dates">
+          {activeTrip.startDate} → {activeTrip.endDate}
+        </p>
       </div>
     </div>
 
-    <div className="atp-premium-arrow">›</div>
+    <div className="atp-arrow">›</div>
 
-    <div className="atp-premium-progress">
+    <div className="atp-progress">
       <div
-        className="atp-premium-progress-fill"
+        className="atp-progress-fill animate"
         style={{
-          width: `${(currentDay / activeTrip.days.length) * 100}%`
+          width: `${((currentDay - 1) / activeTrip.days.length) * 100}%`
         }}
       ></div>
     </div>
   </div>
 )}
+
       {/* ======================================================================== */}
 
       <section className="section">

@@ -1130,3 +1130,113 @@ body {
   border-radius: 10px;
   display: flex;
 }
+/* =====================================================
+   iOS Style Premium Trip Card
+===================================================== */
+
+.active-trip-card-premium.enhanced {
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(14px);
+  border-radius: 22px;
+  padding: 18px 22px;
+  margin: 20px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 26px rgba(0,0,0,0.12);
+
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+/* Card hover / tap animation */
+.active-trip-card-premium.enhanced:active {
+  transform: scale(0.97);
+}
+
+.active-trip-card-premium.enhanced:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 32px rgba(0,0,0,0.18);
+}
+
+/* Left Section */
+.atp-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Day Badge */
+.atp-day-badge {
+  background: linear-gradient(135deg, #4f8cff, #2563eb);
+  color: white;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  display: flex;
+  font-weight: 700;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.4);
+  animation: floatBadge 3s ease-in-out infinite;
+}
+
+/* Badge floating animation */
+@keyframes floatBadge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.atp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.atp-dest {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #0b1736;
+}
+
+.atp-dates {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+}
+
+/* Arrow */
+.atp-arrow {
+  font-size: 26px;
+  color: #1e293b;
+  opacity: 0.7;
+}
+
+/* Progress Bar */
+.atp-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+  width: 100%;
+  background: rgba(0,0,0,0.08);
+  border-radius: 0 0 18px 18px;
+  overflow: hidden;
+}
+
+.atp-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4f8cff, #2563eb);
+  width: 0%;
+}
+
+/* Smooth animation */
+.atp-progress-fill.animate {
+  transition: width 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
