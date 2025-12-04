@@ -14,16 +14,19 @@ import autoTable from "jspdf-autotable";
 import "./ItineraryView.css";
 
 export default function ItineraryView({ itinerary, onBack }) {
+  // ----------- SAFETY -----------------
+  if (!itinerary) return <div className="itn-empty">No itinerary found.</div>;
+
   const [openDay, setOpenDay] = useState(null);
   const [weather, setWeather] = useState(null);
 
   const toggleDay = (i) => setOpenDay(openDay === i ? null : i);
 
   // --------------------------
-  // 🌦 REAL WEATHER FETCH
+  // 🌦 WEATHER FETCH
   // --------------------------
   useEffect(() => {
-    if (!itinerary.destination) return;
+    if (!itinerary?.destination) return;
 
     const fetchWeather = async () => {
       try {
@@ -34,32 +37,48 @@ export default function ItineraryView({ itinerary, onBack }) {
         );
 
         const data = await resp.json();
+        if (!data?.main) return;
 
-        if (data.main) {
-          setWeather({
-            temp: data.main.temp,
-            feels: data.main.feels_like,
-            desc: data.weather[0].description,
-            icon: data.weather[0].icon,
-          });
-        }
+        setWeather({
+          temp: data.main.temp,
+          feels: data.main.feels_like,
+          desc: data.weather?.[0]?.description,
+          icon: data.weather?.[0]?.icon,
+        });
       } catch (e) {
         console.log("Weather Error:", e);
       }
     };
 
     fetchWeather();
-  }, [itinerary.destination]);
+  }, [itinerary?.destination]);
 
   // --------------------------
-  // PDF GENERATION
+  // 🚀 AUTO START → REDIRECT
+  // --------------------------
+  const startTrip = () => {
+    const tripData = {
+      ...itinerary,
+      currentDayIndex: 0,
+      completed: {},
+    };
+
+    localStorage.setItem("activeTrip", JSON.stringify(tripData));
+    localStorage.setItem("currentDayIndex", "0");
+
+    // direct redirect → no popup
+    window.location.href = "/homepage";
+  };
+
+  // --------------------------
+  // PDF EXPORT
   // --------------------------
   const downloadPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(20);
     doc.text(itinerary.tripTitle || "Trip Itinerary", 14, 16);
 
-    itinerary.days?.forEach((day, index) => {
+    itinerary?.days?.forEach((day, index) => {
       const startY = 30 + index * 70;
       doc.setFontSize(14);
       doc.text(`Day ${index + 1} — ${day.theme || ""}`, 14, startY);
@@ -82,92 +101,65 @@ export default function ItineraryView({ itinerary, onBack }) {
     doc.save(`${itinerary.tripTitle}.pdf`);
   };
 
-  // --------------------------
-  // 🚀 START TRIP
-  // --------------------------
-  const startTrip = () => {
-    const tripData = {
-      ...itinerary,
-      currentDayIndex: 0,
-      completed: {},
-    };
-
-    localStorage.setItem("activeTrip", JSON.stringify(tripData));
-    localStorage.setItem("currentDayIndex", "0");
-
-    alert("Trip Started! Go to Home Page to continue.");
-  };
-
-  // --------------------------
-  // 📤 SHARE — FIXED FUNCTION
-  // --------------------------
   const shareItinerary = () => {
     const text = `${itinerary.tripTitle}\n${itinerary.summary}`;
 
     if (navigator.share) {
-      navigator.share({
-        title: itinerary.tripTitle,
-        text,
-      });
+      navigator.share({ title: itinerary.tripTitle, text });
     } else {
       alert(text);
     }
   };
 
   return (
-    <div className="itinerary-container">
+    <div className="itn-wrapper">
 
-      {/* 🔙 Back Button */}
-      <button className="itinerary-back-btn" onClick={onBack}>
+      {/* BACK BTN */}
+      <button className="itn-back" onClick={onBack}>
         <FiArrowLeft /> Back
       </button>
 
-      {/* Header */}
-      <div className="itinerary-title-block">
-        <h1 className="itinerary-title">{itinerary.tripTitle}</h1>
-        <p className="itinerary-sub">{itinerary.summary}</p>
+      {/* TITLE BLOCK */}
+      <div className="itn-header">
+        <h1>{itinerary.tripTitle}</h1>
+        <p className="itn-sub">{itinerary.summary}</p>
 
-        {/* 🌦 LIVE WEATHER */}
+        {/* WEATHER */}
         {weather && (
-          <div className="weather-live">
+          <div className="itn-weather">
             <img
               src={`https://openweathermap.org/img/wn/${weather.icon}@2x.png`}
-              alt="weather"
-              className="weather-icon"
+              className="itn-weather-icon"
             />
             <div>
               <strong>{weather.temp}°C</strong> • {weather.desc}
-              <div className="feels-like">Feels like {weather.feels}°C</div>
+              <div className="itn-feels">Feels like {weather.feels}°C</div>
             </div>
           </div>
         )}
 
-        {/* Chips */}
-        <div className="itinerary-chips">
-          <div className="chip">💰 {itinerary.totalEstimatedCost || "—"}</div>
-
+        {/* CHIPS */}
+        <div className="itn-chips">
+          <div className="chip">💰 {itinerary.totalEstimatedCost || "N/A"}</div>
           <div className="chip">
             <FiCalendar /> {itinerary.days?.length} Days
           </div>
-
           <div className="chip crowd">🧍 {itinerary.crowdLevel}</div>
         </div>
       </div>
 
-      {/* Day Cards */}
-      <div className="itinerary-days-list">
-        {itinerary.days?.map((day, idx) => (
-          <div className="day-card" key={idx}>
-            <div className="day-header" onClick={() => toggleDay(idx)}>
-              <div className="day-header-left">
+      {/* DAYS LIST */}
+      <div className="itn-days">
+        {itinerary?.days?.map((day, idx) => (
+          <div className="itn-day-card" key={idx}>
+            <div className="itn-day-header" onClick={() => toggleDay(idx)}>
+              <div className="itn-dh-left">
                 <FiCalendar className="day-icon" />
                 <div>
-                  <div className="day-title">
+                  <div className="itn-day-title">
                     Day {idx + 1} — {day.date}
                   </div>
-                  {day.theme && (
-                    <div className="day-subtitle">{day.theme}</div>
-                  )}
+                  <div className="itn-day-sub">{day.theme}</div>
                 </div>
               </div>
 
@@ -175,35 +167,25 @@ export default function ItineraryView({ itinerary, onBack }) {
             </div>
 
             {openDay === idx && (
-              <div className="day-body">
+              <div className="itn-day-body">
                 {day.activities?.map((a, i) => (
-                  <div className="activity" key={i}>
-                    <div className="act-time">{a.time}</div>
+                  <div key={i} className="itn-activity">
+                    <div className="itn-time">{a.time}</div>
 
-                    <div className="act-content">
-                      <strong className="act-title">
-                        {a.activity || a.description}
-                      </strong>
+                    <div className="itn-act-content">
+                      <strong>{a.activity}</strong>
 
-                      {a.location && (
-                        <p className="act-location">📍 {a.location}</p>
-                      )}
+                      <p className="itn-location">📍 {a.location}</p>
 
                       {a.mapsLink && (
-                        <a
-                          href={a.mapsLink}
-                          target="_blank"
-                          className="maps-link"
-                        >
+                        <a href={a.mapsLink} target="_blank" className="itn-map">
                           Open in Google Maps
                         </a>
                       )}
 
-                      {a.description && (
-                        <p className="act-desc">{a.description}</p>
-                      )}
+                      <p className="itn-desc">{a.description}</p>
 
-                      <div className="act-meta">
+                      <div className="itn-meta">
                         {a.duration && <span>⏱ {a.duration}</span>}
                         {a.estimatedCost && <span>💰 {a.estimatedCost}</span>}
                       </div>
@@ -216,17 +198,17 @@ export default function ItineraryView({ itinerary, onBack }) {
         ))}
       </div>
 
-      {/* BUTTONS */}
-      <div className="itinerary-actions">
+      {/* ACTION BUTTONS */}
+      <div className="itn-actions">
         <button className="btn-primary" onClick={downloadPDF}>
-          <FiDownload /> Download PDF
+          <FiDownload /> PDF
         </button>
 
         <button className="btn-secondary" onClick={shareItinerary}>
           <FiShare2 /> Share
         </button>
 
-        <button className="btn-start-trip" onClick={startTrip}>
+        <button className="btn-start" onClick={startTrip}>
           🚀 Start Trip
         </button>
       </div>

@@ -40,7 +40,7 @@ export default function ActiveTripPage() {
         </button>
 
         <img
-          src={today?.bannerImage || today?.activities?.[0]?.image}
+          src='./bgImg.avif'
           className="vtp-banner-img"
           alt="Trip Banner"
         />

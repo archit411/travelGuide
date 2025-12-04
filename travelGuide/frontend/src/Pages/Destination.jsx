@@ -35,7 +35,7 @@ export default function DestinationPage() {
         // STEP 1 → Get latitude & longitude
         // ---------------------------------------
         const coordsRes = await fetch(
-          `http://localhost:8080/api/coords?place=${placeName}`,
+          `https://travelguide-1-21sw.onrender.com/api/coords?place=${placeName}`,
           {
             method: "GET",
             headers: {
@@ -55,7 +55,7 @@ export default function DestinationPage() {
         // STEP 2 → Get weather using lat & lon
         // ---------------------------------------
         const weatherRes = await fetch(
-          `http://localhost:8080/api/weather?lat=${lat}&lon=${lon}`,
+          `https://travelguide-1-21sw.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
           {
             method: "GET",
             headers: {

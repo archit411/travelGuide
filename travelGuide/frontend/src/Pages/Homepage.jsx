@@ -418,35 +418,36 @@ export default function HomePage() {
 
       {/* ========================= FIXED ACTIVE TRIP CARD ========================= */}
       {activeTrip && (
-        <div
-          className="active-trip-card-premium"
-          onClick={() => navigate("/active-trip")}
-        >
-          <div className="atp-premium-left">
-            <div className="atp-premium-day">D{currentDay}</div>
+  <div 
+    className="active-trip-card-premium" 
+    onClick={() => navigate("/active-trip")}
+  >
+  
+    <div className="atp-premium-left">
+      <div className="atp-premium-day">D{currentDay}</div>
 
-            <div>
-              <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
-              <p className="atp-premium-dates">
-                {activeTrip.startDate} → {activeTrip.endDate}
-              </p>
-            </div>
-          </div>
-
-          <div className="atp-premium-arrow">›</div>
-
-          <div className="atp-premium-progress">
-            <div
-              className="atp-premium-progress-fill"
-              style={{
-                width: `${
-                  (currentDay / activeTrip.days.length) * 100
-                }%`,
-              }}
-            ></div>
-          </div>
+      <div className="active-trip-card">
+        <div className="atp-premium-top">
+          <h3 className="atp-premium-dest">{activeTrip.destination}</h3>
+          <p className="atp-premium-dates">
+            {activeTrip.startDate} → {activeTrip.endDate}
+          </p>
         </div>
-      )}
+      </div>
+    </div>
+
+    <div className="atp-premium-arrow">›</div>
+
+    <div className="atp-premium-progress">
+      <div
+        className="atp-premium-progress-fill"
+        style={{
+          width: `${(currentDay / activeTrip.days.length) * 100}%`
+        }}
+      ></div>
+    </div>
+  </div>
+)}
       {/* ======================================================================== */}
 
       <section className="section">
@@ -545,77 +546,65 @@ export default function HomePage() {
         </div>
       </section>
 
-      <nav className="bottom-nav">
-        {!isMobile && (
-          <div className="nav-web">
-            {[
-              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-              { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-btn ${
-                  active === item.id ? "active" : ""
-                }`}
-                onClick={() => {
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-ic">{item.icon}</div>
-                <div className="nav-label">{item.label}</div>
-              </button>
-            ))}
-          </div>
-        )}
+     {!showTripPlanner && (
+  <nav className="bottom-nav">
 
-        {isMobile && (
-          <div className="nav-mobile-new">
-            {[
-              { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-              { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-              {
-                id: "upload",
-                label: "",
-                icon: <FiX style={{ transform: "rotate(45deg)" }} />,
-              },
-              {
-                id: "story",
-                label: "Feed",
-                icon: <FiSearch />,
-                path: "/feed",
-              },
-              {
-                id: "profile",
-                label: "Profile",
-                icon: <FiUser />,
-                path: "/profile",
-              },
-            ].map((item) => (
-              <button
-                key={item.id}
-                className={`nav-mobile-btn ${
-                  item.id === "upload" ? "upload-center" : ""
-                } ${active === item.id ? "active" : ""}`}
-                onClick={() => {
-                  if (item.id === "upload") {
-                    setShowAdd(true);
-                    return;
-                  }
-                  setActive(item.id);
-                  navigate(item.path);
-                }}
-              >
-                <div className="nav-icon">{item.icon}</div>
-                {item.label && (
-                  <span className="nav-text">{item.label}</span>
-                )}
-              </button>
-            ))}
-          </div>
-        )}
-      </nav>
+    {/* DESKTOP NAV */}
+    {!isMobile && (
+      <div className="nav-web">
+        {[
+          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+          { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            className={`nav-btn ${active === item.id ? "active" : ""}`}
+            onClick={() => {
+              setActive(item.id);
+              navigate(item.path);
+            }}
+          >
+            <div className="nav-ic">{item.icon}</div>
+            <div className="nav-label">{item.label}</div>
+          </button>
+        ))}
+      </div>
+    )}
+
+    {/* MOBILE NAV */}
+    {isMobile && (
+      <div className="nav-mobile-new">
+        {[
+          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
+          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
+          { id: "upload", label: "", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
+          { id: "story", label: "Feed", icon: <FiSearch />, path: "/feed" },
+          { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
+        ].map((item) => (
+          <button
+            key={item.id}
+            className={`nav-mobile-btn ${
+              item.id === "upload" ? "upload-center" : ""
+            } ${active === item.id ? "active" : ""}`}
+            onClick={() => {
+              if (item.id === "upload") {
+                setShowAdd(true);
+                return;
+              }
+              setActive(item.id);
+              navigate(item.path);
+            }}
+          >
+            <div className="nav-icon">{item.icon}</div>
+            {item.label && <span className="nav-text">{item.label}</span>}
+          </button>
+        ))}
+      </div>
+    )}
+  </nav>
+)}
+
 
       {!isMobile && (
         <footer className="footer">
