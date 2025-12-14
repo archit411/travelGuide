@@ -1,66 +1,28 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FiX, FiUpload, FiCamera, FiImage } from "react-icons/fi";
+import React, { useState, useEffect } from "react";
+import { FiX, FiUpload, FiImage } from "react-icons/fi";
 import { FaStar } from "react-icons/fa";
 import "./home.css";
 
 export default function AddPost({ onClose, onAddStory }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState("Delhi");
   const [btn, setBtn] = useState(false);
-  const [temperature, setTemperature] = useState(`${Math.floor(Math.random() * 10) + 20}`);
+  const [temperature, setTemperature] = useState(
+    `${Math.floor(Math.random() * 10) + 20}`
+  );
   const [crowd, setCrowd] = useState("Low");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username") || "aj_archit";
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => (document.body.style.overflow = "");
   }, []);
-
-  const startCamera = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.play();
-      }
-    } catch {
-      setSnackbarMsg("📷 Unable to access camera. Check permissions.");
-    }
-  };
-
-  const capturePhoto = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    if (!video || !canvas) return;
-    const ctx = canvas.getContext("2d");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    canvas.toBlob((blob) => {
-      if (!blob) return;
-      const newFile = new File([blob], "captured_image.png", { type: "image/png" });
-      setFile(newFile);
-      setPreview(URL.createObjectURL(newFile));
-      stopCamera();
-    });
-  };
-
-  const stopCamera = () => {
-    const stream = videoRef.current?.srcObject;
-    if (stream) stream.getTracks().forEach((track) => track.stop());
-    if (videoRef.current) videoRef.current.srcObject = null;
-  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
@@ -72,17 +34,6 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
-  // ✅ Destination Validation (Only alphabets and spaces)
-  const handleLocationChange = (e) => {
-    const input = e.target.value;
-    if (/^[A-Za-z\s]*$/.test(input)) {
-      setLocation(input);
-    } else {
-      setSnackbarMsg("⚠️ Destination should contain only alphabets.");
-    }
-  };
-
-  // ✅ Temperature Validation (Only numbers)
   const handleTemperatureChange = (e) => {
     const input = e.target.value;
     if (/^\d*$/.test(input)) {
@@ -93,14 +44,13 @@ export default function AddPost({ onClose, onAddStory }) {
   };
 
   const handleSubmit = async () => {
-    if (!file) return setSnackbarMsg("⚠️ Please upload or capture a photo.");
-    if (!location.trim()) return setSnackbarMsg("⚠️ Destination is required.");
+    if (!file) return setSnackbarMsg("⚠️ Please upload a photo.");
     if (!temperature.trim()) return setSnackbarMsg("⚠️ Temperature is required.");
-    if (!crowd.trim()) return setSnackbarMsg("⚠️ Please select crowd level.");
+    if (!crowd.trim()) return setSnackbarMsg("⚠️ Select crowd level.");
     if (rating === 0) return setSnackbarMsg("⚠️ Please give a rating.");
 
     if (!token) {
-      setSnackbarMsg("❌ Missing token. Please log in again.");
+      setSnackbarMsg("❌ Missing token. Please login again.");
       return;
     }
 
@@ -116,13 +66,17 @@ export default function AddPost({ onClose, onAddStory }) {
       formData.append("userRating", rating);
       formData.append("username", username);
 
-      const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/upload", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
-      });
+      const res = await fetch(
+        "https://travelguide-1-21sw.onrender.com/api/travel/upload",
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        }
+      );
 
       const data = await res.json();
+
       if (data.status === "SUCCESS" || res.ok) {
         setSnackbarMsg("✅ Story uploaded successfully!");
         onAddStory({
@@ -135,11 +89,11 @@ export default function AddPost({ onClose, onAddStory }) {
         });
         setTimeout(onClose, 1500);
       } else {
-        setSnackbarMsg("❌ Upload failed. Please try again.");
+        setSnackbarMsg("❌ Upload failed.");
         setBtn(false);
       }
     } catch {
-      setSnackbarMsg("⚠️ Server error. Try again later.");
+      setSnackbarMsg("⚠️ Server error. Try later.");
       setBtn(false);
     }
   };
@@ -157,7 +111,16 @@ export default function AddPost({ onClose, onAddStory }) {
 
         <div className="popup-body">
           {preview ? (
-            <img src={preview} alt="Preview" className="upload-preview medium-preview" />
+            <img
+              src={preview}
+              alt="Preview"
+              style={{
+                maxHeight: "260px",
+                width: "100%",
+                objectFit: "cover",
+                borderRadius: "14px",
+              }}
+            />
           ) : (
             <div className="upload-placeholder">
               <FiUpload size={32} />
@@ -166,56 +129,67 @@ export default function AddPost({ onClose, onAddStory }) {
             </div>
           )}
 
-          <div className="upload-actions">
-            
-           <div className="upload-center">
-  <label className="upload-btn1">
-    <FiImage /> Upload Photo
-    <input
-      type="file"
-      accept="image/*"
-      onChange={handleFileChange}
-      style={{ display: "none" }}
-    />
-  </label>
-</div>
-
+          {/* ✅ Upload Button with Inline CSS */}
+          <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
+            <label
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: "8px",
+                padding: "12px 18px",
+                borderRadius: "12px",
+                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
+                color: "#fff",
+                fontSize: "14px",
+                fontWeight: 600,
+                cursor: "pointer",
+                boxShadow: "0 8px 20px rgba(37, 99, 235, 0.35)",
+                transition: "all 0.25s ease",
+              }}
+              onMouseOver={(e) =>
+                (e.currentTarget.style.boxShadow =
+                  "0 12px 28px rgba(37, 99, 235, 0.45)")
+              }
+              onMouseOut={(e) =>
+                (e.currentTarget.style.boxShadow =
+                  "0 8px 20px rgba(37, 99, 235, 0.35)")
+              }
+            >
+              <FiImage size={18} />
+              Upload Photo
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+            </label>
           </div>
 
-          {videoRef.current && (
-            <div className="camera-container">
-              <video ref={videoRef} autoPlay playsInline className="camera-feed" />
-              <canvas ref={canvasRef} style={{ display: "none" }} />
-              <div className="camera-controls">
-                <button className="btn btn--primary" onClick={capturePhoto}>
-                  📸 Capture
-                </button>
-                <button className="btn btn--cancel" onClick={stopCamera}>
-                  Cancel
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* ✅ Destination field - alphabets only */}
           <div className="form-section">
             <label>Destination *</label>
-            <input
-              type="text"
-              placeholder="Enter location..."
+            <select
               value={location}
-              onChange={handleLocationChange}
-            />
+              onChange={(e) => setLocation(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "12px",
+                borderRadius: "10px",
+                border: "1px solid #e5e7eb",
+                fontSize: "14px",
+              }}
+            >
+              <option value="Delhi">Delhi</option>
+            </select>
           </div>
 
-          {/* ✅ Temperature field - numeric only */}
           <div className="form-section">
             <label>Current Temperature (°C) *</label>
             <input
               type="text"
               value={temperature}
               onChange={handleTemperatureChange}
-              placeholder="e.g., 26"
+              placeholder="e.g. 26"
             />
           </div>
 
@@ -247,7 +221,6 @@ export default function AddPost({ onClose, onAddStory }) {
                 />
               ))}
             </div>
-            <small>{rating ? `${rating}/5 stars` : "Tap a star to rate"}</small>
           </div>
 
           <div className="form-section">
@@ -261,7 +234,10 @@ export default function AddPost({ onClose, onAddStory }) {
           </div>
 
           {snackbarMsg && (
-            <div className="snackbar inside-popup" onAnimationEnd={() => setSnackbarMsg("")}>
+            <div
+              className="snackbar inside-popup"
+              onAnimationEnd={() => setSnackbarMsg("")}
+            >
               {snackbarMsg}
             </div>
           )}
