@@ -6,15 +6,24 @@ const ExploreDetails = ({ placeId }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    fetchDetails();
+    if (placeId) {
+      fetchDetails(placeId);
+    }
   }, [placeId]);
 
-  const fetchDetails = async () => {
+  const fetchDetails = async (id) => {
     try {
       setLoading(true);
+      const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        `http://localhost:8080/api/places/${placeId}/details`
+        `http://localhost:8080/api/places/${id}/details`,
+        {}, // POST body empty
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
       );
 
       setDetails(response.data);
@@ -30,12 +39,27 @@ const ExploreDetails = ({ placeId }) => {
 
   return (
     <div>
-      <h3>Explore {details.name}</h3>
+      <h2>{details.name}</h2>
+      <p>{details.description}</p>
 
+      <h3>Nearby Places</h3>
       <ul>
-        {details.nearByPlaces.map((place) => (
+        {details.nearByPlaces?.map((place) => (
           <li key={place.id}>
-            {place.name} – {place.distance} km
+            <strong>{place.name}</strong> – {place.distance} km
+            <br />
+            <small>{place.description}</small>
+          </li>
+        ))}
+      </ul>
+
+      <h3>Things To Do</h3>
+      <ul>
+        {details.thingsToDo?.map((activity) => (
+          <li key={activity.id}>
+            <strong>{activity.activityName}</strong>
+            <br />
+            <small>{activity.description}</small>
           </li>
         ))}
       </ul>

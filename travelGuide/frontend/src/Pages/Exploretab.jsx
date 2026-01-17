@@ -7,59 +7,53 @@ const ExploreTab = () => {
   const [selectedPlaceId, setSelectedPlaceId] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // 🔹 Tab load hone par getPlaces API hit hogi
   useEffect(() => {
     fetchPlaces();
   }, []);
 
   const fetchPlaces = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
 
-    const token = localStorage.getItem("token"); 
+      const response = await axios.post(
+        "http://localhost:8080/api/places/getPlaces",
+        {}, // POST body empty
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    const response = await axios.get(
-      "http://localhost:8080/api/places/getPlaces",
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-
-    setPlaces(response.data);
-  } catch (error) {
-    console.error("Failed to load places", error);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-  const handlePlaceClick = (placeId) => {
-    setSelectedPlaceId(placeId);
+      setPlaces(response.data);
+    } catch (error) {
+      console.error("Failed to load places", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div>
-      <h2>Explore</h2>
+      <h2>Explore Places</h2>
 
       {loading && <p>Loading places...</p>}
 
-      {/* Places List */}
       <div className="places-list">
         {places.map((place) => (
           <div
             key={place.id}
             className="place-card"
-            onClick={() => handlePlaceClick(place.id)}
+            onClick={() => setSelectedPlaceId(place.id)}
           >
-            {place.name}
+            <img src={place.imageUrl} alt={place.name} width="200" />
+            <h3>{place.name}</h3>
+            <p>{place.description}</p>
           </div>
         ))}
       </div>
 
-      {/* Details Section */}
       {selectedPlaceId && (
         <ExploreDetails placeId={selectedPlaceId} />
       )}
