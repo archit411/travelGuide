@@ -1,0 +1,96 @@
+/* Root Section */
+.explore-section {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Title */
+.explore-title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 4px;
+}
+
+/* Subtitle */
+.explore-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+/* Grid Layout */
+.explore-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Card */
+.explore-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.explore-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Card Header */
+.explore-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+/* Place Name */
+.place-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111;
+  max-width: 75%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Distance Badge */
+.place-distance {
+  font-size: 12px;
+  font-weight: 500;
+  background: #f3f4f6;
+  color: #374151;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+/* Description */
+.place-description {
+  font-size: 14px;
+  color: #4b5563;
+  line-height: 1.5;
+}
+
+/* Loading & Error States */
+.explore-section p {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .explore-title {
+    font-size: 22px;
+  }
+
+  .explore-section {
+    padding: 16px;
+  }
+}

@@ -20,6 +20,9 @@ import TripProgressCard from "./TripProgressCard";
 import ItineraryView from "./ItineraryView";
 import "./StoryViewer.css";
 import TripPlannerModal from "./TripPlannerModal";
+import Explore from "./Exploretab";
+import PlacesList from "./Exploretab";
+import Tabs from "./Tab";
 
 /* ---------------- Helpers ---------------- */
 function timeAgo(t) {
@@ -463,7 +466,7 @@ useEffect(() => {
 )}
 
       {/* ======================================================================== */}
-
+<Tabs/>
       <section className="section">
         <div className="section-head">
           <div>Featured Destinations</div>
