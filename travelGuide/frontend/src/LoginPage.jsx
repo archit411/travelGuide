@@ -125,7 +125,7 @@ const showInstallPrompt = async () => {
 
     try {
       const response = await fetch(
-        `https://travelguide-1-21sw.onrender.com/api/login?email=${encodeURIComponent(
+        `http://localhost:8080/api/login?email=${encodeURIComponent(
           formData.email
         )}&password=${encodeURIComponent(formData.password)}`,
         {
@@ -162,7 +162,7 @@ const showInstallPrompt = async () => {
     try {
       const googleToken = credentialResponse.credential;
       const res = await fetch(
-        "https://travelguide-1-21sw.onrender.com/api/auth/google",
+        "http://localhost:8080/api/auth/google",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -177,7 +177,7 @@ const showInstallPrompt = async () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.userName);
 
-        await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
+        await fetch("http://localhost:8080/profile/saveUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

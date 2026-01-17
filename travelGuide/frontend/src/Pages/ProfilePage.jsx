@@ -50,7 +50,7 @@ useEffect(() => {
           return;
         }
 
-        const response = await fetch("https://travelguide-1-21sw.onrender.com/profile/getUserDetails", {
+        const response = await fetch("http://localhost:8080/profile/getUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ useEffect(() => {
         return;
       }
 
-      const url = `https://travelguide-1-21sw.onrender.com/profile/changePassword?oldPass=${encodeURIComponent(
+      const url = `http://localhost:8080/profile/changePassword?oldPass=${encodeURIComponent(
         formData.currentPassword
       )}&newPass=${encodeURIComponent(formData.newPassword)}`;
 
