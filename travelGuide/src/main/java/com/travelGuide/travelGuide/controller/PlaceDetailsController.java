@@ -1,5 +1,8 @@
 package com.travelGuide.travelGuide.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,6 +31,20 @@ public class PlaceDetailsController {
 			return response;
 		}
 		
+	}
+	
+	@PostMapping("/getPlaces")
+	public List<PlaceDetailsRespBody> getPlaceDetails(){
+		List<PlaceDetailsRespBody> response = null;
+		try {
+			response = placeDetailsService.getPlaceDetails();
+			return response;
+		}catch(Exception e) {
+			e.printStackTrace();
+			response = new ArrayList<>();
+			response.add(new PlaceDetailsRespBody());
+			return response;
+		}
 	}
 	
 }

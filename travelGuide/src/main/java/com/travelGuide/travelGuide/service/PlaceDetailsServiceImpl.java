@@ -54,7 +54,7 @@ public class PlaceDetailsServiceImpl implements PlaceDetailsService {
 				nearByPlacesList = new ArrayList<>();
 				nearByPlacesList.add(new NearByPlacesRespBody());
 				response.setNearByPlaces(nearByPlacesList);
-			}else {
+			} else {
 				nearByPlacesList = new ArrayList<>();
 				for (NearByPlacesModel nearByPlacesModel : nearByPlacesModels) {
 					nearByPlacesRespBody = new NearByPlacesRespBody();
@@ -68,7 +68,7 @@ public class PlaceDetailsServiceImpl implements PlaceDetailsService {
 
 					nearByPlacesList.add(nearByPlacesRespBody);
 				}
-				
+
 				response.setNearByPlaces(nearByPlacesList);
 			}
 
@@ -77,7 +77,7 @@ public class PlaceDetailsServiceImpl implements PlaceDetailsService {
 				thingsToDoList = new ArrayList<>();
 				thingsToDoList.add(new ThingsToDoRespBody());
 				response.setThingsToDo(thingsToDoList);
-			}else {
+			} else {
 				thingsToDoList = new ArrayList<>();
 				for (ThingsToDoModel thingsToDoModel : thingsToDoModels) {
 					thingsToDoRespBody = new ThingsToDoRespBody();
@@ -89,13 +89,45 @@ public class PlaceDetailsServiceImpl implements PlaceDetailsService {
 
 					thingsToDoList.add(thingsToDoRespBody);
 				}
-				
+
 				response.setThingsToDo(thingsToDoList);
 			}
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new PlaceDetailsRespBody();
+		}
+	}
+
+	public List<PlaceDetailsRespBody> getPlaceDetails() {
+		PlaceDetailsRespBody placeDetailsRespBody = null;
+		List<PlaceDetailsRespBody> response = null;
+		try {
+			List<PlaceDetailsModel> placeDetailsModels = placeDetailsRepository.findAll();
+			if (placeDetailsModels.isEmpty()) {
+				response = new ArrayList<>();
+				response.add(placeDetailsRespBody);
+				return response;
+			}
+			
+			response = new ArrayList<>();
+			for(PlaceDetailsModel placeDetailsModel : placeDetailsModels) {
+				placeDetailsRespBody = new PlaceDetailsRespBody();
+				
+				placeDetailsRespBody.setId(placeDetailsModel.getId());
+				placeDetailsRespBody.setName(placeDetailsModel.getName());
+				placeDetailsRespBody.setDescription(placeDetailsModel.getDescription());
+				placeDetailsRespBody.setImageUrl(placeDetailsModel.getImageUrl());
+				
+				response.add(placeDetailsRespBody);
+			}
+			
+			return response;
+		} catch (Exception e) {
+			e.printStackTrace();
+			response = new ArrayList<>();
+			response.add(placeDetailsRespBody);
+			return response;
 		}
 	}
 
