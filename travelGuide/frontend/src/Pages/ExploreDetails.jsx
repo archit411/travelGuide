@@ -1,68 +1,77 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useParams } from "react-router-dom";
+import "./Explore.css";
 
-const ExploreDetails = ({ placeId }) => {
+const ExploreDetails = () => {
+  const { id } = useParams();
   const [details, setDetails] = useState(null);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (placeId) {
-      fetchDetails(placeId);
-    }
-  }, [placeId]);
+    fetchDetails();
+  }, [id]);
 
-  const fetchDetails = async (id) => {
-    try {
-      setLoading(true);
-      const token = localStorage.getItem("token");
-
-      const response = await axios.post(
-        `http://localhost:8080/api/places/${id}/details`,
-        {}, // POST body empty
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      setDetails(response.data);
-    } catch (error) {
-      console.error("Failed to load details", error);
-    } finally {
-      setLoading(false);
-    }
+  const fetchDetails = async () => {
+    const token = localStorage.getItem("token");
+    const res = await axios.post(
+      `http://localhost:8080/api/places/${id}/details`,
+      {},
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+    setDetails(res.data);
   };
 
-  if (loading) return <p>Loading details...</p>;
   if (!details) return null;
 
   return (
-    <div>
-      <h2>{details.name}</h2>
-      <p>{details.description}</p>
+    <div className="details-container">
+      {/* Banner */}
+      <div className="details-hero">
+        <img src={details.imageUrl} alt={details.name} />
+        <div className="details-hero-text">
+          <h1>{details.name}</h1>
+          <p>{details.description}</p>
+        </div>
+      </div>
 
-      <h3>Nearby Places</h3>
-      <ul>
-        {details.nearByPlaces?.map((place) => (
-          <li key={place.id}>
-            <strong>{place.name}</strong> – {place.distance} km
-            <br />
-            <small>{place.description}</small>
-          </li>
-        ))}
-      </ul>
+      {/* Stats */}
+      <div className="details-stats">
+        <div>
+          <strong>{details.thingsToDo?.length || 0}+</strong>
+          <span>Activities</span>
+        </div>
+        <div>
+          <strong>{details.nearByPlaces?.length || 0}</strong>
+          <span>Nearby Places</span>
+        </div>
+        <div>
+          <strong>25–32°C</strong>
+          <span>Avg Temp</span>
+        </div>
+      </div>
 
-      <h3>Things To Do</h3>
-      <ul>
-        {details.thingsToDo?.map((activity) => (
-          <li key={activity.id}>
-            <strong>{activity.activityName}</strong>
-            <br />
-            <small>{activity.description}</small>
-          </li>
+      {/* Nearby Places */}
+      <h2 className="section-title">Nearby Places</h2>
+      <div className="details-grid">
+        {details.nearByPlaces?.map((p) => (
+          <div key={p.id} className="details-card">
+            <h4>{p.name}</h4>
+            <span>{p.distance} km</span>
+            <p>{p.description}</p>
+          </div>
         ))}
-      </ul>
+      </div>
+
+      {/* Things To Do */}
+      <h2 className="section-title">Top Things To Do</h2>
+      <div className="details-grid">
+        {details.thingsToDo?.map((a) => (
+          <div key={a.id} className="details-card">
+            <h4>{a.activityName}</h4>
+            <p>{a.description}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

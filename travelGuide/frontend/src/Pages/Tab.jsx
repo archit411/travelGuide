@@ -1,23 +1,54 @@
-import React, { useState } from "react";
-import ExploreTab from "./Exploretab";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import "./Explore.css";
+import PlaceCard from "./PlaceCard";
 
+const ExplorePlaces = () => {
+  const [places, setPlaces] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-const Tabs = () => {
-  const [activeTab, setActiveTab] = useState("");
+  useEffect(() => {
+    fetchPlaces();
+  }, []);
+
+  const fetchPlaces = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(
+        "http://localhost:8080/api/places/getPlaces",
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      setPlaces(res.data);
+      console.log("data 1",res.data);
+    } catch (err) {
+      console.error("Failed to load places", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <>
-      {/* Tabs */}
-      <div className="tabs">
-        <button onClick={() => setActiveTab("explore")}>
-          Explore
-        </button>
-      </div>
+    <div className="explore-container">
+      <h1 className="explore-title">Explore Places</h1>
+      <p className="explore-subtitle">
+        Discover top destinations, attractions & experiences
+      </p>
 
-      {/* Tab Content */}
-      {activeTab === "explore" && <ExploreTab/>}
-    </>
+      {loading && <p>Loading places...</p>}
+
+      <div className="places-horizontal-scroll">
+        {places.map((place) => (
+          <PlaceCard key={place.id} place={place} />
+        ))}
+      </div>
+    </div>
   );
 };
 
-export default Tabs;
+export default ExplorePlaces;

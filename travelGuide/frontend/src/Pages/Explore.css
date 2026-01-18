@@ -1,96 +1,274 @@
-/* Root Section */
-.explore-section {
-  padding: 24px;
-  max-width: 1200px;
-  margin: 0 auto;
+/* =========================
+   GLOBAL
+========================= */
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #f6f7fb;
+  color: #111827;
 }
 
-/* Title */
+h1, h2, h3, h4 {
+  margin: 0;
+}
+
+/* =========================
+   EXPLORE LIST PAGE
+========================= */
+
+.explore-container {
+  padding: 20px;
+}
+
 .explore-title {
   font-size: 28px;
-  font-weight: 600;
-  color: #111;
-  margin-bottom: 4px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
-/* Subtitle */
 .explore-subtitle {
-  font-size: 14px;
+  font-size: 15px;
   color: #6b7280;
+  margin-bottom: 18px;
+}
+
+/* Horizontal Scroll */
+.places-horizontal-scroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  scrollbar-width: none;
+}
+
+.places-horizontal-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================
+   PLACE CARD (SMALL + VERTICAL)
+========================= */
+
+.place-card {
+  min-width: 200px;
+  max-width: 200px;
+
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  /* 🔥 BULLETPROOF FIX */
+  display: flex;
+  flex-direction: column;
+
+  /* ensure height grows */
+  height: auto;
+}
+
+
+
+.place-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+}
+
+.place-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+
+  border-radius: 16px 16px 0 0;
+
+  /* 🔥 DO NOT ALLOW IMAGE TO COLLAPSE TEXT */
+  flex-shrink: 0;
+  display: block;
+}
+
+
+.place-card-body {
+  padding: 12px;
+  background: #ffffff;
+
+  /* 🔥 FORCE VISIBILITY */
+  display: block;
+}
+
+
+.place-name {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+
+  /* 🔥 ENSURE RENDER */
+  display: block;
+  color: #111827;
+}
+
+.place-desc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+
+/* =========================
+   EXPLORE DETAILS PAGE
+========================= */
+
+.details-container {
+  padding: 20px;
+}
+
+/* Hero Banner */
+.details-hero {
+  position: relative;
+  border-radius: 20px;
+  overflow: hidden;
   margin-bottom: 20px;
 }
 
-/* Grid Layout */
-.explore-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 16px;
+.details-hero img {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
 }
 
-/* Card */
-.explore-card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  cursor: pointer;
+.details-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.55),
+    rgba(0, 0, 0, 0)
+  );
 }
 
-.explore-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+.details-hero-text {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 2;
+  color: #ffffff;
+  max-width: 600px;
 }
 
-/* Card Header */
-.explore-card-header {
+.details-hero-text h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.details-hero-text p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Stats Row */
+.details-stats {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  gap: 20px;
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 16px;
+  margin-top: -30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
-/* Place Name */
-.place-name {
-  font-size: 16px;
-  font-weight: 600;
-  color: #111;
-  max-width: 75%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.details-stats div {
+  flex: 1;
+  text-align: center;
 }
 
-/* Distance Badge */
-.place-distance {
-  font-size: 12px;
-  font-weight: 500;
-  background: #f3f4f6;
-  color: #374151;
-  padding: 4px 10px;
-  border-radius: 999px;
+.details-stats strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
 }
 
-/* Description */
-.place-description {
-  font-size: 14px;
-  color: #4b5563;
-  line-height: 1.5;
-}
-
-/* Loading & Error States */
-.explore-section p {
-  font-size: 14px;
+.details-stats span {
+  font-size: 13px;
   color: #6b7280;
 }
 
-/* Responsive */
+/* Section Titles */
+.section-title {
+  margin: 30px 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* Grid Layout */
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* Detail Cards */
+.details-card {
+  background: #ffffff;
+  padding: 14px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+}
+
+.details-card h4 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.details-card span {
+  display: block;
+  font-size: 12px;
+  color: #9ca3af;
+  margin-bottom: 6px;
+}
+
+.details-card p {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* =========================
+   RESPONSIVE (MOBILE)
+========================= */
+
 @media (max-width: 768px) {
   .explore-title {
     font-size: 22px;
   }
 
-  .explore-section {
-    padding: 16px;
+  .place-card {
+    min-width: 170px;
+    max-width: 170px;
+  }
+
+  .place-card img {
+    height: 170px;
+  }
+
+  .details-hero img {
+    height: 220px;
+  }
+
+  .details-hero-text h1 {
+    font-size: 22px;
+  }
+
+  .details-stats {
+    flex-direction: column;
+    gap: 10px;
   }
 }

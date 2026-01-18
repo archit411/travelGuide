@@ -12,6 +12,8 @@ import Layout from "../src/Pages/Layout";
 import FeedPage from "./Pages/FeedPage";
 import Onboarding from "./Pages/onBoarding";
 import ActiveTripPage from "./Pages/ActiveTripPage";
+import ExploreDetails from "./Pages/ExploreDetails";
+import ExplorePlaces from "./Pages/Tab";
 
 function App() {
   return (
@@ -32,7 +34,8 @@ function App() {
           <Route path="/feed" element={<FeedPage/>}/>
           <Route path="/saved" element={<SavedStories />} />
         </Route>
-
+<Route path="/" element={<ExplorePlaces />} />
+        <Route path="/explore/:id" element={<ExploreDetails />} />
         {/*Routes without BottomNav */}
         <Route path="/destination/:id" element={<DestinationPage />} />
         <Route path="/livestories" element={<LiveStories />} />
