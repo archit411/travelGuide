@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import "./Explore.css";
 import PlaceCard from "./PlaceCard";
 
 const ExplorePlaces = () => {
