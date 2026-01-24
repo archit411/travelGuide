@@ -8,9 +8,11 @@ html, body {
 }
 
 /* Disable scroll globally for desktop main profile page */
-body, .no-scroll {
-  overflow: hidden;
-  height: 100vh;
+@media (min-width: 769px) {
+  body, .no-scroll {
+    overflow: hidden;
+    height: 100vh;
+  }
 }
 
 /* ===== Page Container ===== */
