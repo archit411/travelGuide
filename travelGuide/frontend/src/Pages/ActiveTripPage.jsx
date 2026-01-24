@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import "./activetrip.css";
 
 export default function ActiveTripPage() {
   const activeTrip = JSON.parse(localStorage.getItem("activeTrip"));
-  const currentDayIndex = parseInt(localStorage.getItem("currentDayIndex") || 0);
-  const today = activeTrip?.days[currentDayIndex];
+  const currentDayIndex = parseInt(
+    localStorage.getItem("currentDayIndex") || "0"
+  );
 
-  if (!activeTrip) return <div>No active trip</div>;
+  if (!activeTrip) return <div className="empty">No active trip</div>;
 
-  // -------------------------
-  // LOAD VISITED PROGRESS FOR THIS DAY
-  // -------------------------
+  const today = activeTrip.days[currentDayIndex];
+
   const visitedKey = `visited_day_${currentDayIndex}`;
   const [visited, setVisited] = useState(
     JSON.parse(localStorage.getItem(visitedKey) || "{}")
@@ -23,171 +23,112 @@ export default function ActiveTripPage() {
     localStorage.setItem(visitedKey, JSON.stringify(updated));
   };
 
-  // -------------------------
-  // TIMELINE PROGRESS CALCULATION
-  // -------------------------
   const total = today?.activities?.length || 0;
   const completed = Object.values(visited).filter(Boolean).length;
   const progressPercent = total ? (completed / total) * 100 : 0;
 
   return (
-    <div className="vtp-wrapper">
-
-      {/* HEADER IMAGE */}
-      <div className="vtp-banner">
-        <button className="vtp-back" onClick={() => window.history.back()}>
-          <FiArrowLeft size={20} />
+    <div className="at-wrapper">
+      {/* HEADER */}
+      <header className="at-header">
+        <button className="at-back" onClick={() => window.history.back()}>
+          <FiArrowLeft />
         </button>
 
-        <img
-          src='./bgImg.avif'
-          className="vtp-banner-img"
-          alt="Trip Banner"
-        />
-
-        <div className="vtp-banner-overlay" />
-
-        <div className="vtp-date-range">
-          {activeTrip.startDate} – {activeTrip.endDate}
+        <div>
+          <h1 className="at-title">{activeTrip.destination}</h1>
+          <p className="at-dates">
+            {activeTrip.startDate} – {activeTrip.endDate}
+          </p>
         </div>
-      </div>
+      </header>
 
-      {/* MAIN CONTENT */}
-      <div className="vtp-body">
-
-        {/* DAY HEADER */}
-        <div className="vtp-day-header">
-          <div className="vtp-day-circle">D{currentDayIndex + 1}</div>
-
-          <div>
-            <h2 className="vtp-day-title">Day {currentDayIndex + 1}</h2>
-            <p className="vtp-day-date">{today?.date}</p>
-          </div>
+      {/* DAY + PROGRESS */}
+      <section className="at-day">
+        <div className="at-day-info">
+          <div className="at-day-badge">Day {currentDayIndex + 1}</div>
+          <p className="at-day-date">{today?.date}</p>
         </div>
 
-        {/* VERTICAL TIMELINE */}
-        <div className="vtp-timeline">
-
-          {/* Grey background line */}
-          <div className="vtp-line"></div>
-
-          {/* FILLED PROGRESS LINE */}
+        <div className="at-progress">
           <div
-            className="vtp-line-fill"
-            style={{ height: `${progressPercent}%` }}
-          ></div>
-
-          {/* ACTIVITY CARDS */}
-          <div className="vtp-cards">
-            {today?.activities?.map((act, index) => (
-              <div
-                key={index}
-                className={`vtp-item-wrapper ${visited[index] ? "vtp-visited" : ""}`}
-              >
-                {/* DOT */}
-                <div className="vtp-dot"></div>
-
-                {/* CARD */}
-                <div className="vtp-card">
-
-                  <img
-                    src={act.image || today.bannerImage}
-                    className="vtp-img"
-                    alt={act.activity}
-                  />
-
-                  <h3 className="vtp-title">{act.activity}</h3>
-                  <p className="vtp-desc">{act.description}</p>
-                  <p className="vtp-location">📍 {act.location}</p>
-
-                  {/* BUTTON SECTION */}
-                  <div className="vtp-buttons">
-
-                    <a
-                      className="btn-dir"
-                      target="_blank"
-                      href={act.mapsLink || "#"}
-                    >
-                      ➤ Directions
-                    </a>
-
-                    <a
-                      className="btn-uber"
-                      target="_blank"
-                      href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${act.lat}&dropoff[longitude]=${act.lon}`}
-                    >
-                      🚗 Uber
-                    </a>
-
-                    <a
-                      className="btn-ola"
-                      target="_blank"
-                      href={`https://olawebcdn.com/assets/ola-universal-link.html?lat=${act.lat}&lng=${act.lon}`}
-                    >
-                      🚕 Ola
-                    </a>
-
-                  </div>
-
-                  {/* MARK COMPLETED BUTTON */}
-                  <button
-                    className={`vtp-visit-btn ${visited[index] ? "done" : ""}`}
-                    onClick={() => toggleVisited(index)}
-                  >
-                    {visited[index] ? "✓ Completed" : "Mark Visited"}
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+            className="at-progress-fill"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
+      </section>
 
-        {/* NEXT / PREVIOUS / FINISH DAY BUTTONS */}
-        <div className="vtp-day-nav">
+      {/* ACTIVITIES */}
+      <section className="at-list">
+        {today?.activities?.map((act, index) => (
+          <div
+            key={index}
+            className={`at-card ${visited[index] ? "done" : ""}`}
+          >
+            <div className="at-card-head">
+              <h3>{act.activity}</h3>
 
-          {/* PREVIOUS DAY */}
-          {currentDayIndex > 0 && (
+              <button
+                className="at-check"
+                onClick={() => toggleVisited(index)}
+              >
+                {visited[index] ? "✓" : "○"}
+              </button>
+            </div>
+
+            <p className="at-desc">{act.description}</p>
+            <p className="at-loc">📍 {act.location}</p>
+
+            <div className="at-actions">
+              <a href={act.mapsLink || "#"} target="_blank" rel="noreferrer">
+                Directions
+              </a>
+
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href={`https://m.uber.com/ul/?action=setPickup&pickup=my_location&dropoff[latitude]=${act.lat}&dropoff[longitude]=${act.lon}`}
+              >
+                Uber
+              </a>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* NAVIGATION */}
+      <footer className="at-nav">
+        {currentDayIndex > 0 && (
+          <button
+            onClick={() => {
+              localStorage.setItem(
+                "currentDayIndex",
+                currentDayIndex - 1
+              );
+              window.location.reload();
+            }}
+          >
+            Previous
+          </button>
+        )}
+
+        {currentDayIndex < activeTrip.days.length - 1 &&
+          completed === total && (
             <button
-              className="vtp-nav-btn secondary"
-              onClick={() => {
-                localStorage.setItem("currentDayIndex", currentDayIndex - 1);
-                window.location.reload();
-              }}
-            >
-              ← Previous Day
-            </button>
-          )}
-
-          {/* NEXT DAY */}
-          {currentDayIndex < activeTrip.days.length - 1 && completed === total && (
-            <button
-              className="vtp-nav-btn primary"
+              className="primary"
               onClick={() => {
                 localStorage.removeItem(visitedKey);
-                localStorage.setItem("currentDayIndex", currentDayIndex + 1);
+                localStorage.setItem(
+                  "currentDayIndex",
+                  currentDayIndex + 1
+                );
                 window.location.reload();
               }}
             >
-              Next Day →
+              Next Day
             </button>
           )}
-
-          {/* FINISH TRIP */}
-          {currentDayIndex === activeTrip.days.length - 1 && completed === total && (
-            <button
-              className="vtp-finish-trip"
-              onClick={() => {
-                localStorage.removeItem("activeTrip");
-                localStorage.removeItem("currentDayIndex");
-                window.history.back();
-              }}
-            >
-              🎉 Finish Trip
-            </button>
-          )}
-        </div>
-
-      </div>
+      </footer>
     </div>
   );
 }

@@ -160,3 +160,248 @@
     gap: 12px;
   }
 }
+/* =========================
+   EXPLORE SECTION
+========================= */
+
+/* =========================
+   EXPLORE SECTION
+========================= */
+
+.explore-container {
+  padding: 32px;
+}
+
+.explore-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.explore-header p {
+  margin-top: 6px;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+/* =========================
+   HORIZONTAL SCROLL
+========================= */
+
+.places-scroll {
+  display: flex;
+  gap: 24px;
+  margin-top: 24px;
+  overflow-x: auto;
+  padding-bottom: 12px;
+}
+
+.places-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.places-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 8px;
+}
+
+/* =========================
+   PLACE CARD (IMAGE + TEXT BELOW)
+========================= */
+
+.place-card {
+  min-width: 260px;
+  max-width: 260px;
+  cursor: pointer;
+}
+
+.place-image {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  transition: transform 0.3s ease;
+}
+
+.place-card:hover .place-image {
+  transform: scale(1.03);
+}
+
+/* =========================
+   PLACE INFO (BELOW IMAGE)
+========================= */
+
+.place-info {
+  margin-top: 12px;
+}
+
+.place-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111827;
+}
+
+.place-desc {
+  margin-top: 4px;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+/* =========================
+   SKELETON LOADING
+========================= */
+
+.place-skeleton {
+  min-width: 260px;
+  height: 240px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 37%,
+    #e5e7eb 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+
+/* =========================
+   HORIZONTAL SCROLL
+========================= */
+
+.places-scroll {
+  display: flex;
+  gap: 20px;
+  margin-top: 24px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.places-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.places-scroll::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+/* =========================
+   PLACE CARD
+========================= */
+
+.place-card {
+  min-width: 260px;
+  background: white;
+  border-radius: 16px;
+  cursor: pointer;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.place-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.15);
+}
+
+/* Image */
+
+.place-img-wrapper {
+  height: 170px;
+  overflow: hidden;
+}
+
+.place-img-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.place-card:hover img {
+  transform: scale(1.08);
+}
+
+/* Body */
+
+.place-card-body {
+  padding: 16px;
+}
+
+.place-card-body h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.place-card-body p {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 8px 0 12px;
+  line-height: 1.4;
+}
+
+/* Button */
+
+.explore-btn {
+  font-size: 14px;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+/* =========================
+   SKELETON LOADING
+========================= */
+
+.place-skeleton {
+  min-width: 260px;
+  height: 260px;
+  border-radius: 16px;
+  background: linear-gradient(
+    90deg,
+    #e5e7eb 25%,
+    #f3f4f6 37%,
+    #e5e7eb 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+/* ===== FIX PLACE CARD TEXT NOT SHOWING ===== */
+
+.place-card {
+  display: block !important;
+  height: auto !important;
+  /* overflow: visible !important; */
+}
+
+.place-image {
+  display: block;
+}
+
+.place-info {
+  margin-top: 6px;   /* reduced gap */
+}
+.place-desc {
+  margin-top: 2px;
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.4;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* ONE line only */
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

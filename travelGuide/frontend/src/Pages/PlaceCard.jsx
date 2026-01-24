@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
+import './ExploreDetails.css';
 const PlaceCard = ({ place }) => {
   const navigate = useNavigate();
 
@@ -9,9 +9,13 @@ const PlaceCard = ({ place }) => {
       className="place-card"
       onClick={() => navigate(`/explore/${place.id}`)}
     >
-      <img src={place.imageUrl} alt={place.name} />
+      <img
+        className="place-image"
+        src={place.imageUrl}
+        alt={place.name}
+      />
 
-      <div className="place-card-body">
+      <div className="place-info">
         <h3 className="place-name">{place.name}</h3>
         <p className="place-desc">{place.description}</p>
       </div>

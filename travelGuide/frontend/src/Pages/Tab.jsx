@@ -4,7 +4,7 @@ import PlaceCard from "./PlaceCard";
 
 const ExplorePlaces = () => {
   const [places, setPlaces] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchPlaces();
@@ -12,9 +12,7 @@ const ExplorePlaces = () => {
 
   const fetchPlaces = async () => {
     try {
-      setLoading(true);
       const token = localStorage.getItem("token");
-
       const res = await axios.post(
         "http://localhost:8080/api/places/getPlaces",
         {},
@@ -22,9 +20,7 @@ const ExplorePlaces = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-
       setPlaces(res.data);
-      console.log("data 1",res.data);
     } catch (err) {
       console.error("Failed to load places", err);
     } finally {
@@ -33,20 +29,22 @@ const ExplorePlaces = () => {
   };
 
   return (
-    <div className="explore-container">
-      <h1 className="explore-title">Explore Places</h1>
-      <p className="explore-subtitle">
-        Discover top destinations, attractions & experiences
-      </p>
-
-      {loading && <p>Loading places...</p>}
-
-      <div className="places-horizontal-scroll">
-        {places.map((place) => (
-          <PlaceCard key={place.id} place={place} />
-        ))}
+    <section className="explore-container">
+      <div className="explore-header">
+        <h1>Explore Places</h1>
+        <p>Discover top destinations, attractions & experiences</p>
       </div>
-    </div>
+
+      <div className="places-scroll">
+        {loading
+          ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="place-skeleton" />
+            ))
+          : places.map((place) => (
+              <PlaceCard key={place.id} place={place} />
+            ))}
+      </div>
+    </section>
   );
 };
 

@@ -146,9 +146,6 @@ export default function DestinationPage() {
         >
           <div className="dest-banner-overlay">
             <div className="dest-banner-top">
-              <button className="banner-icon-btn" onClick={() => navigate(-1)}>
-                <FiArrowLeft />
-              </button>
               <div className="banner-actions">
                 <button className="banner-icon-btn">
                   <FiBookmark />

@@ -1,416 +1,223 @@
-/* =========================================================
-   ACTIVE TRIP PAGE – COMPLETE UPDATED CSS
-   ========================================================= */
+/* =========================
+   GLOBAL SCROLL FIX
+========================= */
 
-/* Background */
-.vtp-wrapper {
-  background: linear-gradient(180deg, #f7f9fc, #eef1f6);
-  min-height: 100vh;
+* {
+  box-sizing: border-box;
 }
 
-/* =========================================================
-   BANNER (TOP IMAGE)
-   ========================================================= */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: auto;
+  min-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #f6f7fb;
+  font-family: Inter, system-ui, sans-serif;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
 
-.vtp-banner {
-  position: relative;
+/* =========================
+   WRAPPER
+========================= */
+
+.at-wrapper {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 20px 16px 40px;
+  min-height: 100%;
+  height: auto;
   overflow: visible;
 }
 
-.vtp-banner-img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.20);
-}
+/* =========================
+   HEADER
+========================= */
 
-.vtp-banner-overlay {
-  position: absolute;
-  bottom: 0;
-  height: 110px;
-  width: 100%;
-  background: linear-gradient(180deg, transparent, rgba(0,0,0,0.55));
-  border-bottom-left-radius: 40px;
-  border-bottom-right-radius: 40px;
-}
-
-.vtp-back {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  padding: 12px;
-  background: rgba(255,255,255,0.88);
-  border: 1px solid rgba(255,255,255,0.6);
-  backdrop-filter: blur(12px);
-  border-radius: 50%;
-  box-shadow: 0 4px 18px rgba(0,0,0,0.22);
-  z-index: 20;
-}
-
-.vtp-date-range {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  color: white;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* =========================================================
-   BODY CARD (WHITE CARD UNDER IMAGE)
-   ========================================================= */
-
-.vtp-body {
-  background: #fff;
-  margin-top: -45px;
-  padding: 32px 22px;
-  border-radius: 34px;
-  box-shadow: 0 -10px 50px rgba(0,0,0,0.12);
-}
-
-/* =========================================================
-   DAY HEADER
-   ========================================================= */
-
-.vtp-day-header {
+.at-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
+  margin-bottom: 20px;
 }
 
-.vtp-day-circle {
-  width: 62px;
-  height: 62px;
-  background: linear-gradient(145deg, #4c8bff, #7ab0ff);
-  border-radius: 50%;
-  color: white;
-  font-size: 22px;
-  font-weight: 700;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 8px 25px rgba(76,139,255,0.45);
-  transform: translateY(-6px);
-}
-
-.vtp-day-title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 800;
-}
-
-.vtp-day-date {
-  margin: 2px 0 0 0;
-  font-size: 15px;
-  color: #8692a4;
-}
-
-/* =========================================================
-   TIMELINE
-   ========================================================= */
-
-.vtp-timeline {
-  position: relative;
-  margin-top: 32px;
-  padding-left: 10px;
-}
-
-.vtp-line {
-  position: absolute;
-  left: 36px;
-  width: 4px;
-  background: #e3e7f0;
-  top: 0;
-  bottom: 0;
-  border-radius: 10px;
-}
-
-.vtp-line-fill {
-  position: absolute;
-  left: 36px;
-  width: 4px;
-  background: #4caf50;
-  top: 0;
-  border-radius: 10px;
-  transition: height .3s ease;
-}
-
-/* Card container spacing */
-.vtp-cards {
-  margin-left: 70px;
-  width: calc(100% - 70px);
-}
-
-.vtp-item-wrapper {
-  position: relative;
-  margin-bottom: 40px;
-}
-
-/* Timeline Dot */
-.vtp-dot {
-  width: 20px;
-  height: 20px;
-  background: #4d89ff;
-  border-radius: 50%;
-  position: absolute;
-  left: -38px;
-  top: 20px;
-  border: 3px solid #eef3ff;
-  box-shadow: 0 0 14px rgba(77,137,255,0.7);
-}
-
-.vtp-visited .vtp-dot {
-  background: #41c769 !important;
-  box-shadow: 0 0 14px rgba(0,180,60,0.8);
-}
-
-/* =========================================================
-   ACTIVITY CARD
-   ========================================================= */
-
-.vtp-card {
+.at-back {
+  border: none;
   background: #ffffff;
-  border-radius: 24px;
-  padding: 18px;
-  border: 1px solid #f2f3f7;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.06);
-  transition: 0.25s ease;
-}
-
-.vtp-card:hover {
-  transform: translateY(-2px);
-}
-
-.vtp-img {
-  width: 100%;
-  height: 160px;
-  object-fit: cover;
-  border-radius: 16px;
-}
-
-.vtp-title {
-  margin-top: 16px;
-  font-size: 19px;
-  font-weight: 800;
-  color: #1d2633;
-}
-
-.vtp-desc {
-  margin-top: 8px;
-  color: #5b6573;
-  font-size: 15px;
-  line-height: 1.5;
-}
-
-.vtp-location {
-  margin-top: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-/* =========================================================
-   BUTTONS
-   ========================================================= */
-
-.vtp-buttons a {
-  display: inline-block;
-  padding: 12px 15px;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  margin-right: 10px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-.btn-dir {
-  background: linear-gradient(135deg,#3c7bff,#5e97ff);
-  color: white;
-}
-
-.btn-uber {
-  background: #000;
-  color: white;
-}
-
-.btn-ola {
-  background: #ffcf4a;
-  color: black;
-}
-
-/* Mark Visited */
-.vtp-visit-btn {
-  margin-top: 12px;
-  width: 100%;
-  padding: 14px 0;
-  border-radius: 12px;
-  font-size: 15px;
-  font-weight: 700;
-  background: #eef1f6;
-  color: #2c3546;
-  border: none;
-}
-
-.vtp-visit-btn.done {
-  background: #30c070;
-  color: white;
-}
-
-/* =========================================================
-   DAY NAVIGATION (Next, Previous, Finish)
-   ========================================================= */
-
-.vtp-day-nav {
-  margin-top: 34px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.vtp-nav-btn {
-  padding: 15px;
-  border-radius: 16px;
-  font-size: 17px;
-  font-weight: 600;
-}
-
-.vtp-nav-btn.primary {
-  background: linear-gradient(135deg,#3d7bff,#5a92ff);
-  color: white;
-}
-
-.vtp-nav-btn.secondary {
-  background: #f1f4fa;
-  border: 1px solid #d7ddea;
-  color: #333;
-}
-
-/* Finish Trip */
-.vtp-finish-trip {
-  padding: 16px;
-  border-radius: 16px;
-  background: linear-gradient(135deg,#ff6b6b,#ff3d3d);
-  color: white;
-  font-size: 17px;
-  font-weight: 700;
-  border: none;
-  box-shadow: 0 4px 14px rgba(255,80,80,0.4);
-}
-
-/* =========================================================
-   HOMEPAGE ACTIVE TRIP CARD (updated)
-   ========================================================= */
-
-.active-trip-card-premium {
-  background: rgba(255,255,255,0.92);
-  backdrop-filter: blur(20px);
-  border-radius: 22px;
-  padding: 18px 26px 18px 20px;
-  border: 1px solid rgba(230,236,245,0.85);
-  margin-top: 20px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.10);
-  cursor: pointer;
-  position: relative;
-  animation: fadeUp 0.35s ease-out;
-  transition: 0.25s ease;
-}
-
-.active-trip-card-premium:hover {
-  transform: translateY(-3px);
-}
-
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.atp-premium-left {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.atp-premium-day {
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg,#3d7bff,#6aa3ff);
-  border-radius: 50%;
-  color: white;
-  font-size: 19px;
-  font-weight: 700;
-  display: flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.atp-premium-dest {
-  font-size: 18px;
-  font-weight: 700;
-  color: #222;
-}
-
-.atp-premium-dates {
-  font-size: 14px;
-  color: #677182;
-}
-
-.atp-premium-arrow {
-  font-size: 28px;
-  position: absolute;
-  right: 22px;
-  top: 26px;
-  color: #a7b2c4;
-}
-
-.atp-premium-progress {
-  width: 100%;
-  height: 7px;
-  background: #e7ecf3;
   border-radius: 10px;
-  margin-top: 16px;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.at-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.at-dates {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* =========================
+   DAY + PROGRESS
+========================= */
+
+.at-day {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.at-day-info {
+  margin-bottom: 8px;
+}
+
+.at-day-badge {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.at-day-date {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.at-progress {
+  height: 6px;
+  background: #e5e7eb;
+  border-radius: 10px;
   overflow: hidden;
 }
 
-.atp-premium-progress-fill {
+.at-progress-fill {
   height: 100%;
-  background: linear-gradient(135deg,#3d7bff,#6aa3ff);
-  border-radius: 10px;
-  transition: width 0.4s ease-in-out;
+  background: #2563eb;
+  transition: width 0.3s ease;
 }
 
-/* =========================================================
-   MOBILE VIEW FIXES
-   ========================================================= */
+/* =========================
+   ACTIVITY LIST
+========================= */
 
-@media (max-width: 768px) {
-  .active-trip-card-premium {
-    padding: 16px 18px;
-    flex-direction: column;
-    gap: 10px;
-  }
+.at-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 
-  .atp-premium-left {
-    gap: 14px;
-    padding-right: 0;
-  }
+/* =========================
+   ACTIVITY CARD
+========================= */
 
-  .atp-premium-day {
-    width: 44px;
-    height: 44px;
-    font-size: 17px;
-  }
+.at-card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+}
 
-  .atp-premium-dest {
-    font-size: 16px;
-    max-width: 72vw;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+.at-card.done {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
 
-  .atp-premium-arrow {
-    right: 12px;
-    top: 18px;
+.at-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.at-card h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.at-check {
+  border: none;
+  background: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.at-desc {
+  font-size: 14px;
+  color: #4b5563;
+  margin: 6px 0;
+  line-height: 1.5;
+}
+
+.at-loc {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* =========================
+   ACTION BUTTONS
+========================= */
+
+.at-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.at-actions a {
+  text-decoration: none;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #111827;
+}
+
+/* =========================
+   NAVIGATION
+========================= */
+
+.at-nav {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.at-nav button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  font-weight: 600;
+}
+
+.at-nav .primary {
+  background: #2563eb;
+  color: #ffffff;
+  border: none;
+}
+
+/* =========================
+   EMPTY STATE
+========================= */
+
+.empty {
+  padding: 40px;
+  text-align: center;
+  color: #6b7280;
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media (max-width: 480px) {
+  .at-wrapper {
+    padding: 16px 12px 40px;
   }
 }

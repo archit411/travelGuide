@@ -4,7 +4,7 @@ import { Outlet } from "react-router-dom";
 
 export default function Layout() {
   return (
-    <div style={{ minHeight: "100vh", position: "relative", paddingBottom: "70px" }}>      
+    <div style={{ position: "relative" }}>      
       <Outlet />
       {/* <BottomNav /> */}
     </div>

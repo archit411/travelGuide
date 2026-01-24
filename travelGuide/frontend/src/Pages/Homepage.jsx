@@ -11,6 +11,7 @@ import {
   FiX,
   FiSearch,
   FiHome,
+  FiStar,
 } from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -304,11 +305,13 @@ useEffect(() => {
         name: p.placeOne,
         desc: p.placeOneDescription,
         img: p.image_url1,
+        crowdLevel: p.placeOneCrowdLevel || "Low",
       },
       p.placeTwo && {
         name: p.placeTwo,
         desc: p.placeTwoDescription,
         img: p.image_url2,
+        crowdLevel: p.placeTwoCrowdLevel || "Low",
       },
     ])
     .filter(Boolean);
@@ -360,323 +363,454 @@ useEffect(() => {
   }
 
   return (
-    <div className="homepage-light">
-      <header className="header-main">
-        <div className="trip-header-inner">
-          <div className="trip-logo">
-            <div className="logo-circle">
+    <div className="homepage-modern">
+      {/* Modern Header */}
+      <header className="header-modern">
+        <div className="header-container">
+          <div className="header-logo">
+            <div className="logo-icon-modern">
               <i className="fa-solid fa-location-dot"></i>
             </div>
-            <span className="logo-text">
+            <span className="logo-text-modern">
               TripEZ<span>.in</span>
             </span>
           </div>
 
-          <div className="trip-header-right">
-            <div className="trip-loc-pill">
+          {!isMobile && (
+            <nav className="header-nav-modern">
+              {[
+                { id: "home", label: "Home", path: "/homepage" },
+                { id: "food", label: "Food", path: "/food" },
+                { id: "feed", label: "Feed", path: "/feed" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  className={`nav-link-modern ${active === item.id ? "active" : ""}`}
+                  onClick={() => {
+                    setActive(item.id);
+                    navigate(item.path);
+                  }}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </nav>
+          )}
+
+          <div className="header-actions">
+            <div className="location-badge">
               <i className="fa-solid fa-location-arrow"></i>
-              {city}
+              <span>{city}</span>
             </div>
 
-            <button className="trip-add-btn" onClick={() => setShowAdd(true)}>
-              <FiPlus /> Add Post
-            </button>
+            {!isMobile && (
+              <button className="btn-primary-modern" onClick={() => setShowAdd(true)}>
+                <FiPlus size={18} />
+                <span>Add Story</span>
+              </button>
+            )}
 
-            <button
-              className="trip-profile-btn"
-              onClick={() => navigate("/profile")}
-            >
-              <FiUser />
+            <button className="btn-secondary-modern" onClick={() => navigate("/profile")}>
+              <FiUser size={18} />
             </button>
           </div>
         </div>
       </header>
 
-      <div className="dpg-wrapper">
-        <div
-          className="dpg-bar"
-          onClick={() => setShowTripPlanner(true)}
-          style={{ cursor: "pointer" }}
-        >
-          <div className="dpg-item">
-            <FiCompass className="dpg-icon" />
-            <div>
-              <div className="dpg-title">Discover</div>
-              <div className="dpg-sub">Where?</div>
+      {/* Hero Section */}
+      <section className="hero-section">
+        <div className="hero-container">
+          <div className="hero-content">
+            <h1 className="hero-title">
+              Discover Your Next
+              <span className="hero-highlight"> Adventure</span>
+            </h1>
+            <p className="hero-subtitle">
+              Plan, explore, and share unforgettable travel experiences with TripEZ
+            </p>
+
+            <div className="hero-actions">
+              <button className="btn-hero-primary" onClick={() => setShowTripPlanner(true)}>
+                
+                <span>⟡ Plan Your Trip with AI</span>
+              </button>
+              <button className="btn-hero-secondary" onClick={() => navigate("/feed")}>
+                <FiSearch size={20} />
+                <span>Discover Stories</span>
+              </button>
             </div>
           </div>
 
-          <div className="dpg-divider"></div>
-
-          <div className="dpg-item">
-            <FiCalendar className="dpg-icon" />
-            <div>
-              <div className="dpg-title">Plan</div>
-              <div className="dpg-sub">When?</div>
-            </div>
-          </div>
-
-          <div className="dpg-divider"></div>
-
-          <div className="dpg-item">
-            <FiNavigation className="dpg-icon" />
-            <div>
-              <div className="dpg-title">Go</div>
-              <div className="dpg-sub">How?</div>
-            </div>
-          </div>
-        </div>
-
-        <button
-          className="ai-create-trip-btn"
-          onClick={() => setShowTripPlanner(true)}
-        >
-          <span className="ai-icon">✧˖°</span>
-          <span>Create Trip with AI</span>
-        </button>
-      </div>
-
-      {/* ========================= FIXED ACTIVE TRIP CARD ========================= */}
-     {activeTrip && (
-  <div 
-    className="active-trip-card-premium enhanced"
-    onClick={() => navigate("/active-trip")}
-  >
-    <div className="atp-left">
-      <div className="atp-day-badge">D{currentDay}</div>
-
-      <div className="atp-info">
-        <h3 className="atp-dest">{activeTrip.destination}</h3>
-        <p className="atp-dates">
-          {activeTrip.startDate} → {activeTrip.endDate}
-        </p>
-      </div>
-    </div>
-
-    <div className="atp-arrow">›</div>
-
-    <div className="atp-progress">
-      <div
-        className="atp-progress-fill animate"
-        style={{
-          width: `${((currentDay - 1) / activeTrip.days.length) * 100}%`
-        }}
-      ></div>
-    </div>
-  </div>
-)}
-
-      {/* ======================================================================== */}
-<ExplorePlaces/>
-      <section className="section">
-        <div className="section-head">
-          <div>Featured Destinations</div>
-          <span className="view-all">View All</span>
-        </div>
-
-        <div className="featured-grid">
-          {loadingPlaces ? (
-            <p>Loading destinations...</p>
-          ) : places.length === 0 ? (
-            <p>No destinations available</p>
-          ) : (
-            places.map((p, i) => (
-              <div
-                className="place-card"
-                key={i}
-                onClick={() => {
-                  console.log("Clicked place:", p);
-                  navigate(`/destination/${encodeURIComponent(p.name)}`, {
-                    state: { place: p },
-                  });
-                }}
-                style={{ cursor: "pointer" }}
-              >
-                <div
-                  className="place-img"
-                  style={{ backgroundImage: `url(${p.img})` }}
-                />
-                <div className="place-overlay">
-                  <h3>{p.name}</h3>
-                  <p>{p.desc}</p>
+          <div className="hero-visual">
+            <div className="hero-cards-stack">
+              <div className="hero-card card-1">
+                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="Mountain" />
+                <div className="card-overlay">
+                  <h3>Himalayas</h3>
+                  <p>Adventure awaits</p>
                 </div>
               </div>
-            ))
-          )}
+              <div className="hero-card card-2">
+                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400" alt="Beach" />
+                <div className="card-overlay">
+                  <h3>Goa Beaches</h3>
+                  <p>Paradise found</p>
+                </div>
+              </div>
+              <div className="hero-card card-3">
+                <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400" alt="City" />
+                <div className="card-overlay">
+                  <h3>Delhi</h3>
+                  <p>Cultural hub</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="highlights-section">
-        <div className="section-header">
-          <div>Today's Highlights</div>
-          <span className="view-all">View All</span>
+      {/* Quick Actions Bar */}
+      <section className="quick-actions">
+        <div className="actions-container">
+          <div className="action-card" onClick={() => setShowTripPlanner(true)}>
+            <div className="action-icon">
+              <FiCompass size={24} />
+            </div>
+            <div className="action-content">
+              <h3>Discover</h3>
+              <p>Where to go?</p>
+            </div>
+          </div>
+
+          <div className="action-divider"></div>
+
+          <div className="action-card" onClick={() => setShowTripPlanner(true)}>
+            <div className="action-icon">
+              <FiCalendar size={24} />
+            </div>
+            <div className="action-content">
+              <h3>Plan</h3>
+              <p>When to travel?</p>
+            </div>
+          </div>
+
+          <div className="action-divider"></div>
+
+          <div className="action-card" onClick={() => navigate("/feed")}>
+            <div className="action-icon">
+              <FiNavigation size={24} />
+            </div>
+            <div className="action-content">
+              <h3>Go</h3>
+              <p>How to get there?</p>
+            </div>
+          </div>
         </div>
+      </section>
 
-        <div className="highlights-scroll">
-          {stories.map((story, idx) => (
-            <div
-              className="highlight-card"
-              key={idx}
-              onClick={() => openStory(story)}
-            >
-              <div
-                className="highlight-image"
-                style={{ backgroundImage: `url(${story.image})` }}
-              ></div>
+      {/* Active Trip Status */}
+      {activeTrip && (
+        <section className="active-trip-section">
+          <div className="active-trip-card-modern" onClick={() => navigate("/active-trip")}>
+            <div className="trip-status">
+              <div className="day-indicator">
+                <span className="day-number">D{currentDay}</span>
+                <span className="day-label">Day</span>
+              </div>
+              <div className="trip-details">
+                <h3 className="trip-destination">{activeTrip.destination}</h3>
+                <p className="trip-dates">{activeTrip.startDate} → {activeTrip.endDate}</p>
+              </div>
+            </div>
 
-              <div className="hl-top-row">
-                <div className="hl-user-info">
-                  <div className="hl-avatar">
-                    {story.userName?.charAt(0) || "U"}
-                  </div>
-                  <div className="hl-user-text">
-                    <div className="hl-name">{story.userName || "User"}</div>
-                    <div className="hl-time">{timeAgo(story.createdAt)}</div>
-                  </div>
-                </div>
-
+            <div className="trip-progress">
+              <div className="progress-bar">
                 <div
-                  className={`hl-crowd ${story.crowdLevel?.toLowerCase()}`}
+                  className="progress-fill"
+                  style={{
+                    width: `${((currentDay - 1) / activeTrip.days.length) * 100}%`
+                  }}
+                ></div>
+              </div>
+              <span className="progress-text">
+                {currentDay - 1} of {activeTrip.days.length} days completed
+              </span>
+            </div>
+
+            <div className="trip-arrow">
+              <FiNavigation size={20} />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Explore Section */}
+      <section className="explore-section">
+        <div className="section-container">
+          <div className="section-header-modern">
+            <h2>Explore Places</h2>
+            <p>Discover amazing destinations across India</p>
+          </div>
+          <ExplorePlaces />
+        </div>
+      </section>
+
+      {/* Featured Destinations */}
+      <section className="featured-section">
+        <div className="section-container">
+          <div className="section-header-modern">
+            <h2>Featured Destinations</h2>
+            <p>Handpicked places loved by travelers</p>
+            <button className="view-all-btn" onClick={() => navigate("/feed")}>
+              View All <FiNavigation size={16} />
+            </button>
+          </div>
+
+          <div className="destinations-grid">
+            {loadingPlaces ? (
+              <div className="loading-skeleton">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="skeleton-card"></div>
+                ))}
+              </div>
+            ) : places.length === 0 ? (
+              <div className="empty-state">
+                <FiCompass size={48} />
+                <h3>No destinations available</h3>
+                <p>Check back soon for amazing places!</p>
+              </div>
+            ) : (
+              places.slice(0, 6).map((place, i) => (
+                <div
+                  className="destination-card-modern"
+                  key={i}
+                  onClick={() => {
+                    navigate(`/destination/${encodeURIComponent(place.name)}`, {
+                      state: { place: place },
+                    });
+                  }}
                 >
-                  {story.crowdLevel}
+                  <div className="destination-image">
+                    <img src={place.img} alt={place.name} />
+                    <div className="image-overlay"></div>
+                  </div>
+                  <div className="destination-content">
+                    <h3>{place.name}</h3>
+                    <p>{place.desc}</p>
+                    <div className="destination-meta">
+                      <span className="rating">⭐ 4.{Math.floor(Math.random() * 5) + 5}</span>
+                      <span className="distance">📍 {Math.floor(Math.random() * 500) + 50}km</span>
+                      <span className={`crowd-level ${place.crowdLevel?.toLowerCase()}`}>
+                        👥 {place.crowdLevel}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="hl-badges-row">
-                <div className="hl-badge">
-                  🌡 {story.temprature || "--"}°C
-                </div>
-                <div className="hl-badge">❤️ {story.likes || 0}</div>
-              </div>
-
-              <div className="hl-text-block">
-                <div className="hl-title">
-                  {story.destination || "Unknown"}
-                </div>
-                <div className="hl-desc">
-                  {story.caption?.length > 70
-                    ? story.caption.slice(0, 70) + "..."
-                    : story.caption || "No caption"}
-                </div>
-              </div>
-            </div>
-          ))}
+              ))
+            )}
+          </div>
         </div>
       </section>
 
-     {!showTripPlanner && (
-  <nav className="bottom-nav">
+      {/* Travel Stories */}
+      <section className="stories-section">
+        <div className="section-container">
+          <div className="section-header-modern">
+            <h2>Travel Stories</h2>
+            <p>Real experiences from fellow travelers</p>
+            <button className="view-all-btn" onClick={() => navigate("/feed")}>
+              View All Stories <FiNavigation size={16} />
+            </button>
+          </div>
 
-    {/* DESKTOP NAV */}
-    {!isMobile && (
-      <div className="nav-web">
-        {[
-          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-          { id: "feed", label: "Feed", icon: <FiSearch />, path: "/feed" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-btn ${active === item.id ? "active" : ""}`}
-            onClick={() => {
-              setActive(item.id);
-              navigate(item.path);
-            }}
-          >
-            <div className="nav-ic">{item.icon}</div>
-            <div className="nav-label">{item.label}</div>
-          </button>
-        ))}
-      </div>
-    )}
+          <div className="stories-grid">
+            {stories.slice(0, 4).map((story, idx) => (
+              <div
+                className="story-card-modern"
+                key={idx}
+                onClick={() => openStory(story)}
+              >
+                {/* <div className="story-image">
+                  <img src={story.image} alt={story.destination} />
+                  <div className="story-overlay">
+                    <div className="story-user">
+                      <div className="user-avatar">
+                        {story.userName?.charAt(0) || "U"}
+                      </div>
+                      <span>{story.userName || "User"}</span>
+                    </div>
+                    <div className="story-time">{timeAgo(story.createdAt)}</div>
+                  </div>
+                </div> */}
 
-    {/* MOBILE NAV */}
-    {isMobile && (
-      <div className="nav-mobile-new">
-        {[
-          { id: "home", label: "Home", icon: <FiHome />, path: "/homepage" },
-          { id: "food", label: "Food", icon: <FaUtensils />, path: "/food" },
-          { id: "upload", label: "", icon: <FiX style={{ transform: "rotate(45deg)" }} /> },
-          { id: "story", label: "Feed", icon: <FiSearch />, path: "/feed" },
-          { id: "profile", label: "Profile", icon: <FiUser />, path: "/profile" },
-        ].map((item) => (
-          <button
-            key={item.id}
-            className={`nav-mobile-btn ${
-              item.id === "upload" ? "upload-center" : ""
-            } ${active === item.id ? "active" : ""}`}
-            onClick={() => {
-              if (item.id === "upload") {
-                setShowAdd(true);
-                return;
-              }
-              setActive(item.id);
-              navigate(item.path);
-            }}
-          >
-            <div className="nav-icon">{item.icon}</div>
-            {item.label && <span className="nav-text">{item.label}</span>}
-          </button>
-        ))}
-      </div>
-    )}
-  </nav>
-)}
+                <div className="story-content">
+                  <div className="story-location">
+                    📍 {story.destination || "Unknown"}
+                  </div>
+                  <div className="story-text">
+                    {story.caption?.length > 80
+                      ? story.caption.slice(0, 80) + "..."
+                      : story.caption || "No caption"}
+                  </div>
+                  <div className="story-stats">
+                    <span>❤️ {story.likes || 0}</span>
+                    <span>🌡 {story.temprature || "--"}°C</span>
+                    <span className={`crowd-level ${story.crowdLevel?.toLowerCase()}`}>
+                      {story.crowdLevel}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
+      {/* CTA Section */}
+      <section className="cta-section">
+        <div className="cta-container">
+          <div className="cta-content">
+            <h2>Ready for Your Next Adventure?</h2>
+            <p>Join thousands of travelers planning their perfect trips with TripEZ</p>
+            <button className="btn-cta" onClick={() => setShowTripPlanner(true)}>
+              <span>Start Planning</span>
+              <FiNavigation size={18} />
+            </button>
+          </div>
+          <div className="cta-visual">
+            <div className="cta-stats">
+              <div className="stat-item">
+                <span className="stat-number">10K+</span>
+                <span className="stat-label">Destinations</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">50K+</span>
+                <span className="stat-label">Travelers</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-number">100K+</span>
+                <span className="stat-label">Stories</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
+      {/* Modern Footer */}
       {!isMobile && (
-        <footer className="footer">
-          <div className="footer-content">
-            <div className="footer-left">
-              <div>
-                <h2>TripEZ</h2>
-                <p>
-                  Discover destinations, plan your trips & explore the world.
-                </p>
+        <footer className="footer-modern">
+          <div className="footer-container-minimal">
+            <div className="footer-brand">
+              <div className="footer-logo">
+                <i className="fa-solid fa-location-dot"></i>
+                <span>TripEZ<span>.in</span></span>
+              </div>
+              <div className="footer-social">
+                <a href="#" className="social-link">
+                  <i className="fa-brands fa-instagram social-icon"></i>
+                </a>
+                <a href="#" className="social-link">
+                  <i className="fa-brands fa-facebook social-icon"></i>
+                </a>
+                <a href="#" className="social-link">
+                  <i className="fa-brands fa-twitter social-icon"></i>
+                </a>
               </div>
             </div>
 
-            <div>
-              <h3>Company</h3>
-              <p>About</p>
-              <p>Features</p>
-              <p>Works</p>
-              <p>Career</p>
-            </div>
+            <div className="footer-links-minimal">
+              <div className="footer-section">
+                <h4>Quick Links</h4>
+                <a href="#">About</a>
+                <a href="#">Help</a>
+                <a href="#">Privacy</a>
+              </div>
 
-            <div>
-              <h3>Resources</h3>
-              <p>Free Guides</p>
-              <p>Travel Tips</p>
-              <p>Blog</p>
-              <p>Community</p>
-            </div>
-
-            <div>
-              <h3>Newsletter</h3>
-              <div className="footer-input">
-                <input placeholder="Enter your email" />
-                <button>Subscribe</button>
+              <div className="footer-section">
+                <h4>Contact</h4>
+                <a href="#">Contact Us</a>
+                <a href="#">Terms</a>
+                <a href="#">Blog</a>
               </div>
             </div>
           </div>
 
-          <p className="footer-bottom">
-            © 2025 TripEZ. All Rights Reserved.
-          </p>
+          <div className="footer-bottom-minimal">
+            <p>&copy; 2026 TripEZ. All rights reserved.</p>
+          </div>
         </footer>
       )}
 
+      {/* Mobile Navigation */}
       {isMobile && (
-        <div className="travel-hero-footer">
+        <nav className="mobile-nav-modern">
+          <div className="mobile-nav-container">
+            {/* Left buttons */}
+            <button
+              className={`mobile-nav-btn ${active === "home" ? "active" : ""}`}
+              onClick={() => {
+                setActive("home");
+                navigate("/homepage");
+              }}
+            >
+              <div className="nav-icon"><FiHome /></div>
+              <span className="nav-label">Home</span>
+            </button>
+
+            <button
+              className={`mobile-nav-btn ${active === "food" ? "active" : ""}`}
+              onClick={() => {
+                setActive("food");
+                navigate("/food");
+              }}
+            >
+              <div className="nav-icon"><FaUtensils /></div>
+              <span className="nav-label">Food</span>
+            </button>
+
+            {/* Center floating add button */}
+            <button
+              className="mobile-nav-btn add-btn"
+              onClick={() => setShowAdd(true)}
+            >
+              <div className="nav-icon"><FiPlus /></div>
+            </button>
+
+            {/* Right buttons */}
+            <button
+              className={`mobile-nav-btn ${active === "feed" ? "active" : ""}`}
+              onClick={() => {
+                setActive("feed");
+                navigate("/feed");
+              }}
+            >
+              <div className="nav-icon"><FiSearch /></div>
+              <span className="nav-label">Feed</span>
+            </button>
+
+            <button
+              className={`mobile-nav-btn ${active === "profile" ? "active" : ""}`}
+              onClick={() => {
+                setActive("profile");
+                navigate("/profile");
+              }}
+            >
+              <div className="nav-icon"><FiUser /></div>
+              <span className="nav-label">Profile</span>
+            </button>
+          </div>
+        </nav>
+      )}
+
+      {/* Mobile Hero Footer */}
+      {isMobile && (
+        <div className="mobile-hero-footer">
           <h1>
             India's most loved <br />
             travel companion <span>❤️</span>
           </h1>
-
-          <div className="thf-line"></div>
-
-          <p className="thf-brand">TripEZ</p>
+          <div className="footer-line"></div>
+          <p className="footer-brand">TripEZ</p>
         </div>
       )}
 
