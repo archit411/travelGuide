@@ -19,10 +19,11 @@ public class TripRequestDTO {
     private String transport = "Self Drive";
     private int people;
 
-  
-    public TripRequestDTO() {}
+    public TripRequestDTO() {
+    }
 
-    public TripRequestDTO(String destination, int duration, String startDate, String interests, String budget, String crowdLevel, String transport) {
+    public TripRequestDTO(String destination, int duration, String startDate, String interests, String budget,
+            String crowdLevel, String transport) {
         this.destination = destination;
         this.duration = duration;
         this.startDate = startDate;
@@ -33,32 +34,88 @@ public class TripRequestDTO {
     }
 
     // getters / setters
-    public String getDestination() { return destination; }
-    public void setDestination(String destination) { this.destination = destination; }
+    public String getDestination() {
+        return destination;
+    }
 
-    public int getDuration() { return duration; }
-    public void setDuration(int duration) { this.duration = duration; }
+    public void setDestination(String destination) {
+        this.destination = destination;
+    }
 
-    public String getStartDate() { return startDate; }
-    public void setStartDate(String startDate) { this.startDate = startDate; }
+    public int getDuration() {
+        return duration;
+    }
 
-    public String getInterests() { return interests; }
-    public void setInterests(String interests) { this.interests = interests; }
+    public void setDuration(int duration) {
+        this.duration = duration;
+    }
 
-    public String getBudget() { return budget; }
-    public void setBudget(String budget) { this.budget = budget; }
+    public String getStartDate() {
+        return startDate;
+    }
 
-    public String getCrowdLevel() { return crowdLevel; }
-    public void setCrowdLevel(String crowdLevel) { this.crowdLevel = crowdLevel; }
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
 
-    public String getTransport() { return transport; }
-    public void setTransport(String transport) { this.transport = transport; }
+    public String getInterests() {
+        return interests;
+    }
+
+    public void setInterests(String interests) {
+        this.interests = interests;
+    }
+
+    public String getBudget() {
+        return budget;
+    }
+
+    public void setBudget(String budget) {
+        this.budget = budget;
+    }
+
+    public String getCrowdLevel() {
+        return crowdLevel;
+    }
+
+    public void setCrowdLevel(String crowdLevel) {
+        this.crowdLevel = crowdLevel;
+    }
+
+    public String getTransport() {
+        return transport;
+    }
+
+    public void setTransport(String transport) {
+        this.transport = transport;
+    }
+
     public int getPeople() {
         return people;
     }
-  //Testing
+
+    // Testing
     public void setPeople(int people) {
         this.people = people;
+    }
+
+    private boolean includeFlights;
+    private String originCity;
+
+    public boolean isIncludeFlights() {
+        return includeFlights;
+    }
+
+    public void setIncludeFlights(boolean includeFlights) {
+        this.includeFlights = includeFlights;
+    }
+
+    public String getOriginCity() {
+        return originCity;
+    }
+
+    public void setOriginCity(String originCity) {
+        this.originCity = originCity;
     }
 
 }

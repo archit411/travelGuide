@@ -15,6 +15,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 import java.util.*;
+
 //Testing
 @Service
 public class TripItineraryService {
@@ -30,13 +31,10 @@ public class TripItineraryService {
 
     private static final String GEMINI_MODEL = "gemini-2.5-flash";
 
-
-
     public TripItineraryService(
             TripItineraryRepository repo,
             WebClient.Builder webClientBuilder,
-            ObjectMapper objectMapper
-    ) {
+            ObjectMapper objectMapper) {
         this.repo = repo;
         this.webClientBuilder = webClientBuilder;
         this.objectMapper = objectMapper;
@@ -52,86 +50,89 @@ public class TripItineraryService {
             throw new RuntimeException("Failed to generate itinerary: " + e.getMessage());
         }
     }
-private String buildPrompt(TripRequestDTO req) {
-    return String.format("""
-            You are a professional travel planner.
 
-            Create a detailed %d-day itinerary for %s for %d people.
+    private String buildPrompt(TripRequestDTO req) {
+        String flightInstruction = req.isIncludeFlights()
+                ? String.format(
+                        "- Flight Info: INCLUDE round-trip flight per person cost estimate from %s in the total cost. Suggest best airlines/routes.",
+                        req.getOriginCity())
+                : "- Flight Info: Do NOT include flight costs. Ground transport only.";
 
-            DETAILS:
-            - Travel Style: %s
-            - Budget: %s
-            - Starting Date: %s
-            - Crowd Preference: %s
-            - Transport: %s
+        return String.format(
+                """
+                        You are an expert elite travel planner with decades of experience crafting personalized, distinct, and practical itineraries.
 
-            The itinerary MUST include:
-            - Exact times (e.g., 08:30 AM)
-            - Restaurant names + 1 recommended dish
-            - Google Maps direct link for every place (use "Place Name, City" format)
-            - Estimated cost for %d people
-            - Travel time between places
-            - Short tips & warnings
-            - Weather suggestion
-            - Best photo spots
-            - Optional alternatives
+                        YOUR TASK:
+                        Create a detailed, day-by-day %d-day itinerary for a trip to %s for %d people.
 
-            Return STRICT VALID JSON ONLY with this structure:
+                        TRIP DETAILS:
+                        - Travel Style: %s (Focus on this style heavily)
+                        - Budget Level: %s (Select dining/activities that match this)
+                        - Starting Date: %s
+                        - Crowd Preference: %s
+                        - Preferred Transport: %s
+                        %s
 
-            {
-              "tripTitle": "%s Trip",
-              "summary": "<short overview>",
-              "days": [
-                {
-                  "day": 1,
-                  "date": "<yyyy-mm-dd>",
-                  "theme": "<day theme>",
-                  "activities": [
-                    {
-                      "time": "08:30 AM",
-                      "activity": "Visit Kalaram Temple",
-                      "description": "Short description",
-                      "location": "Kalaram Temple, Nashik",
-                      "mapsLink": "https://www.google.com/maps?q=Kalaram+Temple+Nashik",
-                      "recommendedDish": "Poha or Misal Pav",
-                      "restaurant": "Sri Samarth Snacks",
-                      "travelTime": "20 mins drive",
-                      "estimatedCost": "₹300 total",
-                      "notes": "Wear comfortable footwear"
-                    }
-                  ],
-                  "dailyEstimatedCost": "₹2000"
-                }
-              ],
-              "totalEstimatedCost": "<total in ₹>",
-              "importantTips": [
-                "carry water",
-                "avoid afternoon heat",
-                "book tickets online"
-              ],
-              "packingList": [
-                "sunscreen",
-                "sports shoes",
-                "power bank"
-              ]
-            }
+                        ESSENTIAL REQUIREMENTS:
+                        1. **Real & Specific**: specific restaurant names, real hotel/activity names. No generic suggestions like "Eat at a local restaurant".
+                        2. **Logically Ordered**: Group activities geographically to minimize travel time.
+                        3. **Hidden Gems**: Include at least one "hidden gem" or offbeat location per day that fits the theme.
+                        4. **Practicality**: Include travel times between locations and estimated costs.
+                        5. **Costing**: %s
 
-            DO NOT add any markdown or code block.
-            """,
-            req.getDuration(),
-            req.getDestination(),
-            req.getPeople(),
-            req.getInterests(),
-            req.getBudget(),
-            req.getStartDate(),
-            req.getCrowdLevel(),
-            req.getTransport(),
-            req.getPeople(),
-            req.getDestination()
-    );
-}
+                        OUTPUT FORMAT:
+                        Return ONLY valid JSON. No markdown formatting (no ```json ... ```).
 
-
+                        JSON STRUCTURE:
+                        {
+                          "tripTitle": "Creative Title for %s Trip",
+                          "summary": "A captivating 2-3 sentence summary of what this trip feels like.",
+                          "days": [
+                            {
+                              "day": 1,
+                              "date": "<yyyy-mm-dd>",
+                              "theme": "<Short theme, e.g., Heritage Walk & Local Flavors>",
+                              "dailyEstimatedCost": "₹<amount>",
+                              "activities": [
+                                {
+                                  "time": "09:00 AM",
+                                  "activity": "<Name of Place/Activity>",
+                                  "description": "<Engaging description, 1-2 sentences. Why go here?>",
+                                  "location": "<Exact Name, City>",
+                                  "mapsLink": "https://www.google.com/maps/search/?api=1&query=<URL_ENCODED_NAME>",
+                                  "restaurant": "<Scanning for... recommended nearby restaurant for lunch/dinner>",
+                                  "recommendedDish": "<Specific dish to try here>",
+                                  "travelTime": "<e.g. 15 mins from previous location>",
+                                  "estimatedCost": "₹<cost for group>",
+                                  "notes": "<Practical tip, e.g. 'Book tickets in advance', 'Best sunset view'>"
+                                }
+                              ]
+                            }
+                          ],
+                          "totalEstimatedCost": "₹<Total Trip Cost (breakdown optional)>",
+                          "importantTips": [
+                             "Specific tip about local scams or safety",
+                             "Best transport app to use in this city",
+                             "Cultural etiquette tip"
+                          ],
+                          "packingList": [
+                             "Item 1", "Item 2", "Item 3", "Item 4", "Item 5"
+                          ]
+                        }
+                        """,
+                req.getDuration(),
+                req.getDestination(),
+                req.getPeople(),
+                req.getInterests(),
+                req.getBudget(),
+                req.getStartDate(),
+                req.getCrowdLevel(),
+                req.getTransport(),
+                flightInstruction,
+                req.isIncludeFlights() ? "Total cost MUST include estimated flights from " + req.getOriginCity()
+                        : "Total cost is for ground expenses only (hotels, food, activities, internal transport).",
+                req.getDestination());
+    }
 
     private String callGeminiAPI(String prompt) {
 
@@ -141,21 +142,17 @@ private String buildPrompt(TripRequestDTO req) {
 
         log.info("Sending request to Google Gemini...");
 
-        String url =
-                "https://generativelanguage.googleapis.com/v1beta/models/"
-                        + GEMINI_MODEL
-                        + ":generateContent?key="
-                        + geminiApiKey;
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/"
+                + GEMINI_MODEL
+                + ":generateContent?key="
+                + geminiApiKey;
 
         WebClient webClient = webClientBuilder.build();
 
         Map<String, Object> body = Map.of(
                 "contents", List.of(
                         Map.of("parts", List.of(
-                                Map.of("text", prompt)
-                        ))
-                )
-        );
+                                Map.of("text", prompt)))));
 
         try {
             return webClient.post()
@@ -165,8 +162,7 @@ private String buildPrompt(TripRequestDTO req) {
                     .onStatus(
                             status -> !status.is2xxSuccessful(),
                             resp -> resp.bodyToMono(String.class)
-                                    .flatMap(err -> Mono.error(new RuntimeException("Gemini API error: " + err)))
-                    )
+                                    .flatMap(err -> Mono.error(new RuntimeException("Gemini API error: " + err))))
                     .bodyToMono(String.class)
                     .block(Duration.ofSeconds(60));
 
@@ -176,59 +172,54 @@ private String buildPrompt(TripRequestDTO req) {
         }
     }
 
-private ItineraryResponseDTO parseGeminiResponse(String response, TripRequestDTO req) {
+    private ItineraryResponseDTO parseGeminiResponse(String response, TripRequestDTO req) {
 
-    log.info("Parsing Gemini response...");
+        log.info("Parsing Gemini response...");
 
-    ItineraryResponseDTO dto = new ItineraryResponseDTO();
-    dto.setDestination(req.getDestination());
-    dto.setDuration(req.getDuration());
-    dto.setTripTitle(req.getDestination() + " Trip (" + req.getDuration() + " Days)");
-    dto.setCrowdLevel(req.getCrowdLevel());
-    dto.setRawModelResponse(response);
+        ItineraryResponseDTO dto = new ItineraryResponseDTO();
+        dto.setDestination(req.getDestination());
+        dto.setDuration(req.getDuration());
+        dto.setTripTitle(req.getDestination() + " Trip (" + req.getDuration() + " Days)");
+        dto.setCrowdLevel(req.getCrowdLevel());
+        dto.setRawModelResponse(response);
 
-    try {
-        JsonNode root = objectMapper.readTree(response);
+        try {
+            JsonNode root = objectMapper.readTree(response);
 
-        JsonNode textNode =
-                root.path("candidates")
-                        .get(0)
-                        .path("content")
-                        .path("parts")
-                        .get(0)
-                        .path("text");
+            JsonNode textNode = root.path("candidates")
+                    .get(0)
+                    .path("content")
+                    .path("parts")
+                    .get(0)
+                    .path("text");
 
-        String rawText = textNode.asText();
+            String rawText = textNode.asText();
 
-        // ⭐ Clean code blocks
-        String jsonText = rawText
-                .replace("```json", "")
-                .replace("```", "")
-                .trim();
+            String jsonText = rawText
+                    .replace("```json", "")
+                    .replace("```", "")
+                    .trim();
 
-        JsonNode parsed = objectMapper.readTree(jsonText);
+            JsonNode parsed = objectMapper.readTree(jsonText);
 
-        dto.setSummary(parsed.path("summary").asText("No summary"));
-        dto.setTotalEstimatedCost(parsed.path("totalEstimatedCost").asText("N/A"));
+            dto.setSummary(parsed.path("summary").asText("No summary"));
+            dto.setTotalEstimatedCost(parsed.path("totalEstimatedCost").asText("N/A"));
 
-        dto.setDays(parsed.has("days") ?
-                objectMapper.convertValue(parsed.get("days"), List.class)
-                : new ArrayList<>());
+            dto.setDays(parsed.has("days") ? objectMapper.convertValue(parsed.get("days"), List.class)
+                    : new ArrayList<>());
 
-    } catch (Exception e) {
-        log.error("JSON PARSE FAILED", e);
-        dto.setSummary("Could not parse itinerary. Raw text: " + response);
-        dto.setDays(new ArrayList<>());
+        } catch (Exception e) {
+            log.error("JSON PARSE FAILED", e);
+            dto.setSummary("Could not parse itinerary. Raw text: " + response);
+            dto.setDays(new ArrayList<>());
+        }
+
+        return dto;
     }
 
-    return dto;
-}
-
-
-
-
     public TripItinerary saveItinerary(TripItinerary it) {
-        if (it.getId() == null) it.setId(UUID.randomUUID());
+        if (it.getId() == null)
+            it.setId(UUID.randomUUID());
         return repo.save(it);
     }
 

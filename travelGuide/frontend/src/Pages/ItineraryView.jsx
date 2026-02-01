@@ -13,7 +13,7 @@ import autoTable from "jspdf-autotable";
 
 import "./ItineraryView.css";
 
-export default function ItineraryView({ itinerary, onBack }) {
+export default function ItineraryView({ itinerary, onBack, onRegenerate }) {
   // ----------- SAFETY -----------------
   if (!itinerary) return <div className="itn-empty">No itinerary found.</div>;
 
@@ -66,6 +66,13 @@ export default function ItineraryView({ itinerary, onBack }) {
     localStorage.setItem("activeTrip", JSON.stringify(tripData));
     localStorage.setItem("currentDayIndex", "0");
 
+    // Clear previous visited states
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith("visited_day_")) {
+        localStorage.removeItem(key);
+      }
+    });
+
     // direct redirect → no popup
     window.location.href = "/homepage";
   };
@@ -73,41 +80,119 @@ export default function ItineraryView({ itinerary, onBack }) {
   // --------------------------
   // PDF EXPORT
   // --------------------------
+  // --------------------------
+  // PDF EXPORT
+  // --------------------------
   const downloadPDF = () => {
     const doc = new jsPDF();
-    doc.setFontSize(20);
-    doc.text(itinerary.tripTitle || "Trip Itinerary", 14, 16);
 
+    // -- HEADER --
+    doc.setFontSize(22);
+    doc.setTextColor(40, 40, 40);
+    doc.text(itinerary.tripTitle || "Your Trip Itinerary", 14, 20);
+
+    doc.setFontSize(12);
+    doc.setTextColor(100, 100, 100);
+    const summaryLines = doc.splitTextToSize(itinerary.summary || "", 180);
+    doc.text(summaryLines, 14, 30);
+
+    let lastY = 30 + (summaryLines.length * 5) + 10;
+
+    // -- COST SUMMARY --
+    doc.setFillColor(240, 247, 255);
+    doc.roundedRect(14, lastY, 180, 20, 3, 3, 'F');
+
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    doc.text(`Total Cost: ${itinerary.totalEstimatedCost || "N/A"}`, 20, lastY + 13);
+    doc.text(`Duration: ${itinerary.duration || itinerary.days?.length} Days`, 100, lastY + 13);
+
+    lastY += 35;
+
+    // -- DAYS TABLE --
     itinerary?.days?.forEach((day, index) => {
-      const startY = 30 + index * 70;
-      doc.setFontSize(14);
-      doc.text(`Day ${index + 1} — ${day.theme || ""}`, 14, startY);
+      // Check page break
+      if (lastY > 250) {
+        doc.addPage();
+        lastY = 20;
+      }
+
+      // Day Header
+      doc.setFontSize(16);
+      doc.setTextColor(59, 130, 246); // Primary Blue
+      doc.text(`Day ${index + 1}: ${day.theme || "Adventure"}`, 14, lastY);
+
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.text(day.date || "", 14, lastY + 6);
+
+      lastY += 12;
+
+      // Table for Activities
+      const tableBody = day.activities?.map((a) => [
+        a.time || "-",
+        a.activity || a.description || "Activity",
+        a.location || "-",
+        a.duration || "-",
+        a.estimatedCost || "-"
+      ]);
 
       autoTable(doc, {
-        startY: startY + 5,
+        startY: lastY,
         head: [["Time", "Activity", "Location", "Duration", "Cost"]],
-        body: day.activities?.map((a) => [
-          a.time || "",
-          a.activity || a.description || "",
-          a.location || "",
-          a.duration || "",
-          a.estimatedCost || "",
-        ]),
+        body: tableBody,
         theme: "grid",
-        styles: { fontSize: 9 },
+        headStyles: { fillColor: [59, 130, 246], textColor: 255 },
+        styles: { fontSize: 9, cellPadding: 4 },
+        columnStyles: {
+          0: { cellWidth: 20 }, // Time
+          1: { cellWidth: 70 }, // Activity
+          2: { cellWidth: 40 }, // Location
+          3: { cellWidth: 25 }, // Duration
+          4: { cellWidth: 25 }, // Cost
+        },
+        margin: { top: 20, bottom: 20 },
+        didDrawPage: (data) => {
+          // If table breaks across pages, we need to update our external tracker?
+          // autoTable handles page breaks automatically, but we need to know where it ended.
+        }
       });
+
+      // Update Y for next day using the final Y of the table
+      lastY = doc.lastAutoTable.finalY + 15;
     });
 
-    doc.save(`${itinerary.tripTitle}.pdf`);
+    // Save
+    const filename = (itinerary.tripTitle || "trip").toLowerCase().replace(/\s+/g, "_") + ".pdf";
+    doc.save(filename);
   };
 
   const shareItinerary = () => {
-    const text = `${itinerary.tripTitle}\n${itinerary.summary}`;
+    let text = `🌍 ${itinerary.tripTitle || "My Trip"}\n\n`;
+    text += `${itinerary.summary}\n\n`;
+    text += `💰 Cost: ${itinerary.totalEstimatedCost} | 🗓 Days: ${itinerary.days?.length}\n`;
+    text += `--------------------------\n`;
+
+    itinerary?.days?.forEach((day, index) => {
+      text += `\n📅 Day ${index + 1}: ${day.theme || "Adventure"} (${day.date || ""})\n`;
+
+      day.activities?.forEach((a) => {
+        text += `• ${a.time || ""}: ${a.activity} @ ${a.location || ""}\n`;
+      });
+    });
+
+    text += `\n✨ Planned with TravelGuide`;
 
     if (navigator.share) {
-      navigator.share({ title: itinerary.tripTitle, text });
+      navigator.share({
+        title: itinerary.tripTitle,
+        text: text
+      }).catch((error) => console.log('Error sharing:', error));
     } else {
-      alert(text);
+      // Fallback for desktop/unsupported
+      navigator.clipboard.writeText(text).then(() => {
+        alert("Itinerary copied to clipboard!");
+      });
     }
   };
 
@@ -200,6 +285,12 @@ export default function ItineraryView({ itinerary, onBack }) {
 
       {/* ACTION BUTTONS */}
       <div className="itn-actions">
+        {onRegenerate && (
+          <button className="btn-secondary" onClick={onRegenerate} style={{ marginRight: 'auto' }}>
+            ✏️ Edit & Regenerate
+          </button>
+        )}
+
         <button className="btn-primary" onClick={downloadPDF}>
           <FiDownload /> PDF
         </button>

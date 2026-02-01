@@ -167,8 +167,8 @@ export default function HomePage() {
   );
   const [showItineraryPage, setShowItineraryPage] = useState(false);
   const [currentDay, setCurrentDay] = useState(
-  (parseInt(localStorage.getItem("currentDayIndex") || "0")) + 1
-);
+    (parseInt(localStorage.getItem("currentDayIndex") || "0")) + 1
+  );
 
 
   const [stories, setStories] = useState([]);
@@ -189,21 +189,21 @@ export default function HomePage() {
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);
-// 🔥 Keep homepage in sync with current trip day
-useEffect(() => {
-  const syncDay = () => {
-    const storedDay = parseInt(localStorage.getItem("currentDayIndex") || "0");
-    setCurrentDay(storedDay + 1); // convert index → day number
-  };
+  // 🔥 Keep homepage in sync with current trip day
+  useEffect(() => {
+    const syncDay = () => {
+      const storedDay = parseInt(localStorage.getItem("currentDayIndex") || "0");
+      setCurrentDay(storedDay + 1); // convert index → day number
+    };
 
-  // Run once when page is shown
-  syncDay();
+    // Run once when page is shown
+    syncDay();
 
-  // Run every time user focuses back on this tab/page
-  window.addEventListener("focus", syncDay);
+    // Run every time user focuses back on this tab/page
+    window.addEventListener("focus", syncDay);
 
-  return () => window.removeEventListener("focus", syncDay);
-}, []);
+    return () => window.removeEventListener("focus", syncDay);
+  }, []);
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -320,10 +320,20 @@ useEffect(() => {
     setViewStory({ stories: [story], index: 0 });
   }
 
-  const handleGenerateItinerary = (itinerary) => {
+  /* State for request Params (for regenerate) */
+  const [lastRequestParams, setLastRequestParams] = useState(null);
+
+  const handleGenerateItinerary = (itinerary, requestParams) => {
     setGeneratedItinerary(itinerary);
+    setLastRequestParams(requestParams);
     setShowTripPlanner(false);
     setShowItineraryPage(true);
+  };
+
+  const handleRegenerate = () => {
+    // Open planner with previous data
+    setShowItineraryPage(false);
+    setShowTripPlanner(true);
   };
 
   useEffect(() => {
@@ -347,6 +357,7 @@ useEffect(() => {
       <ItineraryView
         itinerary={generatedItinerary}
         onBack={() => setShowItineraryPage(false)}
+        onRegenerate={handleRegenerate}
         onStartTrip={() => {
           localStorage.setItem(
             "activeTrip",
@@ -364,6 +375,14 @@ useEffect(() => {
 
   return (
     <div className="homepage-modern">
+      {/* Trip Planner Modal with Initial Data */}
+      {showTripPlanner && (
+        <TripPlannerModal
+          onClose={() => setShowTripPlanner(false)}
+          onGenerateItinerary={handleGenerateItinerary}
+          initialData={lastRequestParams}
+        />
+      )}
       {/* Modern Header */}
       <header className="header-modern">
         <div className="header-container">
@@ -431,7 +450,7 @@ useEffect(() => {
 
             <div className="hero-actions">
               <button className="btn-hero-primary" onClick={() => setShowTripPlanner(true)}>
-                
+
                 <span>⟡ Plan Your Trip with AI</span>
               </button>
               <button className="btn-hero-secondary" onClick={() => navigate("/feed")}>
@@ -561,9 +580,9 @@ useEffect(() => {
           <div className="section-header-modern">
             <h2>Featured Destinations</h2>
             <p>Handpicked places loved by travelers</p>
-            <button className="view-all-btn" onClick={() => navigate("/feed")}>
+            {/* <button className="view-all-btn" onClick={() => navigate("/feed")}>
               View All <FiNavigation size={16} />
-            </button>
+            </button> */}
           </div>
 
           <div className="destinations-grid">
@@ -618,9 +637,9 @@ useEffect(() => {
           <div className="section-header-modern">
             <h2>Travel Stories</h2>
             <p>Real experiences from fellow travelers</p>
-            <button className="view-all-btn" onClick={() => navigate("/feed")}>
+            {/* <button className="view-all-btn" onClick={() => navigate("/feed")}>
               View All Stories <FiNavigation size={16} />
-            </button>
+            </button> */}
           </div>
 
           <div className="stories-grid">
@@ -814,12 +833,7 @@ useEffect(() => {
         </div>
       )}
 
-      {showTripPlanner && (
-        <TripPlannerModal
-          onClose={() => setShowTripPlanner(false)}
-          onGenerateItinerary={handleGenerateItinerary}
-        />
-      )}
+
 
       {viewStory && (
         <StoryViewer

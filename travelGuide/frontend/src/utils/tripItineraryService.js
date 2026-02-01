@@ -112,3 +112,9 @@ export function deleteItinerary(id) {
     method: "DELETE",
   });
 }
+
+export function searchPlaces(query) {
+  return doFetch(`/places/search?query=${encodeURIComponent(query)}`, {
+    method: "GET",
+  });
+}

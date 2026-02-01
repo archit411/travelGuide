@@ -207,8 +207,55 @@
 }
 
 /* MOBILE BUTTON STACK */
+/* MOBILE RESPONSIVENESS */
+
+@media (max-width: 768px) {
+  .itn-wrapper {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .itn-header h1 {
+    font-size: 24px;
+  }
+
+  .itn-header {
+    padding: 16px;
+  }
+
+  .itn-weather {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .itn-activity {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .itn-time {
+    width: 100%;
+    margin-bottom: 4px;
+    color: #3b82f6;
+  }
+}
+
 @media (max-width: 480px) {
   .itn-actions {
     flex-direction: column;
+  }
+
+  .btn-primary,
+  .btn-secondary,
+  .btn-start {
+    width: 100%;
+  }
+
+  .itn-day-card {
+    padding: 14px;
+  }
+
+  .itn-chips {
+    gap: 8px;
   }
 }

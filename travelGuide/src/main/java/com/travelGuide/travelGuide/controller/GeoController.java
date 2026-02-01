@@ -12,7 +12,7 @@ import com.travelGuide.travelGuide.service.GeoService;
 @RequestMapping("/api")
 public class GeoController {
 
-	private final GeoService geoService;
+    private final GeoService geoService;
 
     public GeoController(GeoService geoService) {
         this.geoService = geoService;
@@ -22,5 +22,10 @@ public class GeoController {
     public NominatimResponse getCoords(@RequestParam String place) {
         return geoService.getLatLonFromPlace(place);
     }
-	
+
+    @GetMapping("/places/search")
+    public java.util.List<NominatimResponse> searchPlaces(@RequestParam String query) {
+        return geoService.searchPlaces(query);
+    }
+
 }
