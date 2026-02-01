@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import "./HomePage.css";
 import "./Highlights.css";
 import './activetrip.css';
+import { motion, AnimatePresence } from "framer-motion";
 import {
   FiPlus,
   FiUser,
@@ -12,6 +13,8 @@ import {
   FiSearch,
   FiHome,
   FiStar,
+  FiChevronDown,
+  FiHeart,
 } from "react-icons/fi";
 import { FaUtensils } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +22,7 @@ import AddPost from "./AddStoryModal";
 import SearchOverlay from "./SearchOverlay";
 import TripProgressCard from "./TripProgressCard";
 import ItineraryView from "./ItineraryView";
+import { searchPlaces } from "../utils/tripItineraryService";
 import "./StoryViewer.css";
 import TripPlannerModal from "./TripPlannerModal";
 import Explore from "./Exploretab";
@@ -180,9 +184,19 @@ export default function HomePage() {
   const [showTripPlanner, setShowTripPlanner] = useState(false);
   const [generatedItinerary, setGeneratedItinerary] = useState(null);
 
-  const [city, setCity] = useState("Locating...");
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [active, setActive] = useState("home");
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Hero Search / Location States
+  const [showLocationModal, setShowLocationModal] = useState(false);
+  const [showSearchModal, setShowSearchModal] = useState(false);
+  const [heroSearch, setHeroSearch] = useState("");
+  const [heroSuggestions, setHeroSuggestions] = useState([]);
+
+  const [city, setCity] = useState("Locating...");
+  const [locInput, setLocInput] = useState("");
+  const [locSuggestions, setLocSuggestions] = useState([]);
+  const [showAIWelcome, setShowAIWelcome] = useState(true);
 
   useEffect(() => {
     const onResize = () => setIsMobile(window.innerWidth < 768);
@@ -204,6 +218,55 @@ export default function HomePage() {
 
     return () => window.removeEventListener("focus", syncDay);
   }, []);
+
+  // Hero Search Debounce
+  useEffect(() => {
+    const delay = setTimeout(async () => {
+      if (heroSearch.length > 2) {
+        try {
+          const res = await searchPlaces(heroSearch);
+          setHeroSuggestions(res || []);
+        } catch (err) {
+          console.error("Search error:", err);
+        }
+      } else {
+        setHeroSuggestions([]);
+      }
+    }, 400);
+    return () => clearTimeout(delay);
+  }, [heroSearch]);
+
+  // Location Search Debounce
+  useEffect(() => {
+    const delay = setTimeout(async () => {
+      if (locInput.length > 2) {
+        try {
+          const res = await searchPlaces(locInput);
+          setLocSuggestions(res || []);
+        } catch (err) {
+          console.error("Loc search error:", err);
+        }
+      } else {
+        setLocSuggestions([]);
+      }
+    }, 400);
+    return () => clearTimeout(delay);
+  }, [locInput]);
+
+  const handleSelectHeroSuggestion = (place) => {
+    setHeroSearch("");
+    setShowSearchModal(false);
+    navigate(`/destination/${encodeURIComponent(place.display_name)}`, {
+      state: { place: { name: place.display_name, img: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=400" } }
+    });
+  };
+
+  const handleSelectLocation = (place) => {
+    setCity(place.display_name.split(',')[0]);
+    setShowLocationModal(false);
+    setLocInput("");
+    setLocSuggestions([]);
+  };
 
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
@@ -378,24 +441,28 @@ export default function HomePage() {
       {/* Trip Planner Modal with Initial Data */}
       {showTripPlanner && (
         <TripPlannerModal
-          onClose={() => setShowTripPlanner(false)}
+          onClose={() => {
+            setShowTripPlanner(false);
+            setShowAIWelcome(true);
+          }}
           onGenerateItinerary={handleGenerateItinerary}
           initialData={lastRequestParams}
         />
       )}
       {/* Modern Header */}
-      <header className="header-modern">
-        <div className="header-container">
-          <div className="header-logo">
-            <div className="logo-icon-modern">
-              <i className="fa-solid fa-location-dot"></i>
+      {/* Header - Hidden on mobile in favor of hero-embedded navigation */}
+      {!isMobile && (
+        <header className="header-modern">
+          <div className="header-container">
+            <div className="header-logo">
+              <div className="logo-icon-modern">
+                <i className="fa-solid fa-location-dot"></i>
+              </div>
+              <span className="logo-text-modern">
+                TripEZ<span>.in</span>
+              </span>
             </div>
-            <span className="logo-text-modern">
-              TripEZ<span>.in</span>
-            </span>
-          </div>
 
-          {!isMobile && (
             <nav className="header-nav-modern">
               {[
                 { id: "home", label: "Home", path: "/homepage" },
@@ -414,118 +481,218 @@ export default function HomePage() {
                 </button>
               ))}
             </nav>
-          )}
 
-          <div className="header-actions">
-            <div className="location-badge">
-              <i className="fa-solid fa-location-arrow"></i>
-              <span>{city}</span>
-            </div>
+            <div className="header-actions">
+              <div className="location-badge">
+                <i className="fa-solid fa-location-arrow"></i>
+                <span>{city}</span>
+              </div>
 
-            {!isMobile && (
               <button className="btn-primary-modern" onClick={() => setShowAdd(true)}>
                 <FiPlus size={18} />
                 <span>Add Story</span>
               </button>
-            )}
 
-            <button className="btn-secondary-modern" onClick={() => navigate("/profile")}>
-              <FiUser size={18} />
-            </button>
+              <button className="btn-secondary-modern" onClick={() => navigate("/profile")}>
+                <FiUser size={18} />
+              </button>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
+      )}
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="hero-container">
-          <div className="hero-content">
-            <h1 className="hero-title">
-              Discover Your Next
-              <span className="hero-highlight"> Adventure</span>
+      {isMobile ? (
+        <section className="hero-mobile-premium">
+          <div className="hero-mobile-bg">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200" alt="Travel Background" />
+            <div className="hero-mobile-overlay"></div>
+          </div>
+
+          <div className="hero-mobile-top">
+            <div className="mobile-header-left">
+
+              <div className="mobile-location-wrapper">
+                <div className="mobile-city-name" onClick={() => {
+                  console.log("Opening Location Modal");
+                  setShowLocationModal(true);
+                }}>
+                  {city} <FiChevronDown style={{ color: '#3b82f6' }} size={14} />
+                </div>
+                <div className="mobile-location-label">Your Location</div>
+              </div>
+            </div>
+
+            <div className="mobile-header-right-new">
+             
+
+            </div>
+          </div>
+
+          <div className="hero-mobile-main">
+            <h1 className="hero-mobile-title">
+              Discover your next travel destination
             </h1>
-            <p className="hero-subtitle">
-              Plan, explore, and share unforgettable travel experiences with TripEZ
-            </p>
+            <p className="hero-mobile-subtitle">Travel Stories & Inspirations</p>
 
-            <div className="hero-actions">
-              <button className="btn-hero-primary" onClick={() => setShowTripPlanner(true)}>
-
-                <span>⟡ Plan Your Trip with AI</span>
-              </button>
-              <button className="btn-hero-secondary" onClick={() => navigate("/feed")}>
-                <FiSearch size={20} />
-                <span>Discover Stories</span>
-              </button>
+            <div className="hero-mobile-search-wrapper">
+              <motion.div
+                className="hero-mobile-search-bar-white"
+                onClick={() => {
+                  console.log("Opening Search Modal");
+                  setShowSearchModal(true);
+                }}
+                whileTap={{ scale: 0.96 }}
+              >
+                <FiSearch className="mobile-search-icon-grey" />
+                <div className="mobile-search-placeholder">
+                  Search for <strong>Delhi</strong>
+                </div>
+              </motion.div>
             </div>
           </div>
+        </section>
+      ) : (
+        <section className="hero-section">
+          <div className="hero-container">
+            <div className="hero-content">
+              <h1 className="hero-title">
+                Discover Your Next
+                <span className="hero-highlight"> Adventure</span>
+              </h1>
+              <p className="hero-subtitle">
+                Plan, explore, and share unforgettable travel experiences with TripEZ
+              </p>
 
-          <div className="hero-visual">
-            <div className="hero-cards-stack">
-              <div className="hero-card card-1">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="Mountain" />
-                <div className="card-overlay">
-                  <h3>Himalayas</h3>
-                  <p>Adventure awaits</p>
-                </div>
+              <div className="hero-actions">
+                <button className="btn-hero-primary" onClick={() => setShowTripPlanner(true)}>
+                  <span>⟡ Plan Your Trip with Trez</span>
+                </button>
+                <button className="btn-hero-secondary" onClick={() => navigate("/feed")}>
+                  <FiSearch size={20} />
+                  <span>Discover Stories</span>
+                </button>
               </div>
-              <div className="hero-card card-2">
-                <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400" alt="Beach" />
-                <div className="card-overlay">
-                  <h3>Goa Beaches</h3>
-                  <p>Paradise found</p>
+            </div>
+
+            <div className="hero-visual">
+              <div className="hero-cards-stack">
+                <div className="hero-card card-1">
+                  <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400" alt="Mountain" />
+                  <div className="card-overlay">
+                    <h3>Himalayas</h3>
+                    <p>Adventure awaits</p>
+                  </div>
                 </div>
-              </div>
-              <div className="hero-card card-3">
-                <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400" alt="City" />
-                <div className="card-overlay">
-                  <h3>Delhi</h3>
-                  <p>Cultural hub</p>
+                <div className="hero-card card-2">
+                  <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=400" alt="Beach" />
+                  <div className="card-overlay">
+                    <h3>Goa Beaches</h3>
+                    <p>Paradise found</p>
+                  </div>
+                </div>
+                <div className="hero-card card-3">
+                  <img src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=400" alt="City" />
+                  <div className="card-overlay">
+                    <h3>Delhi</h3>
+                    <p>Cultural hub</p>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+        </section>
+      )}
+
+      {/* Premium Floating AI Assistant (Modern App Style) */}
+      {isMobile && (
+        <div className="mobile-ai-bot-container">
+          <AnimatePresence>
+            {showAIWelcome && (
+              <motion.div
+                className="ai-welcome-card"
+                initial={{ opacity: 0, y: 50, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                transition={{ duration: 0.4 }}
+              >
+                <div className="ai-card-content">
+                  <span className="ai-sparkle">✨</span>
+                  <p>Hi, I am <strong>Trez</strong>! Need help planning your next {city} trip?</p>
+                  <button className="ai-ask-btn" onClick={() => {
+                    setShowTripPlanner(true);
+                    setShowAIWelcome(false);
+                  }}>
+                    Plan with AI
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.button
+            className="ai-floating-bot"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={() => {
+              setShowTripPlanner(true);
+              setShowAIWelcome(false);
+            }}
+          >
+            <div className="bot-visual">
+              <div className="bot-face">
+                <div className="bot-eyes">
+                  <div className="eye"></div>
+                  <div className="eye"></div>
+                </div>
+                <div className="bot-smile"></div>
+              </div>
+              <div className="bot-glow"></div>
+            </div>
+          </motion.button>
         </div>
-      </section>
+      )}
 
-      {/* Quick Actions Bar */}
-      <section className="quick-actions">
-        <div className="actions-container">
-          <div className="action-card" onClick={() => setShowTripPlanner(true)}>
-            <div className="action-icon">
-              <FiCompass size={24} />
+      {/* Quick Actions Bar - Hidden on Mobile */}
+      {!isMobile && (
+        <section className="quick-actions">
+          <div className="actions-container">
+            <div className="action-card" onClick={() => setShowTripPlanner(true)}>
+              <div className="action-icon">
+                <FiCompass size={24} />
+              </div>
+              <div className="action-content">
+                <h3>Discover</h3>
+                <p>Where to go?</p>
+              </div>
             </div>
-            <div className="action-content">
-              <h3>Discover</h3>
-              <p>Where to go?</p>
+
+            <div className="action-divider"></div>
+
+            <div className="action-card" onClick={() => setShowTripPlanner(true)}>
+              <div className="action-icon">
+                <FiCalendar size={24} />
+              </div>
+              <div className="action-content">
+                <h3>Plan</h3>
+                <p>When to travel?</p>
+              </div>
+            </div>
+
+            <div className="action-divider"></div>
+
+            <div className="action-card" onClick={() => navigate("/feed")}>
+              <div className="action-icon">
+                <FiNavigation size={24} />
+              </div>
+              <div className="action-content">
+                <h3>Go</h3>
+                <p>How to get there?</p>
+              </div>
             </div>
           </div>
-
-          <div className="action-divider"></div>
-
-          <div className="action-card" onClick={() => setShowTripPlanner(true)}>
-            <div className="action-icon">
-              <FiCalendar size={24} />
-            </div>
-            <div className="action-content">
-              <h3>Plan</h3>
-              <p>When to travel?</p>
-            </div>
-          </div>
-
-          <div className="action-divider"></div>
-
-          <div className="action-card" onClick={() => navigate("/feed")}>
-            <div className="action-icon">
-              <FiNavigation size={24} />
-            </div>
-            <div className="action-content">
-              <h3>Go</h3>
-              <p>How to get there?</p>
-            </div>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Active Trip Status */}
       {activeTrip && (
@@ -567,8 +734,8 @@ export default function HomePage() {
       <section className="explore-section">
         <div className="section-container">
           <div className="section-header-modern">
-            <h2>Explore Places</h2>
-            <p>Discover amazing destinations across India</p>
+            {/* <h2>{isMobile ? "Where You Should Go Next?" : "Explore Places"}</h2> */}
+            <p>{isMobile ? "" : "Discover amazing destinations across India"}</p>
           </div>
           <ExplorePlaces />
         </div>
@@ -617,7 +784,7 @@ export default function HomePage() {
                     <h3>{place.name}</h3>
                     <p>{place.desc}</p>
                     <div className="destination-meta">
-                      <span className="rating">⭐ 4.{Math.floor(Math.random() * 5) + 5}</span>
+                      {/* <span className="rating">⭐ 4.{Math.floor(Math.random() * 5) + 5}</span> */}
                       <span className="distance">📍 {Math.floor(Math.random() * 500) + 50}km</span>
                       <span className={`crowd-level ${place.crowdLevel?.toLowerCase()}`}>
                         👥 {place.crowdLevel}
@@ -643,7 +810,7 @@ export default function HomePage() {
           </div>
 
           <div className="stories-grid">
-            {stories.slice(0, 4).map((story, idx) => (
+            {stories.slice(0, 6).map((story, idx) => (
               <div
                 className="story-card-modern"
                 key={idx}
@@ -652,31 +819,31 @@ export default function HomePage() {
                 {/* <div className="story-image">
                   <img src={story.image} alt={story.destination} />
                   <div className="story-overlay">
-                    <div className="story-user">
-                      <div className="user-avatar">
+                    <div className="story-user-minimal">
+                      <div className="user-avatar-tiny">
                         {story.userName?.charAt(0) || "U"}
                       </div>
                       <span>{story.userName || "User"}</span>
                     </div>
-                    <div className="story-time">{timeAgo(story.createdAt)}</div>
+                    <div className="story-date-minimal">{timeAgo(story.createdAt)}</div>
                   </div>
-                </div> */}
+                </div>  */}
 
                 <div className="story-content">
-                  <div className="story-location">
+                  <div className="story-location-minimal">
                     📍 {story.destination || "Unknown"}
                   </div>
-                  <div className="story-text">
-                    {story.caption?.length > 80
-                      ? story.caption.slice(0, 80) + "..."
+                  <div className="story-text-minimal">
+                    {story.caption?.length > 60
+                      ? story.caption.slice(0, 60) + "..."
                       : story.caption || "No caption"}
                   </div>
-                  <div className="story-stats">
-                    <span>❤️ {story.likes || 0}</span>
-                    <span>🌡 {story.temprature || "--"}°C</span>
-                    <span className={`crowd-level ${story.crowdLevel?.toLowerCase()}`}>
+                  <div className="story-stats-minimal">
+                    <div className="stat-pill"><FiStar size={12} /> {Math.floor(Math.random() * 2) + 4}.{Math.floor(Math.random() * 9)}</div>
+                    <div className="stat-pill">🌡 {story.temprature || "--"}°C</div>
+                    <div className={`crowd-level-mini ${story.crowdLevel?.toLowerCase()}`}>
                       {story.crowdLevel}
-                    </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -833,6 +1000,43 @@ export default function HomePage() {
         </div>
       )}
 
+      {!isMobile && (
+        <footer className="footer-modern">
+          <div className="footer-container-minimal">
+            <div className="footer-column-minimal">
+              <div className="header-logo" style={{ marginBottom: '16px' }}>
+                <div className="logo-icon-modern">
+                  <i className="fa-solid fa-location-dot"></i>
+                </div>
+                <span className="logo-text-modern">
+                  TripEZ<span>.in</span>
+                </span>
+              </div>
+              <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '14px', lineHeight: '1.6', maxWidth: '300px' }}>
+                Your ultimate companion for discovering, planning and sharing amazing travel experiences across India and beyond.
+              </p>
+            </div>
+            <div className="footer-links-grid">
+              <div className="footer-column">
+                <h4>Platform</h4>
+                <a href="#">Explore</a>
+                <a href="#">Food Guide</a>
+                <a href="#">Trip Planner</a>
+              </div>
+              <div className="footer-column">
+                <h4>Company</h4>
+                <a href="#">About Us</a>
+                <a href="#">Contact</a>
+                <a href="#">Terms</a>
+              </div>
+            </div>
+          </div>
+          <div className="footer-bottom-minimal">
+            <p>&copy; 2026 TripEZ. All rights reserved.</p>
+          </div>
+        </footer>
+      )}
+
 
 
       {viewStory && (
@@ -848,6 +1052,102 @@ export default function HomePage() {
           onClose={() => setShowAdd(false)}
           onAddStory={(s) => setStories((prev) => [s, ...prev])}
         />
+      )}
+
+      {/* Location Picker Popup */}
+      {showLocationModal && (
+        <div className="fixed-overlay-premium" onClick={() => setShowLocationModal(false)}>
+          <motion.div
+            className="modal-popup-premium"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header-premium">
+              <h3>Select Location</h3>
+              <button className="close-pill-btn" onClick={() => setShowLocationModal(false)}>
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="modal-body-premium">
+              <div className="premium-input-wrapper">
+                <FiCompass className="input-icon" />
+                <input
+                  autoFocus
+                  placeholder="Search for a city..."
+                  value={locInput}
+                  onChange={(e) => setLocInput(e.target.value)}
+                />
+              </div>
+              <div className="suggestions-list-premium">
+                {locSuggestions.length > 0 ? (
+                  locSuggestions.map((p, i) => (
+                    <div className="suggestion-item-premium" key={i} onClick={() => handleSelectLocation(p)}>
+                      <FiNavigation className="item-icon" />
+                      <div className="item-text">
+                        <span className="main-name">{p.display_name.split(',')[0]}</span>
+                        <span className="sub-name">{p.display_name.split(',').slice(1).join(',')}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : locInput.length > 0 ? (
+                  <div className="empty-suggestions">No cities found</div>
+                ) : (
+                  <div className="helper-text">Try searching for "Mumbai", "Paris", or "Tokyo"</div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Destination Search Popup */}
+      {showSearchModal && (
+        <div className="fixed-overlay-premium" onClick={() => setShowSearchModal(false)}>
+          <motion.div
+            className="modal-popup-premium"
+            initial={{ y: "100%" }}
+            animate={{ y: 0 }}
+            exit={{ y: "100%" }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="modal-header-premium">
+              <h3>Find Destination</h3>
+              <button className="close-pill-btn" onClick={() => setShowSearchModal(false)}>
+                <FiX size={20} />
+              </button>
+            </div>
+            <div className="modal-body-premium">
+              <div className="premium-input-wrapper">
+                <FiSearch className="input-icon" />
+                <input
+                  autoFocus
+                  placeholder="Where do you want to go?"
+                  value={heroSearch}
+                  onChange={(e) => setHeroSearch(e.target.value)}
+                />
+              </div>
+              <div className="suggestions-list-premium">
+                {heroSuggestions.length > 0 ? (
+                  heroSuggestions.map((p, i) => (
+                    <div className="suggestion-item-premium" key={i} onClick={() => handleSelectHeroSuggestion(p)}>
+                      <FiStar className="item-icon" />
+                      <div className="item-text">
+                        <span className="main-name">{p.display_name.split(',')[0]}</span>
+                        <span className="sub-name">{p.display_name.split(',').slice(1).join(',')}</span>
+                      </div>
+                    </div>
+                  ))
+                ) : heroSearch.length > 0 ? (
+                  <div className="empty-suggestions">No places found</div>
+                ) : (
+                  <div className="helper-text">Enter a place name like "Taj Mahal" or "Switzerland"</div>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </div>
       )}
     </div>
   );

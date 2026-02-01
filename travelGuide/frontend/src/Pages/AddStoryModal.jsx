@@ -1,28 +1,68 @@
 import React, { useState, useEffect } from "react";
-import { FiX, FiUpload, FiImage } from "react-icons/fi";
-import { FaStar } from "react-icons/fa";
-import "./home.css";
+import { FiX, FiUpload, FiImage, FiMapPin, FiCheckCircle, FiThermometer } from "react-icons/fi";
+import { FaStar, FaRegStar } from "react-icons/fa";
+import { motion, AnimatePresence } from "framer-motion";
+import { searchPlaces, getWeather } from "../utils/tripItineraryService";
+import "./AddStoryModal.css";
 
 export default function AddPost({ onClose, onAddStory }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [location, setLocation] = useState("Delhi");
-  const [btn, setBtn] = useState(false);
-  const [temperature, setTemperature] = useState(
-    `${Math.floor(Math.random() * 10) + 20}`
-  );
-  const [crowd, setCrowd] = useState("Low");
+  const [location, setLocation] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [temperature, setTemperature] = useState("");
+  const [crowd, setCrowd] = useState("Medium");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(0);
   const [snackbarMsg, setSnackbarMsg] = useState("");
 
+  // Autocomplete State
+  const [destSuggestions, setDestSuggestions] = useState([]);
+  const [showDestSuggestions, setShowDestSuggestions] = useState(false);
+
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username") || "aj_archit";
 
+  // Lock scroll
   useEffect(() => {
     document.body.style.overflow = "hidden";
     return () => (document.body.style.overflow = "");
   }, []);
+
+  // Debounce Search for Destination
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(async () => {
+      if (location.length > 2 && showDestSuggestions) {
+        try {
+          const results = await searchPlaces(location);
+          setDestSuggestions(results || []);
+        } catch (err) {
+          console.error("Search error", err);
+        }
+      } else {
+        setDestSuggestions([]);
+      }
+    }, 400);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [location, showDestSuggestions]);
+
+  const handleSelectPlace = async (place) => {
+    setLocation(place.display_name);
+    setShowDestSuggestions(false);
+
+    if (place.lat && place.lon) {
+      try {
+        const data = await getWeather(place.lat, place.lon);
+        // data.current_weather.temperature usually comes as a number
+        if (data && data.current_weather) {
+          setTemperature(data.current_weather.temperature);
+        }
+      } catch (err) {
+        console.error("Failed to fetch weather", err);
+      }
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files?.[0];
@@ -34,19 +74,10 @@ export default function AddPost({ onClose, onAddStory }) {
     }
   };
 
-  const handleTemperatureChange = (e) => {
-    const input = e.target.value;
-    if (/^\d*$/.test(input)) {
-      setTemperature(input);
-    } else {
-      setSnackbarMsg("⚠️ Temperature should be numeric only.");
-    }
-  };
-
   const handleSubmit = async () => {
     if (!file) return setSnackbarMsg("⚠️ Please upload a photo.");
+    if (!location.trim()) return setSnackbarMsg("⚠️ Destination is required.");
     if (!temperature.trim()) return setSnackbarMsg("⚠️ Temperature is required.");
-    if (!crowd.trim()) return setSnackbarMsg("⚠️ Select crowd level.");
     if (rating === 0) return setSnackbarMsg("⚠️ Please give a rating.");
 
     if (!token) {
@@ -54,7 +85,7 @@ export default function AddPost({ onClose, onAddStory }) {
       return;
     }
 
-    setBtn(true);
+    setLoading(true);
 
     try {
       const formData = new FormData();
@@ -79,183 +110,197 @@ export default function AddPost({ onClose, onAddStory }) {
 
       if (data.status === "SUCCESS" || res.ok) {
         setSnackbarMsg("✅ Story uploaded successfully!");
-        onAddStory({
-          image: preview,
-          location,
-          temperature,
-          crowd,
-          comment,
-          rating,
-        });
+        if (onAddStory) {
+          onAddStory({
+            image: preview,
+            destination: location,
+            caption: comment,
+            temprature: temperature,
+            crowdLevel: crowd,
+            userName: username,
+            createdAt: new Date().toISOString(),
+            likes: 0
+          });
+        }
         setTimeout(onClose, 1500);
       } else {
         setSnackbarMsg("❌ Upload failed.");
-        setBtn(false);
+        setLoading(false);
       }
     } catch {
       setSnackbarMsg("⚠️ Server error. Try later.");
-      setBtn(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="popup-overlay">
-      <div className="popup-card">
-        <div className="popup-header">
-          <button className="popup-close" onClick={onClose}>
-            <FiX />
+    <div className="add-story-overlay" onClick={onClose}>
+      <motion.div
+        className="add-story-card"
+        onClick={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ duration: 0.3, type: "spring", stiffness: 300, damping: 25 }}
+      >
+        {/* Header */}
+        <div className="modal-header">
+          <h2>New Adventure</h2>
+          <p>Share your latest travel story with the world</p>
+          <button className="close-btn" onClick={onClose}>
+            <FiX size={20} />
           </button>
-          <h2>Add Update</h2>
-          <p>Share your travel experience</p>
         </div>
 
-        <div className="popup-body">
-          {preview ? (
-            <img
-              src={preview}
-              alt="Preview"
-              style={{
-                maxHeight: "260px",
-                width: "100%",
-                objectFit: "cover",
-                borderRadius: "14px",
-              }}
-            />
-          ) : (
-            <div className="upload-placeholder">
-              <FiUpload size={32} />
-              <p>Click below to add photo</p>
-              <small>PNG, JPG up to 10MB</small>
-            </div>
-          )}
+        {/* Body */}
+        <div className="modal-body">
 
-          {/* ✅ Upload Button with Inline CSS */}
-          <div style={{ display: "flex", justifyContent: "center", marginTop: 14 }}>
-            <label
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                padding: "12px 18px",
-                borderRadius: "12px",
-                background: "linear-gradient(135deg, #2563eb, #3b82f6)",
-                color: "#fff",
-                fontSize: "14px",
-                fontWeight: 600,
-                cursor: "pointer",
-                boxShadow: "0 8px 20px rgba(37, 99, 235, 0.35)",
-                transition: "all 0.25s ease",
-              }}
-              onMouseOver={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 12px 28px rgba(37, 99, 235, 0.45)")
-              }
-              onMouseOut={(e) =>
-                (e.currentTarget.style.boxShadow =
-                  "0 8px 20px rgba(37, 99, 235, 0.35)")
-              }
-            >
-              <FiImage size={18} />
-              Upload Photo
+          {/* Upload Section */}
+          <div className="upload-area">
+            {preview ? (
+              <>
+                <img src={preview} alt="Preview" className="image-preview" />
+                <label className="reupload-btn">
+                  <FiImage /> Change Photo
+                  <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+                </label>
+              </>
+            ) : (
+              <label className="upload-placeholder">
+                <div style={{ background: '#e0e7ff', padding: '16px', borderRadius: '50%' }}>
+                  <FiUpload size={32} color="#4f46e5" />
+                </div>
+                <span style={{ fontWeight: 600 }}>Click to Upload Photo</span>
+                <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Supports JPG, PNG (Max 10MB)</span>
+                <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+              </label>
+            )}
+          </div>
+
+          {/* Destination Autocomplete */}
+          <div className="form-group">
+            <span className="form-label">Where was this?</span>
+            <div className="icon-input-wrapper">
+              <FiMapPin className="input-icon" />
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{ display: "none" }}
+                className="form-input"
+                placeholder="Search destination (e.g. Kyoto, Bali)"
+                value={location}
+                onChange={(e) => {
+                  setLocation(e.target.value);
+                  setShowDestSuggestions(true);
+                }}
+                onFocus={() => setShowDestSuggestions(true)}
               />
-            </label>
-          </div>
-
-          <div className="form-section">
-            <label>Destination *</label>
-            <select
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "12px",
-                borderRadius: "10px",
-                border: "1px solid #e5e7eb",
-                fontSize: "14px",
-              }}
-            >
-              <option value="Delhi">Delhi</option>
-            </select>
-          </div>
-
-          <div className="form-section">
-            <label>Current Temperature (°C) *</label>
-            <input
-              type="text"
-              value={temperature}
-              onChange={handleTemperatureChange}
-              placeholder="e.g. 26"
-            />
-          </div>
-
-          <div className="form-section">
-            <label>Crowd Level *</label>
-            <div className="crowd-options">
-              {["Low", "Medium", "High"].map((level) => (
-                <button
-                  key={level}
-                  className={`crowd-chip ${crowd === level ? "active" : ""}`}
-                  onClick={() => setCrowd(level)}
-                >
-                  {level}
-                </button>
-              ))}
             </div>
+            {showDestSuggestions && destSuggestions.length > 0 && (
+              <ul className="suggestions-list">
+                {destSuggestions.map((place, idx) => (
+                  <li key={idx} className="suggestion-item" onClick={() => handleSelectPlace(place)}>
+                    <FiMapPin size={14} style={{ marginRight: 8, opacity: 0.6 }} />
+                    {place.display_name}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          <div className="form-section">
-            <label>Your Rating *</label>
-            <div className="rating-stars">
-              {[1, 2, 3, 4, 5].map((num) => (
-                <FaStar
-                  key={num}
-                  size={24}
-                  onClick={() => setRating(num)}
-                  color={num <= rating ? "#facc15" : "#d1d5db"}
-                  style={{ cursor: "pointer" }}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+            {/* Temperature */}
+            <div className="form-group">
+              <span className="form-label">Temperature (°C)</span>
+              <div className="icon-input-wrapper">
+                <FiThermometer className="input-icon" />
+                <input
+                  type="number"
+                  className="form-input"
+                  placeholder="25"
+                  value={temperature}
+                  onChange={(e) => setTemperature(e.target.value)}
                 />
+              </div>
+            </div>
+
+            {/* Crowd Level */}
+            <div className="form-group">
+              <span className="form-label">Crowd Level</span>
+              <div className="chips-container">
+                {["Low", "Medium", "High"].map(level => (
+                  <div
+                    key={level}
+                    className={`chip ${crowd === level ? "active" : ""}`}
+                    onClick={() => setCrowd(level)}
+                  >
+                    {level}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Rating */}
+          <div className="form-group">
+            <span className="form-label">Rate your experience</span>
+            <div className="star-container">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <div key={star} className="star-icon" onClick={() => setRating(star)}>
+                  {star <= rating ? (
+                    <FaStar size={32} color="#facc15" />
+                  ) : (
+                    <FaRegStar size={32} color="#cbd5e1" />
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="form-section">
-            <label>Caption (Optional)</label>
+          {/* Caption */}
+          <div className="form-group">
+            <span className="form-label">Caption</span>
             <textarea
-              placeholder="Share your experience..."
+              className="form-textarea"
+              placeholder="Tell us more about this moment..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              maxLength={200}
+              maxLength={300}
             />
+            <div style={{ textAlign: 'right', fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
+              {comment.length}/300
+            </div>
           </div>
 
-          {snackbarMsg && (
-            <div
-              className="snackbar inside-popup"
-              onAnimationEnd={() => setSnackbarMsg("")}
-            >
-              {snackbarMsg}
-            </div>
-          )}
         </div>
 
-        <div className="popup-footer">
+        {/* Footer */}
+        <div className="modal-footer">
           <button
-            disabled={btn}
-            className={`btn btn--primary full ${btn ? "disabled" : ""}`}
+            className="submit-btn"
             onClick={handleSubmit}
+            disabled={loading}
           >
-            {btn ? "Posting..." : "Post Update"}
+            {loading ? "Publishing..." : "Share Story"}
           </button>
-          <button className="btn btn--cancel full" onClick={onClose}>
+          <button className="cancel-btn" onClick={onClose} disabled={loading}>
             Cancel
           </button>
         </div>
-      </div>
+
+        {/* Snackbar */}
+        <AnimatePresence>
+          {snackbarMsg && (
+            <motion.div
+              className="snackbar"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              onAnimationEnd={() => !loading && setTimeout(() => setSnackbarMsg(""), 3000)}
+            >
+              {snackbarMsg.includes("✅") ? <FiCheckCircle /> : null}
+              {snackbarMsg}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 }

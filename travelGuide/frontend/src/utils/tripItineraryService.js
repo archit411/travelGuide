@@ -118,3 +118,9 @@ export function searchPlaces(query) {
     method: "GET",
   });
 }
+
+export function getWeather(lat, lon) {
+  return doFetch(`/weather?lat=${lat}&lon=${lon}`, {
+    method: "GET",
+  });
+}
