@@ -328,7 +328,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary, initial
                         onClick={nextStep}
                         disabled={!destination}
                       >
-                        Next <FiArrowRight />
+                        Next
                       </button>
                     </div>
                   </motion.div>
@@ -398,7 +398,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary, initial
                         onClick={nextStep}
                         disabled={!startDate}
                       >
-                        Next <FiArrowRight />
+                        Next
                       </button>
                     </div>
                   </motion.div>
