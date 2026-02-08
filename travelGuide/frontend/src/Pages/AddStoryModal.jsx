@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiX, FiUpload, FiImage, FiMapPin, FiCheckCircle, FiThermometer } from "react-icons/fi";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
-import { searchPlaces, getWeather } from "../utils/tripItineraryService";
+import { searchPlaces, getWeather, uploadTravelPost } from "../utils/tripItineraryService";
 import "./AddStoryModal.css";
 
 export default function AddPost({ onClose, onAddStory }) {
@@ -56,7 +56,7 @@ export default function AddPost({ onClose, onAddStory }) {
         const data = await getWeather(place.lat, place.lon);
         // data.current_weather.temperature usually comes as a number
         if (data && data.current_weather) {
-          setTemperature(data.current_weather.temperature);
+          setTemperature(data.current_weather.temperature.toString());
         }
       } catch (err) {
         console.error("Failed to fetch weather", err);
@@ -77,7 +77,7 @@ export default function AddPost({ onClose, onAddStory }) {
   const handleSubmit = async () => {
     if (!file) return setSnackbarMsg("⚠️ Please upload a photo.");
     if (!location.trim()) return setSnackbarMsg("⚠️ Destination is required.");
-    if (!temperature.trim()) return setSnackbarMsg("⚠️ Temperature is required.");
+    if (!temperature || !temperature.toString().trim()) return setSnackbarMsg("⚠️ Temperature is required.");
     if (rating === 0) return setSnackbarMsg("⚠️ Please give a rating.");
 
     if (!token) {
@@ -92,23 +92,15 @@ export default function AddPost({ onClose, onAddStory }) {
       formData.append("image", file);
       formData.append("caption", comment || "No caption");
       formData.append("crowdLevel", crowd);
-      formData.append("destination", location);
+      formData.append("destination", location.trim());
       formData.append("temprature", temperature);
       formData.append("userRating", rating);
       formData.append("username", username);
 
-      const res = await fetch(
-        "http://localhost:8080/api/travel/upload",
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-          body: formData,
-        }
-      );
+      const data = await uploadTravelPost(formData);
+      const result = Array.isArray(data) ? data[0] : data;
 
-      const data = await res.json();
-
-      if (data.status === "SUCCESS" || res.ok) {
+      if (result?.status === "SUCCESS") {
         setSnackbarMsg("✅ Story uploaded successfully!");
         if (onAddStory) {
           onAddStory({
@@ -124,11 +116,11 @@ export default function AddPost({ onClose, onAddStory }) {
         }
         setTimeout(onClose, 1500);
       } else {
-        setSnackbarMsg("❌ Upload failed.");
+        setSnackbarMsg(`❌ ${result?.status || "Upload failed."}`);
         setLoading(false);
       }
-    } catch {
-      setSnackbarMsg("⚠️ Server error. Try later.");
+    } catch (err) {
+      setSnackbarMsg(`⚠️ ${err.message || "Server error. Try later."}`);
       setLoading(false);
     }
   };
@@ -262,10 +254,10 @@ export default function AddPost({ onClose, onAddStory }) {
               placeholder="Tell us more about this moment..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
-              maxLength={300}
+              maxLength={500}
             />
             <div style={{ textAlign: 'right', fontSize: '0.75rem', color: '#94a3b8', marginTop: '4px' }}>
-              {comment.length}/300
+              {comment.length}/500
             </div>
           </div>
 

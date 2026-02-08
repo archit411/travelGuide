@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import "./ExploreDetails.css";
+import { fetchPlaceAIInfo } from "../utils/geminiService";
+import { FiMapPin } from "react-icons/fi";
 
 const ExploreDetails = () => {
   const { id } = useParams();
@@ -9,6 +11,11 @@ const ExploreDetails = () => {
 
   const [showAllNearby, setShowAllNearby] = useState(false);
   const [showAllActivities, setShowAllActivities] = useState(false);
+
+  // AI-powered content states
+  const [aiInfo, setAiInfo] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState(null);
 
   useEffect(() => {
     fetchDetails();
@@ -22,6 +29,30 @@ const ExploreDetails = () => {
       { headers: { Authorization: `Bearer ${token}` } }
     );
     setDetails(res.data);
+
+    // Fetch AI info using the place name from details
+    if (res.data && res.data.name) {
+      fetchAIInfo(res.data.name);
+    }
+  };
+
+  const fetchAIInfo = async (placeName) => {
+    try {
+      setAiLoading(true);
+      setAiError(null);
+      const data = await fetchPlaceAIInfo(placeName);
+
+      if (data && data.error) {
+        throw new Error(data.error);
+      }
+
+      setAiInfo(data);
+      setAiLoading(false);
+    } catch (err) {
+      console.error("AI info fetch error:", err);
+      setAiError(err.message || "Failed to load AI recommendations");
+      setAiLoading(false);
+    }
   };
 
   if (!details) return null;
@@ -105,6 +136,140 @@ const ExploreDetails = () => {
           </div>
         ))}
       </div>
+
+      {/* AI-Powered Sections */}
+      {aiLoading && (
+        <div className="ai-section">
+          <div className="ai-section-header">
+            <h3 className="section-title">AI Recommendations</h3>
+            <span className="ai-badge">✨ Powered by AI</span>
+          </div>
+          <div className="ai-loading">
+            <div className="skeleton-card"></div>
+            <div className="skeleton-card"></div>
+            <div className="skeleton-card"></div>
+          </div>
+        </div>
+      )}
+
+      {aiError && (
+        <div className="ai-section">
+          <div className="ai-error">
+            <p>{aiError}</p>
+            <button className="retry-btn" onClick={() => fetchAIInfo(details.name)}>
+              Retry
+            </button>
+          </div>
+        </div>
+      )}
+
+      {aiInfo && !aiLoading && !aiError && (
+        <>
+          {/* Places to Visit */}
+          {aiInfo.placesToVisit && aiInfo.placesToVisit.length > 0 && (
+            <div className="ai-section">
+              <div className="ai-section-header">
+                <h3 className="section-title">Places to Visit</h3>
+                <span className="ai-badge">✨ AI Recommended</span>
+              </div>
+              <div className="ai-cards-grid">
+                {aiInfo.placesToVisit.map((place, idx) => (
+                  <div key={idx} className="place-visit-card">
+                    <div className="place-visit-header">
+                      <h4 className="place-visit-name">{place.name}</h4>
+                      {place.rating && (
+                        <div className="place-visit-rating">
+                          ⭐ {place.rating}
+                        </div>
+                      )}
+                    </div>
+                    <p className="place-visit-description">{place.description}</p>
+                    <div className="place-visit-footer">
+                      <span className="place-visit-cost">{place.estimatedCost || "Free"}</span>
+                      {place.bestTime && (
+                        <span className="best-time">🕐 {place.bestTime}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Hotels */}
+          {aiInfo.hotels && aiInfo.hotels.length > 0 && (
+            <div className="ai-section">
+              <div className="ai-section-header">
+                <h3 className="section-title">Budget-Friendly Hotels</h3>
+                <span className="ai-badge">✨ AI Recommended</span>
+              </div>
+              <div className="ai-cards-grid">
+                {aiInfo.hotels.map((hotel, idx) => (
+                  <div key={idx} className="hotel-card">
+                    <div className="hotel-header">
+                      <h4 className="hotel-name">{hotel.name}</h4>
+                      {hotel.rating && (
+                        <div className="hotel-rating">
+                          ⭐ {hotel.rating}
+                        </div>
+                      )}
+                    </div>
+                    {hotel.location && (
+                      <div className="hotel-location">
+                        <FiMapPin size={14} />
+                        {hotel.location}
+                      </div>
+                    )}
+                    <p className="hotel-description">{hotel.description}</p>
+                    <div className="hotel-footer">
+                      <span className="hotel-price">{hotel.priceRange}</span>
+                      {hotel.budgetCategory && (
+                        <span className={`budget-badge ${hotel.budgetCategory.toLowerCase().replace(/\s+/g, '-')}`}>
+                          {hotel.budgetCategory}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Restaurants */}
+          {aiInfo.restaurants && aiInfo.restaurants.length > 0 && (
+            <div className="ai-section">
+              <div className="ai-section-header">
+                <h3 className="section-title">Top Restaurants</h3>
+                <span className="ai-badge">✨ AI Recommended</span>
+              </div>
+              <div className="ai-cards-grid">
+                {aiInfo.restaurants.map((restaurant, idx) => (
+                  <div key={idx} className="restaurant-card">
+                    <div className="restaurant-header">
+                      <h4 className="restaurant-name">{restaurant.name}</h4>
+                      {restaurant.rating && (
+                        <div className="restaurant-rating">
+                          ⭐ {restaurant.rating}
+                        </div>
+                      )}
+                    </div>
+                    {restaurant.cuisine && (
+                      <div className="restaurant-cuisine">{restaurant.cuisine}</div>
+                    )}
+                    <p className="restaurant-description">{restaurant.description}</p>
+                    <div className="restaurant-footer">
+                      <span className="restaurant-price">{restaurant.priceRange}</span>
+                      {restaurant.mustTry && (
+                        <span className="must-try">🍽️ {restaurant.mustTry}</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

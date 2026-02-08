@@ -13,15 +13,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class RedisService {
 
 	@Autowired
-	private RedisTemplate<String , String> rt;
+	private RedisTemplate<String, String> rt;
 
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	public <T> void set(String key, List<T> data , Long ttl) {
+	public <T> void set(String key, List<T> data, Long ttl) {
 		try {
 			String json = objectMapper.writeValueAsString(data);
-			rt.opsForValue().set(key, json , ttl , TimeUnit.SECONDS);
+			rt.opsForValue().set(key, json, ttl, TimeUnit.SECONDS);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public <T> void setObject(String key, T data, Long ttl) {
+		try {
+			String json = objectMapper.writeValueAsString(data);
+			rt.opsForValue().set(key, json, ttl, TimeUnit.SECONDS);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -35,6 +44,19 @@ public class RedisService {
 			}
 			return objectMapper.readValue(json,
 					objectMapper.getTypeFactory().constructCollectionType(List.class, type));
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	public <T> T getObject(String key, Class<T> type) {
+		try {
+			String json = rt.opsForValue().get(key);
+			if (json == null) {
+				return null;
+			}
+			return objectMapper.readValue(json, type);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;

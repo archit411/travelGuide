@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import PlaceCard from "./PlaceCard";
+import { getExplorePlaces } from "../utils/tripItineraryService";
 
 const ExplorePlaces = () => {
   const [places, setPlaces] = useState([]);
@@ -12,15 +12,10 @@ const ExplorePlaces = () => {
 
   const fetchPlaces = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:8080/api/places/getPlaces",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setPlaces(res.data);
+      const data = await getExplorePlaces();
+      // Handle the case where backend might return [null] or empty list
+      const validPlaces = Array.isArray(data) ? data.filter(p => p && p.id) : [];
+      setPlaces(validPlaces);
     } catch (err) {
       console.error("Failed to load places", err);
     } finally {
@@ -38,11 +33,11 @@ const ExplorePlaces = () => {
       <div className="places-scroll">
         {loading
           ? Array.from({ length: 5 }).map((_, i) => (
-              <div key={i} className="place-skeleton" />
-            ))
+            <div key={i} className="place-skeleton" />
+          ))
           : places.map((place) => (
-              <PlaceCard key={place.id} place={place} />
-            ))}
+            <PlaceCard key={place.id} place={place} />
+          ))}
       </div>
     </section>
   );

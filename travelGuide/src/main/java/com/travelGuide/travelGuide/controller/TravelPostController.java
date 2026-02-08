@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -35,7 +36,7 @@ public class TravelPostController {
 
 	@Autowired
 	private TravelPostRepository travelPostRepository;
-	
+
 	@Value("${supabase.url}")
 	private String SUPABASE_URL;
 
@@ -44,126 +45,152 @@ public class TravelPostController {
 
 	@Value("${supabase.key}")
 	private String SUPABASE_API_KEY;
-	
+
 	@Autowired
 	private JwtUtil jwtUtil;
-	
+
 	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	//@CachePut(value="story" , key="'user_stories'")
+	// @CachePut(value="story" , key="'user_stories'")
 	public List<TravelPostRespBody> uploadTravelPost(@RequestParam("caption") String caption,
-	        @RequestParam("crowdLevel") String crowdLevel,
-	        @RequestParam("destination") String destination,
-	        @RequestParam("temprature") String temprature,
-	        @RequestParam("userRating") double userRating,
-	        @RequestParam("image") MultipartFile image,
-	        @RequestParam("username")String username ,
-	        @RequestHeader("Authorization") String authHeader) {
-		
+			@RequestParam("crowdLevel") String crowdLevel,
+			@RequestParam("destination") String destination,
+			@RequestParam("temprature") String temprature,
+			@RequestParam("userRating") double userRating,
+			@RequestParam("image") MultipartFile image,
+			@RequestParam("username") String username,
+			@RequestHeader("Authorization") String authHeader) {
+
 		TravelPostRespBody postResponse = null;
 		List<TravelPostRespBody> list = new ArrayList<>();
-		
+
 		try {
-			
+
 			String token = authHeader.substring(7); // remove "Bearer "
-		    String msisdn = jwtUtil.extractUsername(token); //extracting msisdn from token
-		    
-			
-			//this will create the image url
+			String msisdn = jwtUtil.extractUsername(token); // extracting msisdn from token
+
+			// this will create the image url
 			String imageFileName = UUID.randomUUID() + "_" + image.getOriginalFilename();
-			
-			//create the image upload url
+
+			// create the image upload url
 			String uploadUrl = SUPABASE_URL + "/storage/v1/object/" + SUPABASE_BUCKET + "/" + imageFileName;
-			
-			//create the put request to save image in supabase bucket 
+
+			// create the put request to save image in supabase bucket
 			HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(uploadUrl)) //set the target url
-                    .header("Authorization", "Bearer " + SUPABASE_API_KEY) //authenticate backend with supabase api key
-                    .header("Content-Type", image.getContentType()) //image content type
-                    .PUT(HttpRequest.BodyPublishers.ofByteArray(image.getBytes())) //create put request with image byte
-                    .build(); //finalize the request
-            
-            //actually send the put request to save image in supabse bucket
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            
-            //check if the image gets saved successfully
-            if (response.statusCode() != 200 && response.statusCode() != 201) {
-            	postResponse = new TravelPostRespBody();
-            	postResponse.setStatus("image upload failed");
-            	list.add(postResponse);
-            	return list;
-            }
-            
-            //get the image url from supabase to save in db and access it by public url 
-            String publicImageUrl = SUPABASE_URL + "/storage/v1/object/public/" + SUPABASE_BUCKET + "/" + imageFileName;
-            
-            TravelPost post = new TravelPost();
-            post.setCaption(caption);
-            post.setCreatedOn(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); //26/10/25 20:52	
-            post.setCrowdLevel(crowdLevel);
-            post.setDestination(destination);
-            post.setImageUrl(publicImageUrl);
-            post.setTemperature(temprature);
-            post.setmsisdn(msisdn);
-            post.setUserRating(userRating);
-            post.setUsername(username);
-            
-            TravelPost updatedRow = travelPostRepository.save(post);
-            
-            postResponse = new TravelPostRespBody();
-            postResponse.setCaption(updatedRow.getCaption());
-            postResponse.setCreatedOn(updatedRow.getCreatedOn());
-            postResponse.setCrowdLevel(updatedRow.getCrowdLevel());
-            postResponse.setDestination(updatedRow.getDestination());
-            postResponse.setImage(updatedRow.getImageUrl());
-            postResponse.setStatus("SUCCESS");
-            postResponse.setTemprature(updatedRow.getTemperature());
-            postResponse.setMsisdn(updatedRow.getmsisdn());
-            postResponse.setUserRating(updatedRow.getUserRating());
-            postResponse.setUsername(updatedRow.getUsername());
-            
-            list.add(postResponse);
-        	return list;
-		}catch(Exception e) {
+			HttpRequest request = HttpRequest.newBuilder()
+					.uri(URI.create(uploadUrl)) // set the target url
+					.header("Authorization", "Bearer " + SUPABASE_API_KEY) // authenticate backend with supabase api key
+					.header("Content-Type", image.getContentType()) // image content type
+					.PUT(HttpRequest.BodyPublishers.ofByteArray(image.getBytes())) // create put request with image byte
+					.build(); // finalize the request
+
+			// actually send the put request to save image in supabse bucket
+			HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+			// check if the image gets saved successfully
+			if (response.statusCode() != 200 && response.statusCode() != 201) {
+				postResponse = new TravelPostRespBody();
+				postResponse.setStatus("image upload failed");
+				list.add(postResponse);
+				return list;
+			}
+
+			// get the image url from supabase to save in db and access it by public url
+			String publicImageUrl = SUPABASE_URL + "/storage/v1/object/public/" + SUPABASE_BUCKET + "/" + imageFileName;
+
+			TravelPost post = new TravelPost();
+			post.setCaption(caption);
+			post.setCreatedOn(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))); // 26/10/25
+																											// 20:52
+			post.setCrowdLevel(crowdLevel);
+			post.setDestination(destination);
+			post.setImageUrl(publicImageUrl);
+			post.setTemperature(temprature);
+			post.setmsisdn(msisdn);
+			post.setUserRating(userRating);
+			post.setUsername(username);
+
+			TravelPost updatedRow = travelPostRepository.save(post);
+
+			postResponse = new TravelPostRespBody();
+			postResponse.setCaption(updatedRow.getCaption());
+			postResponse.setCreatedOn(updatedRow.getCreatedOn());
+			postResponse.setCrowdLevel(updatedRow.getCrowdLevel());
+			postResponse.setDestination(updatedRow.getDestination());
+			postResponse.setImage(updatedRow.getImageUrl());
+			postResponse.setStatus("SUCCESS");
+			postResponse.setTemprature(updatedRow.getTemperature());
+			postResponse.setMsisdn(updatedRow.getmsisdn());
+			postResponse.setUserRating(updatedRow.getUserRating());
+			postResponse.setUsername(updatedRow.getUsername());
+
+			list.add(postResponse);
+			return list;
+		} catch (Exception e) {
 			e.printStackTrace();
 			postResponse = new TravelPostRespBody();
 			list.add(postResponse);
-        	return list;
+			return list;
 		}
 	}
+
 	@PostMapping("/getUserPosts")
-	//@Cacheable(value="story" , key="'user_stories'")
+	// @Cacheable(value="story" , key="'user_stories'")
 	public List<TravelPostRespBody> getUserPosts() {
-	    List<TravelPostRespBody> responseList = new ArrayList<>();
-	    
-	    System.out.println("------------------------db hit");
-	    
-	    try {
-	    	
-	        List<TravelPost> posts = travelPostRepository.findAll();
+		List<TravelPostRespBody> responseList = new ArrayList<>();
 
-	        for (TravelPost post : posts) {
-	            TravelPostRespBody resp = new TravelPostRespBody();
-	            resp.setCaption(post.getCaption());
-	            resp.setCreatedOn(post.getCreatedOn());
-	            resp.setCrowdLevel(post.getCrowdLevel());
-	            resp.setDestination(post.getDestination());
-	            resp.setImage(post.getImageUrl());
-	            resp.setTemprature(post.getTemperature());
-	            resp.setMsisdn(post.getmsisdn());
-	            resp.setUserRating(post.getUserRating());
-	            resp.setUsername(post.getUsername());
-	            resp.setStatus("SUCCESS");
-	            responseList.add(resp);
-	        }
+		System.out.println("------------------------db hit");
 
-	        return responseList;
+		try {
 
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        return responseList;
-	    }
+			List<TravelPost> posts = travelPostRepository.findAll();
+
+			for (TravelPost post : posts) {
+				TravelPostRespBody resp = new TravelPostRespBody();
+				resp.setCaption(post.getCaption());
+				resp.setCreatedOn(post.getCreatedOn());
+				resp.setCrowdLevel(post.getCrowdLevel());
+				resp.setDestination(post.getDestination());
+				resp.setImage(post.getImageUrl());
+				resp.setTemprature(post.getTemperature());
+				resp.setMsisdn(post.getmsisdn());
+				resp.setUserRating(post.getUserRating());
+				resp.setUsername(post.getUsername());
+				resp.setStatus("SUCCESS");
+				responseList.add(resp);
+			}
+
+			return responseList;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return responseList;
+		}
 	}
 
-	
+	@GetMapping("/getPostsByDestination")
+	public List<TravelPostRespBody> getPostsByDestination(@RequestParam("destination") String destination) {
+		List<TravelPostRespBody> responseList = new ArrayList<>();
+		try {
+			String searchTerm = destination.trim();
+			List<TravelPost> posts = travelPostRepository.findByDestinationContainingIgnoreCase(searchTerm);
+			for (TravelPost post : posts) {
+				TravelPostRespBody resp = new TravelPostRespBody();
+				resp.setCaption(post.getCaption());
+				resp.setCreatedOn(post.getCreatedOn());
+				resp.setCrowdLevel(post.getCrowdLevel());
+				resp.setDestination(post.getDestination());
+				resp.setImage(post.getImageUrl());
+				resp.setTemprature(post.getTemperature());
+				resp.setMsisdn(post.getmsisdn());
+				resp.setUserRating(post.getUserRating());
+				resp.setUsername(post.getUsername());
+				resp.setStatus("SUCCESS");
+				responseList.add(resp);
+			}
+			return responseList;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return responseList;
+		}
+	}
 }

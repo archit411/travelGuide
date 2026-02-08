@@ -9,41 +9,41 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="travel_post")
+@Table(name = "travel_post")
 public class TravelPost {
 
 	@Id
-	@SequenceGenerator(name = "travel_post_seq",sequenceName = "travel_post_seq",allocationSize = 1)
-	@GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "travel_post_seq")
-	@Column(name="id" , updatable = false , nullable = false)
+	@SequenceGenerator(name = "travel_post_seq", sequenceName = "travel_post_seq", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "travel_post_seq")
+	@Column(name = "id", updatable = false, nullable = false)
 	private int id;
-	
-	@Column(name="msisdn")
+
+	@Column(name = "msisdn")
 	private String msisdn;
 
-    @Column(name = "destination")
-    private String destination;
+	@Column(name = "destination", length = 500)
+	private String destination;
 
-    @Column(name="temp")
-    private String temperature;
+	@Column(name = "temp")
+	private String temperature;
 
-    @Column(name = "crowd_level")
-    private String crowdLevel;
+	@Column(name = "crowd_level")
+	private String crowdLevel;
 
-    @Column(name = "caption" , length = 200)
-    private String caption;
+	@Column(name = "caption", length = 500)
+	private String caption;
 
-    @Column(name = "user_rating")
-    private double userRating;
+	@Column(name = "user_rating")
+	private double userRating;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+	@Column(name = "image_url")
+	private String imageUrl;
 
-    @Column(name = "created_on")
-    private String createdOn;
-    
-    @Column(name="username")
-    private String username;
+	@Column(name = "created_on")
+	private String createdOn;
+
+	@Column(name = "username")
+	private String username;
 
 	public String getUsername() {
 		return username;
@@ -124,7 +124,5 @@ public class TravelPost {
 	public void setCreatedOn(String createdOn) {
 		this.createdOn = createdOn;
 	}
-    
-    
-	
+
 }

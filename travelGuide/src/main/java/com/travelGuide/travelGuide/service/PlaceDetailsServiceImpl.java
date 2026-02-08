@@ -104,30 +104,27 @@ public class PlaceDetailsServiceImpl implements PlaceDetailsService {
 		List<PlaceDetailsRespBody> response = null;
 		try {
 			List<PlaceDetailsModel> placeDetailsModels = placeDetailsRepository.findAll();
+			response = new ArrayList<>();
 			if (placeDetailsModels.isEmpty()) {
-				response = new ArrayList<>();
-				response.add(placeDetailsRespBody);
 				return response;
 			}
-			
+
 			response = new ArrayList<>();
-			for(PlaceDetailsModel placeDetailsModel : placeDetailsModels) {
+			for (PlaceDetailsModel placeDetailsModel : placeDetailsModels) {
 				placeDetailsRespBody = new PlaceDetailsRespBody();
-				
+
 				placeDetailsRespBody.setId(placeDetailsModel.getId());
 				placeDetailsRespBody.setName(placeDetailsModel.getName());
 				placeDetailsRespBody.setDescription(placeDetailsModel.getDescription());
 				placeDetailsRespBody.setImageUrl(placeDetailsModel.getImageUrl());
-				
+
 				response.add(placeDetailsRespBody);
 			}
-			
+
 			return response;
 		} catch (Exception e) {
 			e.printStackTrace();
-			response = new ArrayList<>();
-			response.add(placeDetailsRespBody);
-			return response;
+			return response != null ? response : new ArrayList<>();
 		}
 	}
 

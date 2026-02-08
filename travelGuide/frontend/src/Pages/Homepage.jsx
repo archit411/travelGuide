@@ -524,7 +524,7 @@ export default function HomePage() {
             </div>
 
             <div className="mobile-header-right-new">
-             
+
 
             </div>
           </div>
@@ -566,7 +566,7 @@ export default function HomePage() {
 
               <div className="hero-actions">
                 <button className="btn-hero-primary" onClick={() => setShowTripPlanner(true)}>
-                  <span>⟡ Plan Your Trip with Trez</span>
+                  <span>✨ Plan Your Trip with Trez</span>
                 </button>
                 <button className="btn-hero-secondary" onClick={() => navigate("/feed")}>
                   <FiSearch size={20} />
