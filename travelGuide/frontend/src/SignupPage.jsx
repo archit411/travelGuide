@@ -50,9 +50,9 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const res = await fetch(
-  `http://localhost:8080/api/sendOtp?email=${encodeURIComponent(emailId)}`,
-  { method: "POST" }
-);
+        `https://travelguide-1-21sw.onrender.com/api/sendOtp?email=${encodeURIComponent(emailId)}`,
+        { method: "POST" }
+      );
 
       const msg = await res.text();
 
@@ -100,7 +100,7 @@ export default function SignupPage() {
   // ✅ Signup (after OTP entered)
   const handleSignup = async () => {
     const otp = otpValues.join("");
-    if (otpValues.some(v => v === "") || otp.length !== 6){
+    if (otpValues.some(v => v === "") || otp.length !== 6) {
       Swal.fire({
         icon: "warning",
         title: "Invalid OTP",
@@ -119,7 +119,7 @@ export default function SignupPage() {
     try {
       setIsLoading(true);
       const response = await fetch(
-        `http://localhost:8080/api/signup?otp=${encodeURIComponent(otp)}`,
+        `https://travelguide-1-21sw.onrender.com/api/signup?otp=${encodeURIComponent(otp)}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

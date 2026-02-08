@@ -24,7 +24,7 @@ const ExploreDetails = () => {
   const fetchDetails = async () => {
     const token = localStorage.getItem("token");
     const res = await axios.post(
-      `http://localhost:8080/api/places/${id}/details`,
+      `https://travelguide-1-21sw.onrender.com/api/places/${id}/details`,
       {},
       { headers: { Authorization: `Bearer ${token}` } }
     );

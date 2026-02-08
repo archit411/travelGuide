@@ -11,7 +11,7 @@ export default function SearchOverlay({ onClose, userLocation }) {
   useEffect(() => {
     async function fetchPopularPlaces() {
       try {
-        const res = await fetch("http://localhost:8080/api/getPopularPlaces");
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getPopularPlaces");
         const data = await res.json();
         if (Array.isArray(data)) setPopularPlaces(data);
       } catch (err) {

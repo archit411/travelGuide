@@ -46,7 +46,7 @@ export default function DestinationPage() {
         let lat = null, lon = null;
         try {
           const coordsRes = await fetch(
-            `http://localhost:8080/api/coords?place=${encodeURIComponent(placeName)}`,
+            `https://travelguide-1-21sw.onrender.com/api/coords?place=${encodeURIComponent(placeName)}`,
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -67,7 +67,7 @@ export default function DestinationPage() {
         if (lat && lon) {
           try {
             const weatherRes = await fetch(
-              `http://localhost:8080/api/weather?lat=${lat}&lon=${lon}`,
+              `https://travelguide-1-21sw.onrender.com/api/weather?lat=${lat}&lon=${lon}`,
               {
                 headers: { Authorization: `Bearer ${token}` },
               }
@@ -97,7 +97,7 @@ export default function DestinationPage() {
           const shortName = placeName.split(/[,\(]/)[0].trim();
 
           const storiesRes = await fetch(
-            `http://localhost:8080/api/travel/getPostsByDestination?destination=${encodeURIComponent(shortName)}`,
+            `https://travelguide-1-21sw.onrender.com/api/travel/getPostsByDestination?destination=${encodeURIComponent(shortName)}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },

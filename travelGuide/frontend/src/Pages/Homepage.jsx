@@ -295,7 +295,7 @@ export default function HomePage() {
 
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch("http://localhost:8080/api/travel/getUserPosts", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/travel/getUserPosts", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -340,7 +340,7 @@ export default function HomePage() {
       try {
         const token = localStorage.getItem("token");
 
-        const res = await fetch("http://localhost:8080/api/getTopPlacesByMonth", {
+        const res = await fetch("https://travelguide-1-21sw.onrender.com/api/getTopPlacesByMonth", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

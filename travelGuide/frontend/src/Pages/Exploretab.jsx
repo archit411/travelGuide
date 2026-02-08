@@ -17,7 +17,7 @@ const ExploreTab = () => {
       const token = localStorage.getItem("token");
 
       const response = await axios.post(
-        "http://localhost:8080/api/places/getPlaces",
+        "https://travelguide-1-21sw.onrender.com/api/places/getPlaces",
         {}, // POST body empty
         {
           headers: {

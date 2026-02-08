@@ -1,4 +1,4 @@
-package main.java.com.travelGuide.travelGuide.service;
+package com.travelGuide.travelGuide.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

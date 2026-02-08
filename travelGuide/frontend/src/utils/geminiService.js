@@ -5,7 +5,7 @@ const API_BASE_URL =
     (typeof process !== "undefined" &&
         process.env &&
         process.env.REACT_APP_API_URL) ||
-    "http://localhost:8080/api";
+    "https://travelguide-1-21sw.onrender.com/api";
 
 async function handleResponse(res) {
     const text = await res.text().catch(() => "");

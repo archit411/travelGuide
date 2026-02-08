@@ -1,4 +1,4 @@
-package main.java.com.travelGuide.travelGuide.controller;
+package com.travelGuide.travelGuide.controller;
 
 import com.travelGuide.travelGuide.service.GeminiPlaceService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -32,13 +32,13 @@ export default function ProfilePage() {
     newPassword: "",
     confirmPassword: "",
   });
-// Load avatar from localStorage on mount
-useEffect(() => {
-  const savedAvatar = localStorage.getItem("userAvatar");
-  if (savedAvatar) {
-    setSelectedAvatar(savedAvatar);
-  }
-}, []);
+  // Load avatar from localStorage on mount
+  useEffect(() => {
+    const savedAvatar = localStorage.getItem("userAvatar");
+    if (savedAvatar) {
+      setSelectedAvatar(savedAvatar);
+    }
+  }, []);
 
   /* ---------------- Fetch User Details ---------------- */
   useEffect(() => {
@@ -50,7 +50,7 @@ useEffect(() => {
           return;
         }
 
-        const response = await fetch("http://localhost:8080/profile/getUserDetails", {
+        const response = await fetch("https://travelguide-1-21sw.onrender.com/profile/getUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ useEffect(() => {
         return;
       }
 
-      const url = `http://localhost:8080/profile/changePassword?oldPass=${encodeURIComponent(
+      const url = `https://travelguide-1-21sw.onrender.com/profile/changePassword?oldPass=${encodeURIComponent(
         formData.currentPassword
       )}&newPass=${encodeURIComponent(formData.newPassword)}`;
 
@@ -392,10 +392,10 @@ useEffect(() => {
             <div className="expandable-section">
               <p>
                 TripEZ makes travel easier.
-Discover great places, plan smarter, and explore with real insights from real travelers.
-Fast, simple, and reliable — everything you need for your next trip in one clean app.
+                Discover great places, plan smarter, and explore with real insights from real travelers.
+                Fast, simple, and reliable — everything you need for your next trip in one clean app.
 
-TripEZ — Discover. Plan. Go.
+                TripEZ — Discover. Plan. Go.
               </p>
             </div>
           )}
@@ -447,18 +447,18 @@ TripEZ — Discover. Plan. Go.
               ))}
             </div>
 
-          <button
-  className="avatar-save-btn"
-  onClick={() => {
-    if (selectedAvatar) {
-      localStorage.setItem("userAvatar", selectedAvatar); 
-      toast.success("Avatar updated!");
-    }
-    setAvatarModal(false);
-  }}
->
-  Save
-</button>
+            <button
+              className="avatar-save-btn"
+              onClick={() => {
+                if (selectedAvatar) {
+                  localStorage.setItem("userAvatar", selectedAvatar);
+                  toast.success("Avatar updated!");
+                }
+                setAvatarModal(false);
+              }}
+            >
+              Save
+            </button>
 
           </div>
         </div>

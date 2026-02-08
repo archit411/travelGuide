@@ -13,57 +13,57 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   // ✅ Capture PWA install prompt
-// ✅ Capture and manage PWA install prompt
-useEffect(() => {
-  const handleBeforeInstallPrompt = (e) => {
-    e.preventDefault();
-    setDeferredPrompt(e);
-  };
+  // ✅ Capture and manage PWA install prompt
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
 
-  const handleAppInstalled = () => {
-    console.log("✅ App installed successfully!");
-    setIsInstalled(true);
-    localStorage.setItem("tripPulseInstalled", "true");
-
-    // Hide install button after success
-    setDeferredPrompt(null);
-  };
-
-  window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-  window.addEventListener("appinstalled", handleAppInstalled);
-
-  // Check if already installed earlier
-  if (localStorage.getItem("tripPulseInstalled") === "true") {
-    setIsInstalled(true);
-  }
-
-  return () => {
-    window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
-    window.removeEventListener("appinstalled", handleAppInstalled);
-  };
-}, []);
-
-// ✅ Trigger native install prompt or show manual instructions
-const showInstallPrompt = async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const choiceResult = await deferredPrompt.userChoice;
-
-    if (choiceResult.outcome === "accepted") {
-      console.log("📲 User accepted install prompt");
+    const handleAppInstalled = () => {
+      console.log("✅ App installed successfully!");
       setIsInstalled(true);
       localStorage.setItem("tripPulseInstalled", "true");
 
-      // Hide button immediately
+      // Hide install button after success
       setDeferredPrompt(null);
-    } else {
-      console.log("❌ User dismissed install prompt");
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    // Check if already installed earlier
+    if (localStorage.getItem("tripPulseInstalled") === "true") {
+      setIsInstalled(true);
     }
-  } else {
-    // Fallback for iOS/Safari — show manual steps
-    setShowInstallSteps(true);
-  }
-};
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
+  }, []);
+
+  // ✅ Trigger native install prompt or show manual instructions
+  const showInstallPrompt = async () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+
+      if (choiceResult.outcome === "accepted") {
+        console.log("📲 User accepted install prompt");
+        setIsInstalled(true);
+        localStorage.setItem("tripPulseInstalled", "true");
+
+        // Hide button immediately
+        setDeferredPrompt(null);
+      } else {
+        console.log("❌ User dismissed install prompt");
+      }
+    } else {
+      // Fallback for iOS/Safari — show manual steps
+      setShowInstallSteps(true);
+    }
+  };
 
 
   // ✅ Show install prompt or manual steps
@@ -99,10 +99,9 @@ const showInstallPrompt = async () => {
     const toast = document.createElement("div");
     toast.className = "google-toast";
     toast.innerHTML = `
-      <img src="${
-        source === "google"
-          ? "/google.svg"
-          : "/logo.jpg"
+      <img src="${source === "google"
+        ? "/google.svg"
+        : "/logo.jpg"
       }" alt="logo" class="google-logo" />
       <span>Welcome ${userName || "traveler"}!</span>
     `;
@@ -125,7 +124,7 @@ const showInstallPrompt = async () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/login?email=${encodeURIComponent(
+        `https://travelguide-1-21sw.onrender.com/api/login?email=${encodeURIComponent(
           formData.email
         )}&password=${encodeURIComponent(formData.password)}`,
         {
@@ -162,7 +161,7 @@ const showInstallPrompt = async () => {
     try {
       const googleToken = credentialResponse.credential;
       const res = await fetch(
-        "http://localhost:8080/api/auth/google",
+        "https://travelguide-1-21sw.onrender.com/api/auth/google",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -177,7 +176,7 @@ const showInstallPrompt = async () => {
         localStorage.setItem("token", data.token);
         localStorage.setItem("username", data.userName);
 
-        await fetch("http://localhost:8080/profile/saveUserDetails", {
+        await fetch("https://travelguide-1-21sw.onrender.com/profile/saveUserDetails", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -248,17 +247,17 @@ const showInstallPrompt = async () => {
             <span>or continue with</span>
           </div>
 
-        <div className="social-login">
-  <div className="google-btn-wrapper">
-    <GoogleLogin
-      onSuccess={handleGoogleSuccess}
-      onError={handleGoogleFailure}
-      shape="rectangular"
-      theme="outline"
-      text="signin_with"
-    />
-  </div>
-</div>
+          <div className="social-login">
+            <div className="google-btn-wrapper">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleFailure}
+                shape="rectangular"
+                theme="outline"
+                text="signin_with"
+              />
+            </div>
+          </div>
 
 
           <p className="auth-footer">
