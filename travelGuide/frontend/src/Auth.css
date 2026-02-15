@@ -1,11 +1,12 @@
 /* General layout */
 .auth-wrapper {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   min-height: 100vh;
   background: linear-gradient(180deg, #f9faff 0%, #f2f3f7 100%);
   padding: 20px;
+  overflow-y: auto;
+  /* Enable vertical scrolling */
 }
 
 .auth-card {
@@ -17,6 +18,8 @@
   max-width: 400px;
   text-align: center;
   transition: all 0.3s ease;
+  margin: auto;
+  /* Centers correctly when space allows, scrolls when not */
 }
 
 .auth-logo img {
@@ -137,6 +140,7 @@
   width: 18px;
   height: 18px;
 }
+
 /* ✅ Make Google Sign-In button full width on all screens */
 .google-btn-wrapper {
   width: 100%;
@@ -144,7 +148,7 @@
   justify-content: center;
 }
 
-.google-btn-wrapper > div {
+.google-btn-wrapper>div {
   width: 100% !important;
   display: flex !important;
   justify-content: center !important;
@@ -153,11 +157,13 @@
 /* Force iframe full width and same height as Sign In button */
 .google-btn-wrapper iframe {
   width: 100% !important;
-  height: 44px !important; /* Same height as your .sign-in-btn */
+  height: 44px !important;
+  /* Same height as your .sign-in-btn */
   border-radius: 8px !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  transform: scale(1); /* Prevent Google from scaling on desktop */
+  transform: scale(1);
+  /* Prevent Google from scaling on desktop */
 }
 
 /* Prevent shrinking or centering issues */
@@ -210,6 +216,7 @@
     padding: 10px;
   }
 }
+
 /* Success screen styling */
 .success-card {
   background: #ffffff;
@@ -251,11 +258,13 @@
     transform: translateY(20px);
     opacity: 0;
   }
+
   to {
     transform: translateY(0);
     opacity: 1;
   }
 }
+
 .install-btn {
   margin-top: 1rem;
   background: #111827;
@@ -274,6 +283,7 @@
   background: #2563eb;
   transform: translateY(-2px);
 }
+
 /* 🔸 Inline Input Errors */
 .input-error {
   color: #e11d48;
@@ -309,6 +319,7 @@
   width: 20px;
   height: 20px;
 }
+
 /* 🔸 Inline error text */
 .input-error {
   color: #e11d48;
@@ -377,6 +388,7 @@
   height: 20px;
   border-radius: 50%;
 }
+
 /* ======================= */
 /* Modern OTP Verification */
 /* ======================= */
@@ -466,11 +478,13 @@
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
   }
 }
+
 .install-btn {
   margin-top: 15px;
   padding: 10px 16px;
@@ -518,6 +532,13 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

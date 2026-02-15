@@ -172,7 +172,7 @@ export default function TripPlannerModal({ onClose, onGenerateItinerary, initial
       setShowPlaneTransition(false);
       setShowProcessing(false);
       console.log("Generation Error:", e);
-      setError("Failed to generate itinerary. Please try again.");
+      setError(e.message || "Failed to generate itinerary. Please try again.");
     }
   };
 

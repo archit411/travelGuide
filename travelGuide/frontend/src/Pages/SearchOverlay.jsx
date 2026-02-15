@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { FiSearch, FiX } from "react-icons/fi";
+import { FiSearch, FiX, FiMapPin } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { searchPlaces } from "../utils/tripItineraryService";
 import "./searchoverlay.css";
 
 export default function SearchOverlay({ onClose, userLocation }) {
+  const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
   const [popularPlaces, setPopularPlaces] = useState([]);
   const [nearbyPlaces, setNearbyPlaces] = useState([]);
 
@@ -20,6 +24,38 @@ export default function SearchOverlay({ onClose, userLocation }) {
     }
     fetchPopularPlaces();
   }, []);
+
+  // 🔹 Search Suggestions Debounce
+  useEffect(() => {
+    const delay = setTimeout(async () => {
+      if (query.trim().length > 2) {
+        try {
+          const results = await searchPlaces(query);
+          setSuggestions(results || []);
+        } catch (err) {
+          console.error("Search failed:", err);
+          setSuggestions([]);
+        }
+      } else {
+        setSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delay);
+  }, [query]);
+
+  const handleSelectPlace = (place) => {
+    // Navigate to destination page with state
+    navigate(`/destination/${encodeURIComponent(place.display_name)}`, {
+      state: {
+        place: {
+          name: place.display_name,
+          img: "https://images.unsplash.com/photo-1506197603052-3cc9c3a201bd?w=400"
+        }
+      }
+    });
+    onClose();
+  };
 
   // 🔹 Fetch nearby places based on user's location (OpenStreetMap or backend)
   useEffect(() => {
@@ -62,6 +98,22 @@ export default function SearchOverlay({ onClose, userLocation }) {
             onChange={(e) => setQuery(e.target.value)}
             autoFocus
           />
+
+          {/* 📝 Suggestions List */}
+          {suggestions.length > 0 && (
+            <div className="suggestions-list">
+              {suggestions.map((place, idx) => (
+                <div
+                  key={idx}
+                  className="suggestion-item"
+                  onClick={() => handleSelectPlace(place)}
+                >
+                  <FiMapPin className="suggestion-icon" />
+                  <span>{place.display_name}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* 🌍 Popular Places */}

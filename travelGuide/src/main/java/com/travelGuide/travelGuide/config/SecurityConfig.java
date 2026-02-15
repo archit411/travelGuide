@@ -50,6 +50,7 @@ public class SecurityConfig {
                                 "/api/auth/google",
                                 "/api/test",
                                 "/api/travel/getPostsByDestination",
+                                "/api/places/search",
                                 "/actuator/**")
                         .permitAll()
                         .anyRequest().authenticated())

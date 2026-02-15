@@ -17,7 +17,6 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: Inter, system-ui, -apple-system, Roboto, Arial, sans-serif;
-  overflow-y: auto !important;
 }
 
 /* ===============================
@@ -584,7 +583,7 @@ body {
 }
 
 .upload-btn {
- 
+
   background: #111827;
   color: white;
   border: none;
@@ -602,6 +601,7 @@ body {
 .upload-btn:hover {
   background: #1f2937;
 }
+
 .upload-center {
   background: #111827;
   color: white;
@@ -612,7 +612,7 @@ body {
   display: flex;
   justify-content: center;
   width: 100%;
-   transition: all 0.25s ease;
+  transition: all 0.25s ease;
 }
 
 /* 🔹 Form Sections */
@@ -1152,4 +1152,3 @@ body {
   cursor: pointer;
   z-index: 20;
 }
-

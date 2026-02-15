@@ -40,8 +40,10 @@
   flex-direction: column;
   overflow: hidden;
   position: relative;
-  min-height: 500px;
-  /* Consistent height for steps */
+  max-height: 90vh;
+  /* Don't exceed screen height */
+  overflow-y: auto;
+  /* Allow internal scrolling if content overflows */
 }
 
 /* Close Button floating outside or inside nicely */
@@ -546,9 +548,10 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .trip-planner-modal {
     width: 95%;
     max-width: 100%;
+    height: auto;
+    max-height: 95vh;
     border-radius: 16px;
-    height: 90vh;
-    /* Better for mobile modal feel */
+    margin: 10px;
   }
 
   .modal-header h2 {

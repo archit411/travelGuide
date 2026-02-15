@@ -1,15 +1,15 @@
 /* ===== Global Styles ===== */
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
   font-family: "Inter", sans-serif;
   background: #f5f6f8;
 }
 
-/* Disable scroll globally for desktop main profile page */
+/* Disable scroll ONLY for profile page on desktop */
 @media (min-width: 769px) {
-  body, .no-scroll {
+  .profile-page {
     overflow: hidden;
     height: 100vh;
   }
@@ -23,7 +23,6 @@ html, body {
   background: #f5f6f8;
   min-height: 100vh;
   padding: 40px 60px;
-  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -121,7 +120,8 @@ html, body {
 }
 
 .logout-icon {
-  color: #ef4444; /* red accent for logout */
+  color: #ef4444;
+  /* red accent for logout */
 }
 
 .arrow,
@@ -151,6 +151,7 @@ html, body {
     opacity: 0;
     transform: translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -322,6 +323,7 @@ html, body {
     opacity: 0;
     transform: translateY(15px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -340,7 +342,9 @@ html, body {
 
 /* ===== Mobile Responsive ===== */
 @media (max-width: 768px) {
-  html, body {
+
+  html,
+  body {
     height: auto;
     overflow-y: auto;
   }
@@ -408,7 +412,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.45);
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -423,7 +427,7 @@ html, body {
   border-radius: 18px;
   width: 90%;
   max-width: 340px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
   animation: fadeInUp 0.3s ease;
   text-align: center;
 }

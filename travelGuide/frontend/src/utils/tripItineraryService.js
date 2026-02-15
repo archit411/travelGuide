@@ -113,10 +113,23 @@ export function deleteItinerary(id) {
     });
 }
 
-export function searchPlaces(query) {
-    return doFetch(`/places/search?query=${encodeURIComponent(query)}`, {
-        method: "GET",
-    });
+
+export async function searchPlaces(query) {
+    // Public search - no authentication required
+    try {
+        const res = await fetch(`${API_BASE_URL}/places/search?query=${encodeURIComponent(query)}`);
+
+        if (!res.ok) {
+            console.error(`Search failed: ${res.status}`);
+            return [];
+        }
+
+        const data = await res.json();
+        return data;
+    } catch (err) {
+        console.error('Search error:', err);
+        return [];
+    }
 }
 
 export function getWeather(lat, lon) {

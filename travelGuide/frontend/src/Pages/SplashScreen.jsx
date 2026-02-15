@@ -17,8 +17,12 @@ export default function SplashScreen() {
     return () => clearTimeout(timer);
   }, [isMobile, navigate]);
 
+  function skipSplash() {
+    navigate("/onboarding", { replace: true });
+  }
+
   return (
-    <div className="splash-wrapper">
+    <div className="splash-wrapper" onClick={skipSplash}>
       {/* Aesthetic travel background */}
       <img
         src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1500&q=80"
@@ -30,11 +34,14 @@ export default function SplashScreen() {
       <div className="bg-blur"></div>
 
       {/* Centered logo */}
-      <img
-        src="/logo2.png"
-        className="splash-logo"
-        alt="Tripez logo"
-      />
+      <div className="splash-content">
+        <img
+          src="/logo2.png"
+          className="splash-logo"
+          alt="Tripez logo"
+        />
+        <button className="splash-skip-btn">Skip</button>
+      </div>
     </div>
   );
 }

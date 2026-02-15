@@ -24,15 +24,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     // ✅ Public endpoints that bypass JWT validation
     private static final List<String> PUBLIC_ENDPOINTS = List.of(
-    		 "/api/login",
-             "/api/signup",
-             "/api/sendOtp",
-             "/api/auth/google",
-             "/api/test",
-             "/actuator",
-             "/actuator/",
-             "/actuator/health"
-    );
+            "/api/login",
+            "/api/signup",
+            "/api/sendOtp",
+            "/api/auth/google",
+            "/api/test",
+            "/api/places/search",
+            "/actuator",
+            "/actuator/",
+            "/actuator/health");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -64,8 +64,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         new User(username, "", new java.util.ArrayList<>()),
                         null,
-                        new java.util.ArrayList<>()
-                );
+                        new java.util.ArrayList<>());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
